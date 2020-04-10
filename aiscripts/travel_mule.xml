@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="travelmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="1">
+<aiscript name="travelmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="D:\X4 Foundations\unpacked\libraries\aiscripts.xsd" version="1">
 	<order id="TravelMule" name="M1- Travel Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
@@ -203,6 +203,17 @@
 							</do_if> <!--need found-->
 						</do_all>
 						<do_if value="$needFound">
+							<do_if value="$supplySource.owner.owner == this.ship.owner">
+								<set_value name="$currentProfit" exact="$bestCargo * $supplyTarget.unitprice" />
+								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<debug_to_file name="this.ship.knownname" directory="'TravelMule'" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+							</do_if>
+							<do_else>
+								<set_value name="$currentProfit" exact="$bestCargo * ($supplyTarget.unitprice - $supplySource.unitprice)" />
+								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<debug_to_file name="this.ship.knownname" directory="'TravelMule'" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+							</do_else>
+							
 							<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$bestCargo" immediate="false" />
 							<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$bestCargo" immediate="false" />
 						</do_if>
