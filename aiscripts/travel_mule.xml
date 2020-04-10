@@ -5,9 +5,9 @@
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<param name="tradeWithBig" required="false" type="bool" default="false" text="Target NPC Shipyards" comment="Assign to trade with all NPC shipyards, wharfs, and equip docks" />
-			<param name="tradeWithAll" required="false" type="bool" default="false" text="Target all NPC stations" comment="Assign to trade with all NPC stations" />
-			<param name="maxDist" required="false" default="15" type="number" text="Max Jumps" comment="Max gate distance to sell.">
+			<param name="tradeWithBig" required="false" type="bool" default="false" text="Target NPC Shipyards" comment="Assign to trade with all NPC shipyards, wharfs, and equip docks." />
+			<param name="tradeWithAll" required="false" type="bool" default="false" text="Target All NPC Stations" comment="Assign to trade with all NPC stations." />
+			<param name="maxDist" required="false" default="15" type="number" text="Max Jumps" comment="Max Gate Distance to sell.">
 				<input_param name="startvalue" value="15" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="15" />
@@ -17,7 +17,7 @@
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
-			<param name="destList" required="false" default="[]" type="list" text="Customers (replaces 'Target' options)" comment="Points to visit">
+			<param name="destList" required="false" default="[]" type="list" text="Customers (replaces 'Target' options)" comment="Points to visit.">
 				<input_param name="type" value="'object'" />
 			</param>
 		</params>
@@ -62,7 +62,7 @@
 			<create_list name="$outerList" />
 			<create_list name="$tempList" />
 
-			<!-- Sell leftover cargo before regular Mule duty -->
+			<!-- Sell leftover cargo before resuming regular Mule routine -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<do_if value="$currentcargo.count">
 				<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" wares="$currentcargo" multiple="true">
@@ -98,7 +98,7 @@
 
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true" />
 
-			<!-- Finding buyers -->
+			<!-- Finding Buyers -->
 			<do_if value="$destList == []">
 				<do_if value="$maxDist == 15">
 					<do_if value="$tradeWithAll">
@@ -172,7 +172,7 @@
 				</do_all>
 			</do_else>
 
-			<!-- Travelling Mule Routine -->
+			<!-- Regular Travelling Mule Routine -->
 			<do_if value="$needs.count gt 0 and $supplies.count gt 0">
 				<set_value name="$innerList" exact="$needs" />
 				<sort_trades name="$outerList" tradelist="$supplies" sorter="volume" />

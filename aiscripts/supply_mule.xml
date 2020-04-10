@@ -7,8 +7,8 @@
 			</param>
 			<param name="assignSrc" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the source station if it's the players." />
 			<param name="dedicatedServe" type="bool" default="false" text="Serve Source Only" comment="Will only serve the configured source station" />
-			<param name="tradeWithOwn" required="false" type="bool" default="false" text="Your Stations Only" comment="Buys from player stations only" />
-			<param name="maxtrades" required="false" default="[5 + this.ship.pilot.skill.piloting * 2, 20].min" type="number" text="Max Trades" comment="Max Trades per buy run">
+			<param name="tradeWithOwn" required="false" type="bool" default="false" text="Player Stations Only" comment="Buys from player stations only" />
+			<param name="maxtrades" required="false" default="[5 + this.ship.pilot.skill.piloting * 2, 20].min" type="number" text="Max Trades" comment="Max Trades per buy run.">
 				<input_param name="startvalue" value="[5 + this.ship.pilot.skill.piloting * 2, 20].min" />
 				<input_param name="min" value="1" />
 				<input_param name="max" value="5 + this.ship.pilot.skill.piloting * 2" />
@@ -20,7 +20,7 @@
 				<input_param name="max" value="this.ship.pilot.skill.piloting * 2" />
 				<input_param name="step" value="1" />
 			</param>
-			<param name="builder" type="bool" default="true" text="Builder" comment="Prioritizes supplying build sites" />
+			<param name="builder" type="bool" default="true" text="Give Builders Priority" comment="Prioritizes supplying build sites before station needs." />
 			<param name="specialWareBasket" required="false" default="[]" type="list" text="Wares (all by default)" comment="Warebasket">
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
@@ -130,12 +130,14 @@
 				<resume label="start" />
 			</do_if>
 
+			<!-- Debug: Selling left over wares performance metrics -->
 			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Selling leftover cargo used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
-			<!-- Wares defines -->
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Define wares'" output="false" append="true" />
+			<!-- Debug: Defined Wares  -->
+			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Define Wares'" output="false" append="true" />
 			<do_if value="$dedicatedServe and $sourceStation">
+
 				<!-- If Warebasket is EMPTY, add the repective wares of the source station -->
 				<do_if value="$specialWareBasket == []">
 					<set_value name="$resources" exact="$sourceStation.resources.list" />
@@ -188,6 +190,7 @@
 					</do_all>
 					<remove_value name="$tradewares" />
 				</do_if>
+
 				<!-- AI Trade stations, remove everything which is not a trade ware -->
 				<do_elseif value="$sourceStation.tradewares.count gt 0 and $sourceStation.owner != this.ship.owner">
 					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Trade station detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
@@ -200,6 +203,7 @@
 					</do_all>
 					<remove_value name="$tradewares" />
 				</do_elseif>
+
 				<!-- Add trade wares to player warehouse -->
 				<do_elseif value="$sourceStation.owner == this.ship.owner">
 					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Warehouse detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
@@ -213,6 +217,7 @@
 					</do_all>
 				</do_elseif>
 			</do_if>
+
 			<do_else>
 				<do_if value="$specialWareBasket == []">
 					<set_value name="$AllWares" exact="[ware.spacefuel,ware.spaceweed,ware.advancedcomposites,ware.advancedelectronics,ware.antimattercells,ware.antimatterconverters,ware.claytronics,
@@ -230,7 +235,7 @@
 			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Setting Warebasket used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
-			<!-- Find build site demands -->
+			<!-- Find build site demands (used when 'Give Builders Priority') -->
 			<do_if value="$builder">
 				<find_buy_offer space="player.galaxy" result="$needs" wares="$wareBasket" multiple="true" excludeempty="false">
 					<match_buyer class="class.buildstorage" owner="this.ship.owner">
@@ -245,6 +250,7 @@
 						</match_parent>
 					</match_buyer>
 				</find_buy_offer>
+
 				<do_if value="$needs.count">
 					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="$needs.count + ' Build demands found'" output="false" append="true" />
 					<set_value name="$BuilderList" exact="true" />
@@ -294,16 +300,18 @@
 				</do_else>
 			</do_if>
 
+			<!-- Debug: Supply needs performance metrics-->
 			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Finding supply needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
-			<label name="SortTrades" />
 			<!-- Sort Demands -->
+			<label name="SortTrades" />
 			<create_list name="$needsValues" />
 			<do_all exact="$needs.count" counter="$vy">
 				<append_to_list name="$needsValues" exact="(($needs.{$vy}.desiredamount)f / ($needs.{$vy}.owner.cargo.{$needs.{$vy}.ware}.target)f)*1000" />
 			</do_all>
 
+			<!-- This sorting method should be replaced with vanilla function at some stage ;Misunderstood Wookiee -->
 			<run_script name="'quicksort'">
 				<param name="objects" value="$needs" />
 				<param name="values" value="$needsValues" />
@@ -449,8 +457,8 @@
 								<create_trade_order name="$getSupply" object="this.object" tradeoffer="$someSeller" amount="$cargoHauled" immediate="false" />
 							</do_if>
 						</do_if>
-					</do_all> <!-- inner loop -->
-				</do_all> <!-- outer loop -->
+					</do_all>
+				</do_all>
 
 				<do_if value="$BuilderList and $TradeTargets.count == 0">
 					<remove_value name="$SupplierSorted" />
@@ -462,9 +470,9 @@
 				<do_all exact="$TradeTargets.count" counter="$idc">
 					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Query Sell: : ' + $TradeTargets.{$idc}.ware.id + ' Target:  ' + $TradeTargets.{$idc}.owner.knownname + ' ' + $TradeTargets.{$idc}.owner.idcode + ' Amount ' + $TradeAmounts.{$idc}" output="false" append="true" />
 					<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$TradeTargets.{$idc}" amount="$TradeAmounts.{$idc}" immediate="false" />
-				</do_all> <!-- outer loop -->
+				</do_all>
 
-				<!-- Leave builder area after selling to builder to avoid traffic jam -->
+				<!-- Leave builder area after selling to builder to avoid traffic jam (no longer used) -->
 				<!--  			<do_if value="$BuilderList and $TradeTargets.count">
 				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Moving to avoid Traffic Jam'" />
 				<select_flight_behaviour entity="this" evasive="true" result="$fb"/>
@@ -473,8 +481,9 @@
 					<interrupt_after_time time="60s"/>
 				</move_to>
 			</do_if> -->
-
 			</do_if> <!-- the stations have supply and demand -->
+
+			<!-- Debug: Finding trade routes performance metrics-->
 			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Finding trade routes used up: ' + (player.age-$PerformanceTime) + ' seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 

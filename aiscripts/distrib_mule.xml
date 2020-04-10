@@ -125,18 +125,21 @@
 						<set_value name="$sourceCargoRatio" exact="($outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.count * 100 / [$outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.target, 1].max)" />
 						<do_if value="(not $needFound) and ($sourceCargoRatio gt $staticStorage)">
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
+
 							<do_all exact="$innerList.count" counter="$ctr">
-								<!-- inner loop -->
 								<set_value name="$targetCargoRatio" exact="($innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.count * 100 / [$innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.target, 1].max)" />
 								<do_if value="(not $needFound) and ($targetCargoRatio lt $minStorage or ($sourceCargoRatio gt $maxStorage and $sourceCargoRatio gt ($targetCargoRatio + 10)))">
 									<set_value name="$someInner" exact="$innerList.{$ctr}" />
+
 									<do_if value="$someOuter.ware.id" exact="$someInner.ware.id">
 										<do_if value="$someInner.owner.owner == this.ship.owner">
 											<set_value name="$targetAmount" exact="$someInner.desiredamount" />
 										</do_if>
+
 										<do_else>
 											<set_value name="$targetAmount" exact="$someInner.amount" />
 										</do_else>
+
 										<set_value name="$cargoHauled" exact="[this.ship.cargo.{$someInner.ware}.free,$targetAmount,$someOuter.amount].min" />
 										<do_if value="($cargoHauled gt (this.ship.cargo.{$someInner.ware}.max / 1.25)) or ($needFound2 and ($cargoHauled gt (this.ship.cargo.{$someInner.ware}.max / 2))) ">
 											<set_value name="$supplyTarget" exact="$someInner" />
@@ -146,13 +149,14 @@
 									</do_if>
 								</do_if>
 							</do_all>
+
+							<!--need found -->
 							<do_if value="$needFound">
-								<!--need found -->
 								<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$cargoHauled" immediate="false" />
 								<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$cargoHauled" immediate="false" />
 							</do_if>
 						</do_if>
-					</do_all> <!-- outer loop -->
+					</do_all>
 
 				</do_if> <!-- the stations have supply and demand -->
 				<set_value name="$needFound2" exact="$needFound" />
@@ -171,7 +175,7 @@
 					</do_all>
 				</do_else>
 			</do_all>
-			
+
 			<remove_value name="$supplyTarget" />
 			<remove_value name="$supplySource" />
 			<remove_value name="$supplies" />

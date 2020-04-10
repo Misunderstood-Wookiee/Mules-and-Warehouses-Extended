@@ -17,7 +17,7 @@
 			<param name="twoWay" type="bool" default="false" text="Two-way trade" comment="Trades back and forth between stations" />
 			<param name="twoWaySupplyFirst" type="bool" default="false" text="Return Seller Priority" comment="Seller priority on return trade" />
 			<param name="forbidTradeAll" type="bool" default="false" text="No in-system trade" comment="Forbid trade between all player objects in system when idle" />
-			<param name="allowLowVol" type="bool" default="false" text="Allow low volumes" comment="Allow trades below 50% cargo, 80% for system trade" />
+			<param name="allowLowVol" type="bool" default="false" text="Allow Low Volumes" comment="Allow trades below 50% cargo, 80% for system trade" />
 			<param name="allowCreateTrade" type="bool" default="false" text="Make Target Warehouse" comment="Allow mules to force Target to buy all the Source sells." />
 		</params>
 		<requires>
@@ -138,7 +138,7 @@
 			<find_buy_offer tradepartner="this.ship" buyer="$targetStation" result="$needs" excludeempty="false" multiple="true" />
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" multiple="true" />
 
-			<!-- Regular Mule duty -->
+			<!-- Station Mule Routines -->
 			<do_all exact="$loops" counter="$loop">
 				<do_if value="$needs.count gt 0 and $supplies.count gt 0">
 					<set_value name="$outerList" exact="[]" />
@@ -234,6 +234,7 @@
 							</do_if>
 
 							<do_all exact="$innerList.count" counter="$ctr">
+								<!--need found -->
 								<do_if value="not $needFound">
 									<set_value name="$someInner" exact="$innerList.{$ctr}" />
 									<do_if value="$wareName" exact="$someInner.ware.name">
@@ -245,6 +246,8 @@
 											<set_value name="$supplyTarget" exact="$someOuter" />
 											<set_value name="$supplySource" exact="$someInner" />
 										</do_else>
+
+										<!--never trade between warehouses -->
 										<do_if value="not ($supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and $supplySource.owner.tradewares.{$supplyTarget.ware}.exists)">
 											<do_if value="$supplyTarget.owner.owner == this.ship.owner">
 												<set_value name="$targetAmount" exact="$supplyTarget.desiredamount" />
@@ -252,19 +255,20 @@
 											<do_else>
 												<set_value name="$targetAmount" exact="$supplyTarget.amount" />
 											</do_else>
-											<set_value name="$cargoHauled" exact="[this.ship.cargo.{$supplyTarget.ware}.free,$targetAmount,$supplySource.amount].min" />
+
 											<!--$cargoHauled == $targetAmount means it is the last few units needed to finish a station or drones-->
+											<set_value name="$cargoHauled" exact="[this.ship.cargo.{$supplyTarget.ware}.free,$targetAmount,$supplySource.amount].min" />
 											<do_if value="$cargoHauled gt 0 and ($allowLowVol or $cargoHauled gt (this.ship.cargo.{$supplyTarget.ware}.max / 1.25) or ($cargoHauled == $targetAmount and ($supplyTarget.owner.class == class.buildstorage or $supplyTarget.owner.cargo.{$supplyTarget.ware}.target == 0)))">
 												<set_value name="$needFound" exact="true" />
 												<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$cargoHauled" immediate="false" />
 												<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$cargoHauled" immediate="false" />
 											</do_if>
-										</do_if> <!--never trade between warehouses -->
+										</do_if>
 									</do_if>
-								</do_if> <!--need found -->
-							</do_all> <!-- inner loop -->
+								</do_if>
+							</do_all>
 						</do_if>
-					</do_all> <!-- outer loop -->
+					</do_all>
 				</do_if> <!-- the stations have supply and demand -->
 
 				<do_if value="not ($loop ge 3)">
