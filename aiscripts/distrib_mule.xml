@@ -115,7 +115,7 @@
 				</do_all>
 			</do_all>
 
-			<!-- Distribution Mule duty -->
+			<!-- Distribution Mule Routine -->
 			<do_all exact="2">
 				<do_if value="$needs.count gt 0 and $supplies.count gt 0">
 					<sort_trades name="$innerList" tradelist="$needs" sorter="totalvolume" />
@@ -126,6 +126,7 @@
 						<do_if value="(not $needFound) and ($sourceCargoRatio gt $staticStorage)">
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
 							<do_all exact="$innerList.count" counter="$ctr">
+								<!-- inner loop -->
 								<set_value name="$targetCargoRatio" exact="($innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.count * 100 / [$innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.target, 1].max)" />
 								<do_if value="(not $needFound) and ($targetCargoRatio lt $minStorage or ($sourceCargoRatio gt $maxStorage and $sourceCargoRatio gt ($targetCargoRatio + 10)))">
 									<set_value name="$someInner" exact="$innerList.{$ctr}" />
@@ -142,15 +143,17 @@
 											<set_value name="$supplySource" exact="$someOuter" />
 											<set_value name="$needFound" exact="true" />
 										</do_if>
-									</do_if> <!--need found -->
+									</do_if>
 								</do_if>
-							</do_all> <!-- inner loop -->
+							</do_all>
 							<do_if value="$needFound">
+								<!--need found -->
 								<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$cargoHauled" immediate="false" />
 								<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$cargoHauled" immediate="false" />
 							</do_if>
 						</do_if>
 					</do_all> <!-- outer loop -->
+
 				</do_if> <!-- the stations have supply and demand -->
 				<set_value name="$needFound2" exact="$needFound" />
 				<set_value name="$needFound" exact="false" />
@@ -168,8 +171,7 @@
 					</do_all>
 				</do_else>
 			</do_all>
-
-
+			
 			<remove_value name="$supplyTarget" />
 			<remove_value name="$supplySource" />
 			<remove_value name="$supplies" />

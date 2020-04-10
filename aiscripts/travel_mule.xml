@@ -172,7 +172,7 @@
 				</do_all>
 			</do_else>
 
-			<!-- Travelling Mule duty -->
+			<!-- Travelling Mule Routine -->
 			<do_if value="$needs.count gt 0 and $supplies.count gt 0">
 				<set_value name="$innerList" exact="$needs" />
 				<sort_trades name="$outerList" tradelist="$supplies" sorter="volume" />
@@ -183,6 +183,7 @@
 						<do_all exact="$innerList.count" counter="$ctr">
 							<set_value name="$someInner" exact="$innerList.{$ctr}" />
 							<do_if value="$someOuter.ware.id" exact="$someInner.ware.id">
+								<!-- find need-->
 								<do_if value="$someInner.owner.owner == this.ship.owner">
 									<set_value name="$targetAmount" exact="$someInner.desiredamount" />
 								</do_if>
@@ -199,17 +200,15 @@
 										<set_value name="$supplySource" exact="$someOuter" />
 									</do_if>
 								</do_if>
-
-							</do_if> <!--need found -->
-						</do_all> <!-- inner loop -->
+							</do_if> <!--need found-->
+						</do_all>
 						<do_if value="$needFound">
 							<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$bestCargo" immediate="false" />
 							<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$bestCargo" immediate="false" />
 						</do_if>
 					</do_if>
-				</do_all> <!-- outer loop -->
+				</do_all>
 			</do_if> <!-- the stations have supply and demand -->
-
 
 			<remove_value name="$supplyTarget" />
 			<remove_value name="$supplySource" />
