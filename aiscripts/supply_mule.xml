@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="1">
-	<order id="SupplyMule" name="M4- SupplyMule" description="Supplys own Station" category="trade" infinite="true">
+	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<param name="assignSrc" type="bool" default="false" text="Assign ship to source" comment="Assign to the source station if it's the players." />
-			<param name="dedicatedServe" type="bool" default="false" text="Serve source only" comment="Will only serve the configured source station" />
-			<param name="tradeWithOwn" required="false" type="bool" default="false" text="Own Stations only" comment="Buys from own stations only" />
+			<param name="assignSrc" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the source station if it's the players." />
+			<param name="dedicatedServe" type="bool" default="false" text="Serve Source Only" comment="Will only serve the configured source station" />
+			<param name="tradeWithOwn" required="false" type="bool" default="false" text="Your Stations Only" comment="Buys from player stations only" />
 			<param name="maxtrades" required="false" default="[5 + this.ship.pilot.skill.piloting * 2, 20].min" type="number" text="Max Trades" comment="Max Trades per buy run">
 				<input_param name="startvalue" value="[5 + this.ship.pilot.skill.piloting * 2, 20].min" />
 				<input_param name="min" value="1" />

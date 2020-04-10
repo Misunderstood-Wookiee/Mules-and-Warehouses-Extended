@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="travelmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="1">
-	<order id="TravelMule" name="M3- TravelMule" description="Ferries supplies between stations" category="trade" infinite="true">
+	<order id="TravelMule" name="M1- Travel Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />

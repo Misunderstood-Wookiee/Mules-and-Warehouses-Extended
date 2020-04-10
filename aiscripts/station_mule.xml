@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="5">
-	<order id="StationMule" name="M1- StationMule" description="Ferries supplies between stations" category="trade" infinite="true">
+	<order id="StationMule" name="M2- Station Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />
@@ -8,12 +8,12 @@
 			<param name="targetStation" type="object" text="Target Station" comment="The recipient station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<param name="assignSrc" type="bool" default="false" text="Assign ship to source" comment="Assign to the source station if it's the players." />
-			<param name="incEgry" type="bool" default="false" text="Include energy cells" comment="Includes energy cells in the supply" />
+			<param name="assignSrc" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the source station if it's the players." />
+			<param name="incEgry" type="bool" default="false" text="Include Energy Cells" comment="Includes energy cells in the supply" />
 			<param name="incFood" type="bool" default="false" text="Include Food and Meds" comment="Includes food and meds in the supply" />
 			<param name="supplyFirst" type="bool" default="false" text="Seller Priority" comment="Put the priority on emptying the seller's stocks" />
-			<param name="drugFree" type="bool" default="false" text="Never illegal wares" comment="Never trades illegal wares" />
-			<param name="drugMule" type="bool" default="false" text="Only illegal wares" comment="Trades only illegal wares" />
+			<param name="drugFree" type="bool" default="false" text="Never Illegal " comment="Never trades illegal wares" />
+			<param name="drugsOnly" type="bool" default="false" text="Illegal Only" comment="Trade only illegal wares" />
 			<param name="twoWay" type="bool" default="false" text="Two-way trade" comment="Trades back and forth between stations" />
 			<param name="twoWaySupplyFirst" type="bool" default="false" text="Return Seller Priority" comment="Seller priority on return trade" />
 			<param name="forbidTradeAll" type="bool" default="false" text="No in-system trade" comment="Forbid trade between all player objects in system when idle" />
@@ -189,14 +189,17 @@
 						</do_all>
 					</do_else>
 
+					<!-- exclude energy cells -->
 					<do_all exact="$outerList.count" counter="$idx">
 						<do_if value="not $needFound">
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
 							<set_value name="$wareName" exact="$someOuter.ware.name" />
+							<!--target is 0 when ware used only to build drones-->
 							<do_if value="($someOuter.ware.id == 'energycells') and not $incEgry and (not $someOuter.owner.class == class.buildstorage)">
-								<!--target is 0 when ware used only to build drones-->
 								<set_value name="$wareName" exact="'NOPE'" />
-							</do_if> <!-- exclude energy cells -->
+							</do_if>
+
+							<!-- exclude food & meds -->
 							<do_if value="not $incFood">
 								<do_if value="$someOuter.ware.id" exact="'foodrations'">
 									<set_value name="$wareName" exact="'NOPE'" />
@@ -204,7 +207,9 @@
 								<do_if value="$someOuter.ware.id" exact="'medicalsupplies'">
 									<set_value name="$wareName" exact="'NOPE'" />
 								</do_if>
-							</do_if> <!-- exclude food & meds -->
+							</do_if>
+
+							<!-- exclude illegal wares -->
 							<do_if value="$drugFree">
 								<do_if value="$someOuter.ware.id" exact="'spacefuel'">
 									<set_value name="$wareName" exact="'NOPE'" />
@@ -215,8 +220,10 @@
 								<do_if value="$someOuter.ware.id" exact="'majadust'">
 									<set_value name="$wareName" exact="'NOPE'" />
 								</do_if>
-							</do_if> <!-- exclude illegal wares -->
-							<do_if value="$drugMule">
+							</do_if>
+
+							<!-- Only allow illegal wares -->
+							<do_if value="$drugsOnly">
 								<do_if value="$someOuter.ware.id" exact="not 'spacefuel'">
 									<do_if value="$someOuter.ware.id" exact="not 'spaceweed'">
 										<do_if value="$someOuter.ware.id" exact="not 'majadust'">
@@ -224,7 +231,7 @@
 										</do_if>
 									</do_if>
 								</do_if>
-							</do_if> <!-- Only allow illegal wares -->
+							</do_if>
 
 							<do_all exact="$innerList.count" counter="$ctr">
 								<do_if value="not $needFound">
