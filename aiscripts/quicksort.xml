@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="quicksort" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="2">
+	<params>
+		<param name="objects" />
+		<param name="values" />
+	</params>
+	<attention min="unknown">
+		<actions>
+			<set_value name="$StartTime" exact="player.age" />
+			<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="' Start Quicksort ' + $objects.count + ' ' + $values.count" output="false" append="false" />
+			<do_if value="$objects.count and $values.count and $objects.count == $values.count">
+				<do_all exact="$objects.count" counter="$vy1">
+					<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="' Input Obj: ' + $objects.{$vy1}.owner.idcode + ' Ware: ' + $objects.{$vy1}.ware.id + ' Value: ' + ($values.{$vy1})f + ' Demand: ' + $objects.{$vy1}.desiredamount + ' Max Store: ' + $objects.{$vy1}.owner.cargo.{$objects.{$vy1}.ware}.target " output="false" append="true" />
+				</do_all>
+
+
+				<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="'Quicksort prepare '" />
+
+				<set_value name="$left" exact="1" />
+				<set_value name="$right" exact="$objects.count" />
+				<set_value name="$top" exact="0" />
+
+				<create_list name="$stack" />
+				<do_all exact="$values.count" counter="$vy">
+					<append_to_list name="$stack" exact="0" />
+				</do_all>
+				<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="'Quicksort start '" />
+
+				<set_value name="$top" exact="$top+1" />
+				<set_value name="$stack.{$top}" exact="$left" />
+				<set_value name="$top" exact="$top+1" />
+				<set_value name="$stack.{$top}" exact="$right" />
+
+				<do_while value="$top ge 1">
+					<set_value name="$right" exact="$stack.{$top}" />
+					<set_value name="$top" exact="$top-1" />
+					<set_value name="$left" exact="$stack.{$top}" />
+					<set_value name="$top" exact="$top-1" />
+
+					<!-- <debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="' left ' + $left + '  right ' + $right"/> -->
+
+					<set_value name="$tmpleft" exact="$left" />
+					<set_value name="$tmpright" exact="$right" />
+
+					<set_value name="$pivot" exact="$values.{$tmpright}" />
+					<do_while value="true">
+
+						<do_while value="$values.{$tmpleft} lt $pivot">
+							<set_value name="$tmpleft" exact="$tmpleft+1" />
+						</do_while>
+
+						<do_while value="$values.{$tmpright} gt $pivot">
+							<set_value name="$tmpright" exact="$tmpright-1" />
+						</do_while>
+						<!-- <debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="' left ' + $tmpleft + '  right ' + $tmpright"/> -->
+
+						<do_if value="$tmpleft lt $tmpright">
+							<!-- <debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="'Swap ' + $tmpright + ' with ' + $tmpleft"/> -->
+							<!-- <debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="'Swap ' + $values.{$tmpright} + ' with ' + $values.{$tmpleft}"/> -->
+
+							<do_if value="$values.{$tmpright} == $values.{$tmpleft}">
+								<set_value name="$tmpleft" exact="$tmpleft+1" />
+							</do_if>
+							<do_else>
+								<set_value name="$tmp" exact="$values.{$tmpright}" />
+								<set_value name="$values.{$tmpright}" exact="$values.{$tmpleft}" />
+								<set_value name="$values.{$tmpleft}" exact="$tmp" />
+
+								<set_value name="$tmp" exact="$objects.{$tmpright}" />
+								<set_value name="$objects.{$tmpright}" exact="$objects.{$tmpleft}" />
+								<set_value name="$objects.{$tmpleft}" exact="$tmp" />
+							</do_else>
+						</do_if>
+						<do_else>
+							<break />
+						</do_else>
+					</do_while>
+
+					<do_if value="$tmpright gt $left">
+						<set_value name="$top" exact="$top+1" />
+						<set_value name="$stack.{$top}" exact="$left" />
+						<set_value name="$top" exact="$top+1" />
+						<set_value name="$stack.{$top}" exact="$tmpright-1" />
+					</do_if>
+
+					<do_if value="$tmpright+1 lt $right">
+						<set_value name="$top" exact="$top+1" />
+						<set_value name="$stack.{$top}" exact="$tmpright+1" />
+						<set_value name="$top" exact="$top+1" />
+						<set_value name="$stack.{$top}" exact="$right" />
+					</do_if>
+				</do_while>
+
+				<do_all exact="$objects.count" counter="$v3">
+					<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="' Output Obj: ' + $objects.{$v3}.owner.idcode + ' Ware: ' + $objects.{$v3}.ware.id + ' Value: ' + ($values.{$v3})f + ' Demand: ' + $objects.{$v3}.desiredamount + ' Max Store: ' + $objects.{$v3}.owner.cargo.{$objects.{$v3}.ware}.target " output="false" append="true" />
+					<do_if value="$objects.count gt $v3 and $values.{$v3} gt $values.{($v3+1)}">
+						<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="'Quicksort failed: ' + $values.{$v3} + '  is bigger then ' + $values.{($v3+1)}" output="false" append="true" />
+						<debug_to_file name="'Quicksort fails'" directory="'QuickSort'" text="'Quicksort failed: ' + $values.{$v3} + '  is bigger then ' + $values.{($v3+1)}" output="false" append="true" />
+						<!-- 				<do_all exact="$objects.count" counter="$v31">
+						<debug_to_file name="'Quicksort fails'" directory="'QuickSort'" text="' Output Obj: ' + $objects.{$v31}.owner.idcode + ' Ware: ' + $objects.{$v31}.ware.id + ' Value: ' + ($values.{$v31})f + ' Demand: ' + $objects.{$v31}.desiredamount + ' Max Store: ' + $objects.{$v31}.owner.cargo.{$objects.{$v31}.ware}.target " output="false" append="true" /> 
+					</do_all> -->
+					</do_if>
+
+					<do_if value="$objects.count gt $v3 and (not $objects.{$v3} and $objects.{$v3} != 0 or not $objects.{($v3+1)} and $objects.{($v3+1)} != 0 or not $values.{$v3} and $values.{$v3} != 0 or not $values.{($v3+1)} and $values.{($v3+1)} != 0)">
+						<debug_to_file name="'Quicksort fails'" directory="'QuickSort'" text="' quicksort failed (some value is invalid):  left: ' + $objects.{$v3} + '('+$values.{$v3}+')' + ' right: ' + $objects.{($v3+1)} + '('+$values.{($v3+1)}+')'" output="false" append="true" />
+					</do_if>
+				</do_all>
+
+				<debug_to_file name="'Quicksort debug'" directory="'QuickSort'" text="' Script used up: ' + (player.age-$StartTime)" />
+			</do_if>
+			<return>
+				<retval name="sortedobject" value="$objects" />
+				<retval name="sortedvalue" value="$values" />
+			</return>
+		</actions>
+	</attention>
+</aiscript>
