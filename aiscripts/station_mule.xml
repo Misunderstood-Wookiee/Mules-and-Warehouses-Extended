@@ -209,7 +209,7 @@
 								</do_if>
 							</do_if>
 
-							<!-- exclude illegal wares -->
+							<!-- exclude illegal wares (Whoop whopp this is the police.)-->
 							<do_if value="$drugFree">
 								<do_if value="$someOuter.ware.id" exact="'spacefuel'">
 									<set_value name="$wareName" exact="'NOPE'" />
@@ -222,7 +222,7 @@
 								</do_if>
 							</do_if>
 
-							<!-- Only allow illegal wares -->
+							<!-- Only allow illegal wares (Infected Mushroom...)-->
 							<do_if value="$drugsOnly">
 								<do_if value="$someOuter.ware.id" exact="not 'spacefuel'">
 									<do_if value="$someOuter.ware.id" exact="not 'spaceweed'">
