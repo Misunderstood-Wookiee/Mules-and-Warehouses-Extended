@@ -38,6 +38,7 @@
 	</interrupts>
 
 	<init>
+		<debug_to_file name="this.ship.knownname" directory="'TravelMule'" text="'Starting Log File'" output="false" append="false" />
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
