@@ -33,12 +33,13 @@
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
+			<!-- menu option: Destination Override (select stations manually to visit)-->
 			<param name="destList" required="false" default="[]" type="list" text="Target Warehouses" comment="Points to visit">
 				<input_param name="type" value="'object'" />
 			</param>
 		</params>
 		<requires>
-			<match shiptype="shiptype.lasertower" negate="true" />
+			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for-->
 		</requires>
 	</order>
 
