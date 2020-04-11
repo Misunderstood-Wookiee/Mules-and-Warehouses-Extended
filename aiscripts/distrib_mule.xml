@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="distrimule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="1">
+<aiscript name="distrimule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
 	<order id="DistriMule" name="M3- Distribute Mule" description="Ferries supplies between warehouses" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Warehouse" comment="The source station">
