@@ -95,14 +95,14 @@
 			</do_if>
 
 			<set_value name="$wareBasket" exact="$specialWareBasket" />
-			<do_if value="$wareBasket == []">
-				<do_if value="not $sourceStation.tradewares == []">
-					<set_value name="$wareBasket" exact="$sourceStation.tradewares" />
-				</do_if>
-				<do_elseif value="not $sourceStation.products == []">
-					<set_value name="$wareBasket" exact="$sourceStation.products" />
-				</do_elseif>
-			</do_if>
+			<do_if value="$wareBasket == []">               
+				<do_if value="$sourceStation.tradewares.count">
+					<set_value name="$wareBasket" exact="$sourceStation.tradewares.list" />
+				</do_if>             
+				<do_elseif value="$sourceStation.products.count">
+					<set_value name="$wareBasket" exact="$sourceStation.products.list" />
+				</do_elseif>			
+			</do_if> 
 
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true" />
 
