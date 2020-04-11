@@ -105,7 +105,7 @@
 				<wait exact="100ms" />
 			</do_if>
 
-			<!-- Add trade wares to target station -->
+			<!-- Add trade ware orders to target station if make target warehouse is checked-->
 			<do_if value="$allowCreateTrade and ($targetStation.owner == this.ship.owner)">
 				<set_value name="$sourceTradeWares" exact="0" />
 				<set_value name="$targetTradeWares" exact="0" />
@@ -262,7 +262,9 @@
 										</do_else>
 
 										<!--never trade between warehouses -->
-										<do_if value="not ($supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and $supplySource.owner.tradewares.{$supplyTarget.ware}.exists)">
+										<set_value name="$sourceIsWarehouse" exact="$supplySource.owner.tradewares.{$supplySource.ware}.exists and not $supplySource.owner.products.{$supplySource.ware}.exists"/>
+										<set_value name="$targetIsWarehouse" exact="$supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and not $supplyTarget.owner.products.{$supplyTarget.ware}.exists"/>
+										<do_if value="not ($sourceIsWarehouse and $targetIsWarehouse)">
 											<do_if value="$supplyTarget.owner.owner == this.ship.owner">
 												<set_value name="$targetAmount" exact="$supplyTarget.desiredamount" />
 											</do_if>
