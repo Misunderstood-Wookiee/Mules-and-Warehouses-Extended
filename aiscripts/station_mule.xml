@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="5">
+<aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="5">
 	<order id="StationMule" name="M2- Station Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" type="object" text="Source Station" comment="The source station">

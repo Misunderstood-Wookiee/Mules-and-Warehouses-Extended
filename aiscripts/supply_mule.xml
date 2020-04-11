@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="G:\Dev Projects\X4 Foundations\X4_Assets\aiscripts\aiscripts.xsd" version="1">
+<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
 	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
 		<params>
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
@@ -54,32 +54,32 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'ScriptStart'" output="false" append="false" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'ScriptStart'" output="false" append="false" />
 			<set_value name="$StartTime" exact="player.age" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<do_if value="$dedicatedServe and not $sourceStation">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Invalid Config: dedicatedServe (No Station configured)'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Invalid Config: dedicatedServe (No Station configured)'" output="false" append="true" />
 				<set_value name="$dedicatedServe" exact="false" />
 			</do_if>
 
 			<do_if value="$assignSrc and not $sourceStation">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Invalid Config: assignSrc (No Station configured)'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Invalid Config: assignSrc (No Station configured)'" output="false" append="true" />
 				<set_value name="$assignSrc" exact="false" />
 			</do_if>
 
 			<!--here we want to copy settings to subordinates-->
 			<set_value name="$subordinates" exact="this.ship.subordinates" />
 			<set_value name="$subNr" exact="$subordinates.count" />
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'found subordinates: '+$subNr" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'found subordinates: '+$subNr" output="false" append="true" />
 			<do_all exact="$subNr" counter="$nr">
 				<set_value name="$subordinate" exact="$subordinates.{$nr}" />
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'  '+$nr+' '+$subordinate.knownname" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'  '+$nr+' '+$subordinate.knownname" output="false" append="true" />
 				<do_if value="$subordinate.type != this.ship.type">
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'    not same shiptype: '+$subordinate.type+' and '+this.ship.type" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'    not same shiptype: '+$subordinate.type+' and '+this.ship.type" output="false" append="true" />
 					<continue />
 				</do_if>
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'    copying default behavior'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'    copying default behavior'" output="false" append="true" />
 				<remove_object_commander object="$subordinate" />
 				<create_order object="$subordinate" default="true" id="'SupplyMule'">
 					<param name="sourceStation" value="$sourceStation" />
@@ -98,7 +98,7 @@
 			<remove_value name="$subordinate" />
 
 
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Setting subordinates used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Setting subordinates used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<create_list name="$Supplier" />
@@ -110,7 +110,7 @@
 			<!-- Sell leftover cargo before regular Mule duty -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<do_if value="$currentcargo.count">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Attempt sell leftover cargo'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Attempt sell leftover cargo'" output="false" append="true" />
 				<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$needs" wares="$currentcargo" multiple="true"></find_buy_offer>
 				<sort_trades name="$needs" tradelist="$needs" sorter="totalvolume" />
 				<do_all exact="$currentcargo.count" counter="$cc">
@@ -119,7 +119,7 @@
 						<set_value name="$cargoHauled" exact="[this.ship.cargo.{$currentcargo.{$cc}}.count,$needs.{$ccn}.amount].min" />
 						<do_if value="$currentcargo.{$cc} == $needs.{$ccn}.ware and $cargoHauled gt (this.ship.cargo.{$currentcargo.{$cc}}.count / 5)">
 							<do_if value="not $ccNeedFound">
-								<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Sell cargo before beginning job: ' + $needs.{$ccn}.ware.id" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Sell cargo before beginning job: ' + $needs.{$ccn}.ware.id" output="false" append="true" />
 								<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$needs.{$ccn}" amount="$cargoHauled" immediate="false" />
 							</do_if>
 							<set_value name="$ccNeedFound" exact="true" />
@@ -131,11 +131,11 @@
 			</do_if>
 
 			<!-- Debug: Selling left over wares performance metrics -->
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Selling leftover cargo used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Selling leftover cargo used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<!-- Debug: Defined Wares  -->
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Define Wares'" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Define Wares'" output="false" append="true" />
 			<do_if value="$dedicatedServe and $sourceStation">
 
 				<!-- If Warebasket is EMPTY, add the repective wares of the source station -->
@@ -162,11 +162,11 @@
 				<!-- If station is a factory/shipyard station, remove all wares which are not wares of that station-->
 				<create_list name="$wareBasket" />
 				<do_if value="$sourceStation.products.count gt 0 or $sourceStation.canbuildships or $sourceStation.canequipships">
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Factory/Shipyard detected: Resources: ' + $sourceStation.resources.count + ' Products: ' + $sourceStation.products.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Factory/Shipyard detected: Resources: ' + $sourceStation.resources.count + ' Products: ' + $sourceStation.products.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
 					<set_value name="$resources" exact="$sourceStation.resources.list" />
 					<do_all exact="$resources.count" counter="$nr">
 						<do_if value="$specialWareBasket.indexof.{$resources.{$nr}}">
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Resource: ' + $resources.{$nr}.id" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Resource: ' + $resources.{$nr}.id" output="false" append="true" />
 							<append_to_list name="$wareBasket" exact="$resources.{$nr}" />
 						</do_if>
 					</do_all>
@@ -175,7 +175,7 @@
 					<set_value name="$supplyresources" exact="$sourceStation.supplyresources.list" />
 					<do_all exact="$supplyresources.count" counter="$nr2">
 						<do_if value="$specialWareBasket.indexof.{$supplyresources.{$nr}}">
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Supply: ' + $supplyresources.{$nr2}.id" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Supply: ' + $supplyresources.{$nr2}.id" output="false" append="true" />
 							<append_to_list name="$wareBasket" exact="$supplyresources.{$nr2}" />
 						</do_if>
 					</do_all>
@@ -184,7 +184,7 @@
 					<set_value name="$tradewares" exact="$sourceStation.tradewares.list" />
 					<do_all exact="$tradewares.count" counter="$nr3">
 						<do_if value="$specialWareBasket.indexof.{$tradewares.{$nr}}">
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Tradeware: ' + $tradewares.{$nr3}.id" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Tradeware: ' + $tradewares.{$nr3}.id" output="false" append="true" />
 							<append_to_list name="$wareBasket" exact="$tradewares.{$nr3}" />
 						</do_if>
 					</do_all>
@@ -193,11 +193,11 @@
 
 				<!-- AI Trade stations, remove everything which is not a trade ware -->
 				<do_elseif value="$sourceStation.tradewares.count gt 0 and $sourceStation.owner != this.ship.owner">
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Trade station detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Trade station detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
 					<set_value name="$tradewares" exact="$sourceStation.tradewares.list" />
 					<do_all exact="$tradewares.count" counter="$nr4">
 						<do_if value="$specialWareBasket.indexof.{$tradewares.{$nr}}">
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Tradeware: ' + $tradewares.{$nr4}.id" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Tradeware: ' + $tradewares.{$nr4}.id" output="false" append="true" />
 							<append_to_list name="$wareBasket" exact="$tradewares.{$nr4}" />
 						</do_if>
 					</do_all>
@@ -206,11 +206,11 @@
 
 				<!-- Add trade wares to player warehouse -->
 				<do_elseif value="$sourceStation.owner == this.ship.owner">
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Warehouse detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Warehouse detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
 					<set_value name="$wareBasket" exact="$specialWareBasket" />
 					<do_all exact="$wareBasket.count" counter="$v1">
 						<do_if value="not $sourceStation.tradewares.indexof.{$wareBasket.{$v1}}">
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Offer: ' + $wareBasket.{$v1} + ' ' + $wareBasket.count + ' Tradeware count: ' + $sourceStation.tradewares.count" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Adding Offer: ' + $wareBasket.{$v1} + ' ' + $wareBasket.count + ' Tradeware count: ' + $sourceStation.tradewares.count" output="false" append="true" />
 							<add_tradeware object="$sourceStation" ware="$wareBasket.{$v1}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<wait exact="100ms" />
 						</do_if>
@@ -232,7 +232,7 @@
 				<set_value name="$wareBasket" exact="$specialWareBasket" />
 			</do_else>
 
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Setting Warebasket used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Setting Warebasket used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<!-- Find build site demands (used when 'Give Builders Priority') -->
@@ -252,10 +252,10 @@
 				</find_buy_offer>
 
 				<do_if value="$needs.count">
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="$needs.count + ' Build demands found'" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="$needs.count + ' Build demands found'" output="false" append="true" />
 					<set_value name="$BuilderList" exact="true" />
 
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding building needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding building needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 					<set_value name="$PerformanceTime" exact="player.age" />
 
 					<resume label="SortTrades" />
@@ -267,7 +267,7 @@
 			<label name="Supply" />
 			<set_value name="$BuilderList" exact="false" />
 			<do_if value="$needs.count == 0">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Continue with regular Demands'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Continue with regular Demands'" output="false" append="true" />
 				<do_if value="$dedicatedServe">
 					<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" wares="$wareBasket" multiple="true">
 						<match_buyer>
@@ -301,7 +301,7 @@
 			</do_if>
 
 			<!-- Debug: Supply needs performance metrics-->
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding supply needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding supply needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<!-- Sort Demands -->
@@ -320,7 +320,7 @@
 			</run_script>
 
 			<do_if value="$needs.count gt $needs2.count">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Quicksort execution failed, is quicksort installed?'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Quicksort execution failed, is quicksort installed?'" output="false" append="true" />
 				<sort_trades name="$needs2" tradelist="$needs" sorter="stocklevel" />
 			</do_if>
 
@@ -334,11 +334,11 @@
 			</do_all>
 
 
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Sorting needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Sorting needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<do_all exact="$Demands.count" counter="$vy1">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Sorted Objects: ' + $Demands.{$vy1}.owner.idcode + ' Ware: ' + $Demands.{$vy1}.ware.id + ' Value: ' + (($Demands.{$vy1}.desiredamount)f / ($Demands.{$vy1}.owner.cargo.{$Demands.{$vy1}.ware}.target)f)*1000 + ' Demand: ' + $Demands.{$vy1}.desiredamount + ' Max Store: ' + $Demands.{$vy1}.owner.cargo.{$Demands.{$vy1}.ware}.target" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Sorted Objects: ' + $Demands.{$vy1}.owner.idcode + ' Ware: ' + $Demands.{$vy1}.ware.id + ' Value: ' + (($Demands.{$vy1}.desiredamount)f / ($Demands.{$vy1}.owner.cargo.{$Demands.{$vy1}.ware}.target)f)*1000 + ' Demand: ' + $Demands.{$vy1}.desiredamount + ' Max Store: ' + $Demands.{$vy1}.owner.cargo.{$Demands.{$vy1}.ware}.target" output="false" append="true" />
 			</do_all>
 
 			<!-- Trade only with own stations -->
@@ -376,10 +376,10 @@
 				</find_sell_offer>
 			</do_else>
 
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding sell offers used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding sell offers used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Found Station need offers: ' + $Demands.count + ' Warebasket count: ' + $wareBasket.count + ' Sellers found: '+ $Supplier.count" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Found Station need offers: ' + $Demands.count + ' Warebasket count: ' + $wareBasket.count + ' Sellers found: '+ $Supplier.count" output="false" append="true" />
 
 			<create_list name="$TradeTargets" />
 			<create_list name="$TradeWares" />
@@ -400,21 +400,21 @@
 
 				<do_all exact="$Demands.count" counter="$idx">
 					<do_if value="$OccupiedCargo + $MinCargoSize / 2 ge $ShipCapacity">
-						<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Cargo full, skipping'" output="false" append="true" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Cargo full, skipping'" output="false" append="true" />
 						<break />
 					</do_if>
 
 					<set_value name="$someBuyer" exact="$Demands.{$idx}" />
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Buyer: ' + $someBuyer.owner.knownname + ' ' + $someBuyer.owner.idcode + ' Ware Required: ' + $someBuyer.ware.id + ' RequiredAmount: ' + $someBuyer.desiredamount" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Buyer: ' + $someBuyer.owner.knownname + ' ' + $someBuyer.owner.idcode + ' Ware Required: ' + $someBuyer.ware.id + ' RequiredAmount: ' + $someBuyer.desiredamount" output="false" append="true" />
 
 					<do_if value="($someBuyer.desiredamount * $someBuyer.ware.volume) lt $MinCargoSize">
-						<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Demand too little: ' + $someBuyer.ware.id" output="false" append="true" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Demand too little: ' + $someBuyer.ware.id" output="false" append="true" />
 						<break />
 					</do_if>
 
 					<do_all exact="$SupplierSorted.count" counter="$ctr">
 						<do_if value="$OccupiedCargo + $MinCargoSize / 2 ge $ShipCapacity">
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Cargo full, skipping'" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Cargo full, skipping'" output="false" append="true" />
 							<break />
 						</do_if>
 
@@ -438,22 +438,22 @@
 							<set_value name="$CargoWareFree" exact="(($ShipCapacity - $OccupiedCargo)/$someSeller.ware.volume)" />
 							<set_value name="$cargoHauled" exact="[$CargoWareFree,$someSeller.amount,($buyofferamount-$WareCountBought)].min" />
 							<set_value name="$cargoSpace" exact="($cargoHauled * $someSeller.ware.volume)" />
-							<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Seller: ' + $someSeller.owner.knownname + ' ' + $someSeller.owner.idcode + ' Min trade cargo:  ' + $MinCargoSize + ' Buy cargo space requirement: ' + $cargoSpace + ' Trade amount: ' + $cargoHauled +  ' Already bought Wares: ' + $WareCountBought + ' Desired amount ' + $buyofferamount + ' Desired amount left: ' + ($buyofferamount-$WareCountBought) + ' Seller offer: ' + $someSeller.amount + ' Stocklevel: ' + $someSeller.stocklevel" output="false" append="true" />
+							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Seller: ' + $someSeller.owner.knownname + ' ' + $someSeller.owner.idcode + ' Min trade cargo:  ' + $MinCargoSize + ' Buy cargo space requirement: ' + $cargoSpace + ' Trade amount: ' + $cargoHauled +  ' Already bought Wares: ' + $WareCountBought + ' Desired amount ' + $buyofferamount + ' Desired amount left: ' + ($buyofferamount-$WareCountBought) + ' Seller offer: ' + $someSeller.amount + ' Stocklevel: ' + $someSeller.stocklevel" output="false" append="true" />
 							<!-- Test if ship capacity is reached, min trade volume is reached and allow one extra half sized trade when it fills the cargo 100% -->
 							<do_if value="$cargoHauled gt 0 and $ShipCapacity ge ($OccupiedCargo + $cargoSpace) and ($cargoSpace gt $MinCargoSize or ($cargoHauled == $CargoWareFree and $cargoSpace ge $MinCargoSize / 2) or $cargoHauled == ($buyofferamount-$WareCountBought)) ">
 								<do_if value="$WareInList">
 									<set_value name="$TradeAmounts.{$WareInList}" exact="$TradeAmounts.{$WareInList} + $cargoHauled" />
-									<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Modify Ware : ' + $someSeller.ware.id + ' Amount: ' + $cargoHauled" output="false" append="true" />
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Modify Ware : ' + $someSeller.ware.id + ' Amount: ' + $cargoHauled" output="false" append="true" />
 								</do_if>
 								<do_else>
 									<append_to_list name="$TradeAmounts" exact="$cargoHauled" />
 									<append_to_list name="$TradeTargets" exact="$someBuyer" />
-									<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Add Ware : ' + $someBuyer.ware.id + ' Amount: ' + $cargoHauled" output="false" append="true" />
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Add Ware : ' + $someBuyer.ware.id + ' Amount: ' + $cargoHauled" output="false" append="true" />
 								</do_else>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $cargoSpace" />
-								<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Query Buy: : ' + $someSeller.ware.id + ' Amount: ' + $cargoHauled + ' DesiredAmount left: ' + ($buyofferamount-$WareCountBought)" output="false" append="true" />
-								<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' New occupied space : ' + $OccupiedCargo + ' MaxSpace: ' + $ShipCapacity" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Query Buy: : ' + $someSeller.ware.id + ' Amount: ' + $cargoHauled + ' DesiredAmount left: ' + ($buyofferamount-$WareCountBought)" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' New occupied space : ' + $OccupiedCargo + ' MaxSpace: ' + $ShipCapacity" output="false" append="true" />
 								<create_trade_order name="$getSupply" object="this.object" tradeoffer="$someSeller" amount="$cargoHauled" immediate="false" />
 							</do_if>
 						</do_if>
@@ -468,13 +468,13 @@
 				</do_if>
 
 				<do_all exact="$TradeTargets.count" counter="$idc">
-					<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Query Sell: : ' + $TradeTargets.{$idc}.ware.id + ' Target:  ' + $TradeTargets.{$idc}.owner.knownname + ' ' + $TradeTargets.{$idc}.owner.idcode + ' Amount ' + $TradeAmounts.{$idc}" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Query Sell: : ' + $TradeTargets.{$idc}.ware.id + ' Target:  ' + $TradeTargets.{$idc}.owner.knownname + ' ' + $TradeTargets.{$idc}.owner.idcode + ' Amount ' + $TradeAmounts.{$idc}" output="false" append="true" />
 					<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$TradeTargets.{$idc}" amount="$TradeAmounts.{$idc}" immediate="false" />
 				</do_all>
 
 				<!-- Leave builder area after selling to builder to avoid traffic jam (no longer used) -->
 				<!--  			<do_if value="$BuilderList and $TradeTargets.count">
-				<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Moving to avoid Traffic Jam'" />
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="'Moving to avoid Traffic Jam'" />
 				<select_flight_behaviour entity="this" evasive="true" result="$fb"/>
 				<move_to object="this.ship" abortpath="false" destination="this.ship.zone" flightbehaviour="$fb" boost="false">
 					<position object="this.ship" min="1km" max="2km"/>
@@ -484,7 +484,7 @@
 			</do_if> <!-- the stations have supply and demand -->
 
 			<!-- Debug: Finding trade routes performance metrics-->
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding trade routes used up: ' + (player.age-$PerformanceTime) + ' seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Finding trade routes used up: ' + (player.age-$PerformanceTime) + ' seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<remove_value name="$TradeAmounts" />
@@ -500,7 +500,7 @@
 			<remove_value name="$wareBasket" />
 			<remove_value name="$Demands" />
 
-			<debug_to_file name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Script used up: ' + (player.age-$StartTime) + '  seconds'" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'Mules_Extended\Supply_Mule'" text="' Script used up: ' + (player.age-$StartTime) + '  seconds'" />
 			<wait exact="60s" />
 			<resume label="start" />
 		</actions>
