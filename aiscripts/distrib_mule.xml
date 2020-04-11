@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="distrimule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
+	<!-- Setup context menu order-->
 	<order id="DistriMule" name="M3- Distribute Mule" description="Ferries supplies between warehouses" category="trade" infinite="true">
 		<params>
+			<!-- menu option: Source Warehouse (Define Source Station)-->
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Warehouse" comment="The source station">
 				<input_param name="class" value="[class.station]" />
 			</param>
+			<!-- menu option: Min Storage-->
 			<param name="minStorage" required="false" default="20" type="number" text="Min Storage" comment="Min storage to put in every warehouse">
 				<input_param name="startvalue" value="20" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="98" />
 				<input_param name="step" value="1" />
 			</param>
+			<!-- menu option: Static Storage-->
 			<param name="staticStorage" required="false" default="40" type="number" text="Static Storage" comment="Min storage to put in every warehouse">
 				<input_param name="startvalue" value="40" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="99" />
 				<input_param name="step" value="1" />
 			</param>
+			<!-- menu option: Max Storage-->
 			<param name="maxStorage" required="false" default="70" type="number" text="Max Storage" comment="Max gate distance to sell.">
 				<input_param name="startvalue" value="70" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="100" />
 				<input_param name="step" value="1" />
 			</param>
+			<!-- menu option: WareBasket list-->
 			<param name="specialWareBasket" required="false" default="[]" type="list" text="Wares (all by default)" comment="Warebasket">
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
@@ -95,14 +101,14 @@
 			</do_if>
 
 			<set_value name="$wareBasket" exact="$specialWareBasket" />
-			<do_if value="$wareBasket == []">               
+			<do_if value="$wareBasket == []">
 				<do_if value="$sourceStation.tradewares.count">
 					<set_value name="$wareBasket" exact="$sourceStation.tradewares.list" />
-				</do_if>             
+				</do_if>
 				<do_elseif value="$sourceStation.products.count">
 					<set_value name="$wareBasket" exact="$sourceStation.products.list" />
-				</do_elseif>			
-			</do_if> 
+				</do_elseif>
+			</do_if>
 
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true" />
 
