@@ -127,7 +127,7 @@
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true">
 				<!-- this blacklist block shouldnt be needed unless the match_gate_distance has a max distance. If we ever do that we will need it so leaving it in -->
 				<match_seller>
-					<match_gate_distance object="this.ship">
+					<match_gate_distance object="this.ship" min="0">
 						<blacklist group="blacklistgroup.civilian" object="this.ship" />
 					</match_gate_distance>
 				</match_seller>
@@ -230,7 +230,7 @@
 				<set_value name="$needFound" exact="false" />
 				<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" wares="$wareBasket" excludeempty="false" multiple="true">
 					<match_buyer>
-						<match_gate_distance object="this.ship">
+						<match_gate_distance object="this.ship" min="0">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
 					</match_buyer>

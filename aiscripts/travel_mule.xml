@@ -45,6 +45,7 @@
 	</interrupts>
 
 	<init>
+		<set_value name="$debugchance" exact="100"/>
 		<debug_to_file chance="$debugchance" name="this.ship.knownname" directory="'MulesExtended'" text="'Starting Log File'" output="false" append="false" />
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
@@ -73,25 +74,24 @@
 			<!-- Sell leftover cargo before resuming regular Mule routine -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<do_if value="$currentcargo.count">
-				<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" wares="$currentcargo" multiple="true">
-					<match_buyer>
-						<match owner="this.ship.owner" />
-					</match_buyer>
-				</find_buy_offer>
+				<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$needs" wares="$currentcargo" multiple="true"></find_buy_offer>
 				<sort_trades name="$needs" tradelist="$needs" sorter="totalvolume" />
 				<do_all exact="$currentcargo.count" counter="$cc">
 					<set_value name="$ccNeedFound" exact="false" />
 					<do_all exact="$needs.count" counter="$ccn">
-						<do_if value="$currentcargo.{$cc}" exact="$needs.{$ccn}.ware">
+						<set_value name="$cargoHauled" exact="[this.ship.cargo.{$currentcargo.{$cc}}.count,$needs.{$ccn}.amount].min" />
+						<do_if value="$currentcargo.{$cc} == $needs.{$ccn}.ware and $cargoHauled gt (this.ship.cargo.{$currentcargo.{$cc}}.count / 5)">
 							<do_if value="not $ccNeedFound">
-								<set_value name="$cargoHauled" exact="[this.ship.cargo.{$currentcargo.{$cc}}.count,$needs.{$ccn}.amount].min" />
+								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Sell cargo before beginning job: ' + $needs.{$ccn}.ware.id" output="false" append="true" />
 								<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$needs.{$ccn}" amount="$cargoHauled" immediate="false" />
+								<break></break>
 							</do_if>
 							<set_value name="$ccNeedFound" exact="true" />
 						</do_if>
 					</do_all>
 				</do_all>
 				<wait exact="100ms" />
+				<resume label="start" />
 			</do_if>
 
 			<set_value name="$wareBasket" exact="$specialWareBasket" />
@@ -104,28 +104,67 @@
 				</do_elseif>
 			</do_if>
 
-			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true" />
+			<!-- technically sourceStation could be owned by someone on the blacklist, but the player picked this manually -->
+			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true">
+				<match_seller>
+					<match_gate_distance object="this.ship" min="0">
+						<blacklist group="blacklistgroup.civilian" object="this.ship" />
+					</match_gate_distance>
+					<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+					<match_parent>
+						<match_parent>
+						  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+						  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+						</match_parent>
+					</match_parent>
+				</match_seller>
+			</find_sell_offer>
 
+			<debug_to_file chance="$debugchance" name="this.ship.knownname" directory="'MulesExtended'" text="'supplies: ' +$supplies" output="false" append="true" />
+
+
+			<!-- TODO: refactor these blocks -->
+			<!-- maxDist of 15 is the equivalent of "no limit" apparently -->
 			<!-- Finding Buyers -->
 			<do_if value="$destList == []">
 				<do_if value="$maxDist == 15">
 					<do_if value="$tradeWithAll">
 						<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$needs" wares="$wareBasket" multiple="true">
 							<match_buyer>
+								<match_gate_distance object="$sourceStation">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
 								<match_relation_to object="this.ship" relation="enemy" comparison="not" />
 								<match tradesknownto="this.owner" />
 								<match owner="this.ship.owner" negate="true" />
 								<match class="class.station" />
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+								<match_parent>
+									<match_parent>
+									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+									</match_parent>
+								</match_parent>
 							</match_buyer>
 						</find_buy_offer>
 					</do_if>
 					<do_elseif value="$tradeWithBig">
 						<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$needs" wares="$wareBasket" multiple="true">
 							<match_buyer>
+								<match_gate_distance object="$sourceStation">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
 								<match_relation_to object="this.ship" relation="enemy" comparison="not" />
 								<match tradesknownto="this.owner" />
 								<match owner="this.ship.owner" negate="true" />
 								<match class="class.station" />
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+								<match_parent>
+									<match_parent>
+									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+									</match_parent>
+								</match_parent>
 								<match_any>
 									<match canbuildships="true" />
 									<match canequipships="true" />
@@ -135,27 +174,47 @@
 					</do_elseif>
 				</do_if>
 				<do_else>
-					<find_cluster_in_range distances="$clusterstable" multiple="true" object="$sourceStation.cluster" mindistance="0" maxdistance="$maxDist" />
+					<find_cluster_in_range distances="$clusterstable" multiple="true" object="$sourceStation.cluster" mindistance="0" maxdistance="$maxDist"/>
 					<set_value name="$sellspaces" exact="$clusterstable.keys.sorted" />
 					<remove_value name="$clusterstable" />
 					<do_all exact="$sellspaces.count" counter="$sector">
 						<do_if value="$tradeWithAll">
 							<find_buy_offer tradepartner="this.ship" space="$sellspaces.{$sector}" result="$tempList" wares="$wareBasket" multiple="true">
 								<match_buyer>
+									<match_gate_distance object="$sourceStation" max="$maxDist">
+										<blacklist group="blacklistgroup.civilian" object="this.ship" />
+									</match_gate_distance>
 									<match_relation_to object="this.ship" relation="enemy" comparison="not" />
 									<match tradesknownto="this.owner" />
 									<match owner="this.ship.owner" negate="true" />
 									<match class="class.station" />
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+									<match_parent>
+										<match_parent>
+										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+										</match_parent>
+									</match_parent>
 								</match_buyer>
 							</find_buy_offer>
 						</do_if>
 						<do_elseif value="$tradeWithBig">
 							<find_buy_offer tradepartner="this.ship" space="$sellspaces.{$sector}" result="$tempList" wares="$wareBasket" multiple="true">
 								<match_buyer>
+									<match_gate_distance object="$sourceStation" max="$maxDist">
+										<blacklist group="blacklistgroup.civilian" object="this.ship" />
+									</match_gate_distance>
 									<match_relation_to object="this.ship" relation="enemy" comparison="not" />
 									<match tradesknownto="this.owner" />
 									<match owner="this.ship.owner" negate="true" />
 									<match class="class.station" />
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+									<match_parent>
+										<match_parent>
+										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+										</match_parent>
+									</match_parent>
 									<match_any>
 										<match canbuildships="true" />
 										<match canequipships="true" />
@@ -169,10 +228,29 @@
 						</do_all>
 					</do_all>
 				</do_else>
+				<debug_to_file chance="$debugchance" name="this.ship.knownname" directory="'MulesExtended'" text="'needs: ' +$needs" output="false" append="true" />
+				<do_all exact="$needs.count" counter="$i">
+					<debug_to_file chance="$debugchance" name="this.ship.knownname" directory="'MulesExtended'" text="'  ' +$needs.{$i}.ware + ' ' +$needs.{$i}.owner.knownname" output="false" append="true" />
+				</do_all>
 			</do_if>
+
 			<do_else>
 				<do_all exact="$destList.count" counter="$customer">
-					<find_buy_offer tradepartner="this.ship" buyer="$destList.{$customer}" result="$tempList" wares="$wareBasket" multiple="true" />
+					<!-- the destList was built by the user manually in the UI so dont filter by blacklist -->
+					<find_buy_offer tradepartner="this.ship" buyer="$destList.{$customer}" result="$tempList" wares="$wareBasket" multiple="true">
+						<match_buyer>
+							<match_gate_distance object="$sourceStation" max="$maxDist">
+								<blacklist group="blacklistgroup.civilian" object="this.ship" />
+							</match_gate_distance>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+							<match_parent>
+								<match_parent>
+								  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+								  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+								</match_parent>
+							</match_parent>
+						</match_buyer>
+					</find_buy_offer>
 
 					<do_all exact="$tempList.count" counter="$tl">
 						<append_to_list name="$needs" exact="$tempList.{$tl}" />
@@ -210,6 +288,8 @@
 								</do_if>
 							</do_if> <!--need found-->
 						</do_all>
+						<debug_to_file chance="$debugchance" name="this.ship.knownname" directory="'MulesExtended'" text="'need found: ' +$needFound" output="false" append="true" />
+
 
 						<do_if value="$needFound">
 							<do_if value="$supplySource.owner.owner == this.ship.owner">

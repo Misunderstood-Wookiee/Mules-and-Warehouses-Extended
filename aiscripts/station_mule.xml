@@ -159,7 +159,7 @@
 			</find_buy_offer>
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" multiple="true">
 				<match_seller>
-					<match_gate_distance object="this.ship">
+					<match_gate_distance object="this.ship" min="0">
 						<blacklist group="blacklistgroup.civilian" object="this.ship" />
 					</match_gate_distance>
 				</match_seller>
@@ -312,7 +312,7 @@
 					<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI, except for potential pathing  -->
 					<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" excludeempty="false" multiple="true">
 						<match_buyer>
-							<match_gate_distance object="this.ship">
+							<match_gate_distance object="this.ship" min="0">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 						</match_buyer>
@@ -343,7 +343,7 @@
 						<!-- this is checking for player owned station sells, no blacklist needed except potential pathing -->
 						<find_sell_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$supplies" multiple="true">
 							<match_seller>
-								<match_gate_distance object="this.ship">
+								<match_gate_distance object="this.ship" min="0">
 									<blacklist group="blacklistgroup.civilian" object="this.ship" />
 								</match_gate_distance>
 								<match owner="this.ship.owner" />
