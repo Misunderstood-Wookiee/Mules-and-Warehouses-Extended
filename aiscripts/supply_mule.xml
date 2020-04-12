@@ -52,6 +52,7 @@
 	</interrupts>
 
 	<init>
+		<set_value name="$debugchance" exact="100"/>
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
@@ -251,6 +252,7 @@
 						<match_gate_distance object="$StartPosition" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 						<match_parent>
 							<match_parent>
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
@@ -283,6 +285,7 @@
 							<match_gate_distance object="$StartPosition" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 							<match_parent>
 								<match_parent>
 									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
@@ -298,6 +301,7 @@
 							<match_gate_distance object="$StartPosition" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 							<match_parent>
 								<match_parent>
 									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
@@ -356,6 +360,7 @@
 					<match_seller class="class.station">
 						<match owner="this.ship.owner" />
 						<match_gate_distance object="$StartPosition" max="$maxDist" />
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 						<match_parent>
 							<match_parent>
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
@@ -369,20 +374,21 @@
 
 			<!-- Trade with everyone -->
 			<do_else>
-				<find_sell_offer tradepartner="this.ship" space="player.galaxy" result="$Supplier" wares="$wareBasket" multiple="true">
-					<match_seller tradesknownto="this.owner" class="class.station">
-						<match_relation_to object="this.ship" relation="neutral" comparison="ge" />
-						<match_gate_distance object="$StartPosition" min="0" max="$maxDist">
-							<blacklist group="blacklistgroup.civilian" object="this.ship" />
-						</match_gate_distance>
-						<match_parent>
-							<match_parent>
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
-							</match_parent>
-						</match_parent>
-					</match_seller>
-				</find_sell_offer>
+<find_sell_offer tradepartner="this.ship" space="player.galaxy" result="$Supplier" wares="$wareBasket" multiple="true">
+	<match_seller tradesknownto="this.owner" class="class.station">
+		<match_relation_to object="this.ship" relation="neutral" comparison="ge" />
+		<match_gate_distance object="$StartPosition" min="0" max="$maxDist">
+			<blacklist group="blacklistgroup.civilian" object="this.ship" />
+		</match_gate_distance>
+		<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+		<match_parent>
+			<match_parent>
+				<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+				<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+			</match_parent>
+		</match_parent>
+	</match_seller>
+</find_sell_offer>
 			</do_else>
 
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Finding sell offers used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
