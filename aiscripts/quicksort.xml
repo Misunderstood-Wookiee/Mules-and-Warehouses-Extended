@@ -37,7 +37,7 @@
 					<set_value name="$left" exact="$stack.{$top}" />
 					<set_value name="$top" exact="$top-1" />
 
-					<!-- <debug_to_file name="'Quicksort debug'" directory="'MulesExtended'" text="' left ' + $left + '  right ' + $right"/> -->
+					<!-- <debug_to_file name="'Quicksort debug'" directory="'MulesExtended'" text="' left ' + $left + ' right ' + $right"/> -->
 
 					<set_value name="$tmpleft" exact="$left" />
 					<set_value name="$tmpright" exact="$right" />
@@ -52,7 +52,7 @@
 						<do_while value="$values.{$tmpright} gt $pivot">
 							<set_value name="$tmpright" exact="$tmpright-1" />
 						</do_while>
-						<!-- <debug_to_file name="'Quicksort debug'" directory="'MulesExtended'" text="' left ' + $tmpleft + '  right ' + $tmpright"/> -->
+						<!-- <debug_to_file name="'Quicksort debug'" directory="'MulesExtended'" text="' left ' + $tmpleft + ' right ' + $tmpright"/> -->
 
 						<do_if value="$tmpleft lt $tmpright">
 							<!-- <debug_to_file name="'Quicksort debug'" directory="'MulesExtended'" text="'Swap ' + $tmpright + ' with ' + $tmpleft"/> -->
@@ -96,9 +96,7 @@
 					<do_if value="$objects.count gt $v3 and $values.{$v3} gt $values.{($v3+1)}">
 						<debug_to_file name="'Quicksort debug'" directory="'MulesExtended'" text="'Quicksort failed: ' + $values.{$v3} + '  is bigger then ' + $values.{($v3+1)}" output="false" append="true" />
 						<debug_to_file name="'Quicksort fails'" directory="'MulesExtended'" text="'Quicksort failed: ' + $values.{$v3} + '  is bigger then ' + $values.{($v3+1)}" output="false" append="true" />
-						<!-- 				<do_all exact="$objects.count" counter="$v31">
-						<debug_to_file name="'Quicksort fails'" directory="'MulesExtended'" text="' Output Obj: ' + $objects.{$v31}.owner.idcode + ' Ware: ' + $objects.{$v31}.ware.id + ' Value: ' + ($values.{$v31})f + ' Demand: ' + $objects.{$v31}.desiredamount + ' Max Store: ' + $objects.{$v31}.owner.cargo.{$objects.{$v31}.ware}.target " output="false" append="true" /> 
-					</do_all> -->
+						<!-- <do_all exact="$objects.count" counter="$v31"> <debug_to_file name="'Quicksort fails'" directory="'MulesExtended'" text="' Output Obj: ' + $objects.{$v31}.owner.idcode + ' Ware: ' + $objects.{$v31}.ware.id + ' Value: ' + ($values.{$v31})f + ' Demand: ' + $objects.{$v31}.desiredamount + ' Max Store: ' + $objects.{$v31}.owner.cargo.{$objects.{$v31}.ware}.target " output="false" append="true" /> </do_all> -->
 					</do_if>
 
 					<do_if value="$objects.count gt $v3 and (not $objects.{$v3} and $objects.{$v3} != 0 or not $objects.{($v3+1)} and $objects.{($v3+1)} != 0 or not $values.{$v3} and $values.{$v3} != 0 or not $values.{($v3+1)} and $values.{($v3+1)} != 0)">
