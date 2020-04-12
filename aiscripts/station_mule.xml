@@ -149,8 +149,21 @@
 				<remove_value name="$targetTradeWares" />
 			</do_if>
 
-			<find_buy_offer tradepartner="this.ship" buyer="$targetStation" result="$needs" excludeempty="false" multiple="true" />
-			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" multiple="true" />
+			<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI  -->
+			<find_buy_offer tradepartner="this.ship" buyer="$targetStation" result="$needs" excludeempty="false" multiple="true">
+				<match_buyer>
+					<match_gate_distance object="$sourceStation">
+						<blacklist group="blacklistgroup.civilian" object="this.ship" />
+					</match_gate_distance>
+				</match_buyer>
+			</find_buy_offer>
+			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" multiple="true">
+				<match_seller>
+					<match_gate_distance object="this.ship">
+						<blacklist group="blacklistgroup.civilian" object="this.ship" />
+					</match_gate_distance>
+				</match_seller>
+			</find_sell_offer>
 
 			<!-- Station Mule Routines -->
 			<do_all exact="$loops" counter="$loop">
@@ -296,30 +309,55 @@
 					<set_value name="$needFound2" exact="$needFound" />
 					<set_value name="$needFound" exact="false" />
 					<set_value name="$supplyFirstLocal" exact="$twoWaySupplyFirst" />
-					<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" excludeempty="false" multiple="true" />
-					<find_sell_offer tradepartner="this.ship" seller="$targetStation" result="$supplies" multiple="true" />
+					<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI, except for potential pathing  -->
+					<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" excludeempty="false" multiple="true">
+						<match_buyer>
+							<match_gate_distance object="this.ship">
+								<blacklist group="blacklistgroup.civilian" object="this.ship" />
+							</match_gate_distance>
+						</match_buyer>
+					</find_buy_offer>
+					<find_sell_offer tradepartner="this.ship" seller="$targetStation" result="$supplies" multiple="true">
+						<match_seller>
+							<match_gate_distance object="$sourceStation">
+								<blacklist group="blacklistgroup.civilian" object="this.ship" />
+							</match_gate_distance>
+						</match_seller>
+					</find_sell_offer>
 				</do_if>
 
 				<do_if value="($loop ge 2) and not ($forbidTradeAll or $needFound or $needFound2)">
 					<do_if value="$loop == 2">
 						<set_value name="$supplyFirstLocal" exact="false" />
+						<!-- I believe this trade is intended to be intra-cluster so pathing blacklists may be mostly irrelevant -->
+						<!-- this is checking for player owned stations which need build storage, no blacklist needed -->
 						<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" excludeempty="false" multiple="true">
 							<match_buyer>
+								<match_gate_distance object="$sourceStation">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
 								<match owner="this.ship.owner" />
 								<match class="class.buildstorage" />
 							</match_buyer>
 						</find_buy_offer>
-
+						<!-- this is checking for player owned station sells, no blacklist needed except potential pathing -->
 						<find_sell_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$supplies" multiple="true">
 							<match_seller>
+								<match_gate_distance object="this.ship">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
 								<match owner="this.ship.owner" />
 							</match_seller>
 						</find_sell_offer>
 						<sort_trades name="$supplies" tradelist="$supplies" sorter="amount" />
 					</do_if>
 					<do_elseif value="$loop == 3">
+						<!-- this is checking for player owned stations which need build storage, no blacklist needed -->
 						<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" excludeempty="false" multiple="true">
 							<match_buyer>
+								<match_gate_distance object="$sourceStation">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
 								<match owner="this.ship.owner" />
 								<match class="class.buildstorage" negate="true" />
 							</match_buyer>
