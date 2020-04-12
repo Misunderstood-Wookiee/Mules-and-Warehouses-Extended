@@ -81,25 +81,34 @@
 			<!-- Sell leftover cargo before regular Mule duty -->
 			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
 			<do_if value="$currentcargo.count">
-				<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" wares="$currentcargo" multiple="true">
-					<match_buyer>
-						<match owner="this.ship.owner" />
-					</match_buyer>
+				<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$needs" wares="$currentcargo" multiple="true">
+					<match_seller>
+						<match_relation_to object="this.ship" relation="enemy" comparison="not"/>
+						<match tradesknownto="this.owner"/>
+						<match_use_blacklist group="$blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+						<match_gate_distance object="this.ship" max="8"></match_gate_distance>
+					</match_seller>
+					<!-- this is a total hack -->
+					<amount min="$currentcargo.{0}.amount"/>
 				</find_buy_offer>
+				
 				<sort_trades name="$needs" tradelist="$needs" sorter="totalvolume" />
 				<do_all exact="$currentcargo.count" counter="$cc">
 					<set_value name="$ccNeedFound" exact="false" />
 					<do_all exact="$needs.count" counter="$ccn">
-						<do_if value="$currentcargo.{$cc}" exact="$needs.{$ccn}.ware">
+						<set_value name="$cargoHauled" exact="[this.ship.cargo.{$currentcargo.{$cc}}.count,$needs.{$ccn}.amount].min" />
+						<do_if value="$currentcargo.{$cc} == $needs.{$ccn}.ware and $cargoHauled eq (this.ship.cargo.{$currentcargo.{$cc}}.count)">
 							<do_if value="not $ccNeedFound">
-								<set_value name="$cargoHauled" exact="[this.ship.cargo.{$currentcargo.{$cc}}.count,$needs.{$ccn}.amount].min" />
+								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Sell cargo before beginning job: ' + $needs.{$ccn}.ware.id" output="false" append="true" />
 								<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$needs.{$ccn}" amount="$cargoHauled" immediate="false" />
+								<break></break>
 							</do_if>
 							<set_value name="$ccNeedFound" exact="true" />
 						</do_if>
 					</do_all>
 				</do_all>
 				<wait exact="100ms" />
+				<resume label="start" />
 			</do_if>
 
 			<set_value name="$wareBasket" exact="$specialWareBasket" />
@@ -112,7 +121,19 @@
 				</do_elseif>
 			</do_if>
 
-			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true" />
+			<set_value name="$distanceToSourceStation" exact="this.ship.gatedistance.{$sourceStation}"></set_value>
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'gate distance from ship to source station: ' +$distanceToSourceStation" output="false" append="true" />
+
+			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true">
+				<!-- this blacklist block shouldnt be needed unless the match_gate_distance has a max distance. If we ever do that we will need it so leaving it in -->
+				<match_seller>
+					<match_gate_distance object="this.ship">
+						<blacklist group="blacklistgroup.civilian" object="this.ship" />
+					</match_gate_distance>
+				</match_seller>
+			</find_sell_offer>
+
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'source station ' +$sourceStation.knownname" output="false" append="true" />
 
 			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'source station ' +$sourceStation.knownname" output="false" append="true" />
 			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'this is the wareBasket'" output="false" append="true" />
@@ -129,7 +150,14 @@
 			<do_all exact="$destList.count" counter="$customer">
 				<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$destList.{$customer}.knownname" output="false" append="true" />
 				
-				<find_buy_offer tradepartner="this.ship" buyer="$destList.{$customer}" result="$tempList" wares="$wareBasket" excludeempty="false" multiple="true" />
+				<!-- customers here are intended to only be player owned warehouses, so there is no need to filter trades by blacklist -->
+				<find_buy_offer tradepartner="this.ship" buyer="$destList.{$customer}" result="$tempList" wares="$wareBasket" excludeempty="false" multiple="true">
+					<match_buyer>
+						<match_gate_distance object="$sourceStation">
+							<blacklist group="blacklistgroup.civilian" object="this.ship" />
+						</match_gate_distance>
+					</match_buyer>
+				</find_buy_offer>
 
 				<do_all exact="$tempList.count" counter="$tl">
 					<append_to_list name="$needs" exact="$tempList.{$tl}" />
@@ -192,16 +220,40 @@
 					</do_all>
 
 				</do_if> <!-- the stations have supply and demand -->
+	
+				<!-- I'm not at all confident that the objects in the match_gate_distance are all correct
+				since right now we don't have gate limits, it shouldn't matter, but if max distances are ever added
+				this will need to be definitively accurate 
+				What it looks like to me is that it's searching other stations owned by the destination to add their 
+				needs to the supply list -->
 				<set_value name="$needFound2" exact="$needFound" />
 				<set_value name="$needFound" exact="false" />
-				<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" wares="$wareBasket" excludeempty="false" multiple="true" />
+				<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" wares="$wareBasket" excludeempty="false" multiple="true">
+					<match_buyer>
+						<match_gate_distance object="this.ship">
+							<blacklist group="blacklistgroup.civilian" object="this.ship" />
+						</match_gate_distance>
+					</match_buyer>
+				</find_buy_offer>
 
 				<do_if value="$needFound2">
-					<find_sell_offer tradepartner="this.ship" seller="$supplyTarget.owner" result="$supplies" wares="$wareBasket" multiple="true" />
+					<find_sell_offer tradepartner="this.ship" seller="$supplyTarget.owner" result="$supplies" wares="$wareBasket" multiple="true">
+						<match_seller>
+							<match_gate_distance object="$supplyTarget">
+								<blacklist group="blacklistgroup.civilian" object="this.ship" />
+							</match_gate_distance>
+						</match_seller>
+					</find_sell_offer>
 				</do_if>
 				<do_else>
 					<do_all exact="$destList.count" counter="$customer">
-						<find_sell_offer tradepartner="this.ship" seller="$destList.{$customer}" result="$tempList" wares="$wareBasket" multiple="true" />
+						<find_sell_offer tradepartner="this.ship" seller="$destList.{$customer}" result="$tempList" wares="$wareBasket" multiple="true">
+							<match_seller>
+								<match_gate_distance object="$sourceStation">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+							</match_seller>
+						</find_sell_offer>
 						<do_all exact="$tempList.count" counter="$tl">
 							<append_to_list name="$supplies" exact="$tempList.{$tl}" />
 						</do_all>
