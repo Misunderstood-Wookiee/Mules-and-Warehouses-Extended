@@ -55,6 +55,7 @@
 	</interrupts>
 
 	<init>
+		<set_value name="$debugchance" exact="100"/>
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
@@ -66,7 +67,7 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'ScriptStart'" output="false" append="false" />
 			<set_value name="$needFound" exact="false" />
 			<set_value name="$needFound2" exact="false" />
 			<set_value name="$supplyTarget" exact="0" />
@@ -113,13 +114,31 @@
 
 			<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$supplies" wares="$wareBasket" multiple="true" />
 
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'source station ' +$sourceStation.knownname" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'this is the wareBasket'" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$wareBasket" output="false" append="true" />
+
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'these are the sell offers'" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$supplies" output="false" append="true" />
+			<do_all exact="$supplies.count" counter="$i">
+				<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$supplies.{$i}.ware + ' ' +$supplies.{$i}.amount" output="false" append="true" />
+			</do_all>
+
 			<!-- Finding buyers -->
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'these are the customers'" output="false" append="true" />
 			<do_all exact="$destList.count" counter="$customer">
+				<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$destList.{$customer}.knownname" output="false" append="true" />
+				
 				<find_buy_offer tradepartner="this.ship" buyer="$destList.{$customer}" result="$tempList" wares="$wareBasket" excludeempty="false" multiple="true" />
 
 				<do_all exact="$tempList.count" counter="$tl">
 					<append_to_list name="$needs" exact="$tempList.{$tl}" />
 				</do_all>
+			</do_all>
+
+			<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'these are all customer buy orders'" output="false" append="true" />
+			<do_all exact="$needs.count" counter="$i">
+				<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$needs.{$i}.ware + ' ' +$needs.{$i}.amount" output="false" append="true" />
 			</do_all>
 
 			<!-- Distribution Mule Routine -->
@@ -128,13 +147,19 @@
 					<sort_trades name="$innerList" tradelist="$needs" sorter="totalvolume" />
 					<sort_trades name="$outerList" tradelist="$supplies" sorter="volume" />
 
+					<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'static storage setting value. If no wares are above this, no trades will happen'" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$staticStorage" output="false" append="true" />
+
 					<do_all exact="$outerList.count" counter="$idx">
 						<set_value name="$sourceCargoRatio" exact="($outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.count * 100 / [$outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.target, 1].max)" />
+						<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  source cargo ratio for ' +$outerList.{$idx}.ware + ': ' +$sourceCargoRatio" output="false" append="true" />
+
 						<do_if value="(not $needFound) and ($sourceCargoRatio gt $staticStorage)">
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
 
 							<do_all exact="$innerList.count" counter="$ctr">
 								<set_value name="$targetCargoRatio" exact="($innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.count * 100 / [$innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.target, 1].max)" />
+								<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  target cargo ratio for ' +$innerList.{$ctr}.ware + ': ' +$targetCargoRatio" output="false" append="true" />
 								<do_if value="(not $needFound) and ($targetCargoRatio lt $minStorage or ($sourceCargoRatio gt $maxStorage and $sourceCargoRatio gt ($targetCargoRatio + 10)))">
 									<set_value name="$someInner" exact="$innerList.{$ctr}" />
 
@@ -152,6 +177,7 @@
 											<set_value name="$supplyTarget" exact="$someInner" />
 											<set_value name="$supplySource" exact="$someOuter" />
 											<set_value name="$needFound" exact="true" />
+											<debug_to_file chance="$debugchance" name="'DistribMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'found a trade: ' +$someInner.ware + ' ' +$cargoHauled" output="false" append="true" />
 										</do_if>
 									</do_if>
 								</do_if>
