@@ -19,7 +19,7 @@
 				<input_param name="startvalue" value="80" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="100" />
-				<input_param name="step" value="25" />
+				<input_param name="step" value="5" />
 			</param>
 
 			<!-- menu option: WareBasket List -->
