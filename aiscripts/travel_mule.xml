@@ -15,8 +15,8 @@
 				<input_param name="step" value="1" />
 			</param>
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
-			<param name="profitMargin" default="80" type="number" text="Profit Override" comment="Owned Station Buy price adjustment, 0=Sell all wares regardless of trade offer price. 100= Obey Station Manager's buy offer.">
-				<input_param name="startvalue" value="80" />
+			<param name="profitMargin" default="90" type="number" text="Profit Override" comment="Owned Station Buy price adjustment, 0=Sell all wares regardless of trade offer price. 100= Obey Station Manager's buy offer.">
+				<input_param name="startvalue" value="90" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="100" />
 				<input_param name="step" value="5" />
@@ -28,10 +28,10 @@
 				<input_param name="cancarry" value="this.ship" />
 			</param>
 			<!-- menu option: Cargo Percentage Used for Trade -->
-			<param name="minCargoUsed" default="100" type="number" text="Fill Cargo Hold %" comment="The percentage of the ship's cargo hold that the trade will take up.">
-				<input_param name="startvalue" value="100" />
+			<param name="minCargoUsed" default="80" type="number" text="Fill Cargo Hold %" comment="The percentage of the ship's cargo hold that the trade will take up.">
+				<input_param name="startvalue" value="80" />
 				<input_param name="min" value="25" />
-				<input_param name="max" value="100" />
+				<input_param name="max" value="95" />
 				<input_param name="step" value="5" />
 			</param>
 
@@ -334,7 +334,7 @@
 									<set_value name="$targetAmount" exact="$someInner.amount" />
 								</do_else>
 								<set_value name="$cargoHauled" exact="[this.ship.cargo.{$someInner.ware}.free,$targetAmount,$someOuter.amount].min" />
-								<set_value name="$currentProfit" exact="$cargoHauled * ($someInner.unitprice - $someOuter.unitprice*$profitMargin)" />
+								<set_value name="$currentProfit" exact="$cargoHauled * ($someInner.unitprice - $someOuter.unitprice*$profitMargin/100)" />
 								<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----'" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'cargoHauled: ' +$cargoHauled" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buyer.unitprice: ' +$someInner.unitprice" output="false" append="true" />
