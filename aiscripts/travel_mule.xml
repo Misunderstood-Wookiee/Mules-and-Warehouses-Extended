@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="travelmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
-	<!-- Setup context menu order-->
+	<!-- Setup context menu order -->
 	<order id="TravelMule" name="M1- Travel Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
-			<!-- menu option: Source Station (Define Source Station)-->
+			<!-- menu option: Source Station (Define Source Station) -->
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<!-- menu option: Target NPC Shipyards, Whalfs, Equipment Docks-->
+			<!-- menu option: Target NPC Shipyards, Whalfs, Equipment Docks -->
 			<param name="tradeWithBig" required="false" type="bool" default="false" text="Target NPC Shipyards" comment="Assign to trade with all NPC shipyards, wharfs, and equip docks." />
-			<!-- menu option: Target All NPC Stations (trade with any station toggle)-->
+			<!-- menu option: Target All NPC Stations (trade with any station toggle) -->
 			<param name="tradeWithAll" required="false" type="bool" default="true" text="Target All NPC Stations" comment="Assign to trade with all NPC stations." />
-			<!-- menu option: Max Gate Distance-->
+			<!-- menu option: Max Gate Distance -->
 			<param name="maxDist" required="false" default="8" type="number" text="Max Jumps" comment="Max Gate Distance to sell.">
 				<input_param name="startvalue" value="15" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="15" />
 				<input_param name="step" value="1" />
 			</param>
-			<!-- menu option: WareBasket List-->
+			<!-- menu option: WareBasket List -->
 			<param name="specialWareBasket" required="false" default="[]" type="list" text="Wares (all by default)" comment="Warebasket">
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
-			<!-- menu option: Destination Override (select stations manually to visit)-->
+			<!-- menu option: Destination Override (select stations manually to visit) -->
 			<param name="destList" required="false" default="[]" type="list" text="Custom Stop List (Replaces 'Target' Options)" comment="Manually choose Points to visit.">
 				<input_param name="type" value="'object'" />
 			</param>
 		</params>
 		<requires>
-			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for-->
+			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for -->
 		</requires>
 	</order>
 
@@ -152,11 +152,11 @@
 					<match_gate_distance object="this.ship" min="0">
 						<blacklist group="blacklistgroup.civilian" object="this.ship" />
 					</match_gate_distance>
-					<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+					<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 					<match_parent>
 						<match_parent>
-						  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
-						  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 						</match_parent>
 					</match_parent>
 				</match_seller>
@@ -180,11 +180,11 @@
 								<match tradesknownto="this.owner" />
 								<match owner="this.ship.owner" negate="true" />
 								<match class="class.station" />
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
 									<match_parent>
-									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
-									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 									</match_parent>
 								</match_parent>
 							</match_buyer>
@@ -200,11 +200,11 @@
 								<match tradesknownto="this.owner" />
 								<match owner="this.ship.owner" negate="true" />
 								<match class="class.station" />
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
 									<match_parent>
-									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
-									  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 									</match_parent>
 								</match_parent>
 								<match_any>
@@ -216,7 +216,7 @@
 					</do_elseif>
 				</do_if>
 				<do_else>
-					<find_cluster_in_range distances="$clusterstable" multiple="true" object="$sourceStation.cluster" mindistance="0" maxdistance="$maxDist"/>
+					<find_cluster_in_range distances="$clusterstable" multiple="true" object="$sourceStation.cluster" mindistance="0" maxdistance="$maxDist" />
 					<set_value name="$sellspaces" exact="$clusterstable.keys.sorted" />
 					<remove_value name="$clusterstable" />
 					<do_all exact="$sellspaces.count" counter="$sector">
@@ -230,11 +230,11 @@
 									<match tradesknownto="this.owner" />
 									<match owner="this.ship.owner" negate="true" />
 									<match class="class.station" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 									<match_parent>
 										<match_parent>
-										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
-										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+											<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+											<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 										</match_parent>
 									</match_parent>
 								</match_buyer>
@@ -250,11 +250,11 @@
 									<match tradesknownto="this.owner" />
 									<match owner="this.ship.owner" negate="true" />
 									<match class="class.station" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 									<match_parent>
 										<match_parent>
-										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
-										  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+											<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+											<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 										</match_parent>
 									</match_parent>
 									<match_any>
@@ -284,11 +284,11 @@
 							<match_gate_distance object="$sourceStation" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 							<match_parent>
 								<match_parent>
-								  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
-								  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 								</match_parent>
 							</match_parent>
 						</match_buyer>
@@ -311,7 +311,7 @@
 						<do_all exact="$innerList.count" counter="$ctr">
 							<set_value name="$someInner" exact="$innerList.{$ctr}" />
 							<do_if value="$someOuter.ware.id" exact="$someInner.ware.id">
-								<!-- find need-->
+								<!-- find need -->
 								<do_if value="$someInner.owner.owner == this.ship.owner">
 									<set_value name="$targetAmount" exact="$someInner.desiredamount" />
 								</do_if>
@@ -336,7 +336,7 @@
 										<set_value name="$supplySource" exact="$someOuter" />
 									</do_if>
 								</do_if>
-							</do_if> <!--need found-->
+							</do_if> <!-- need found -->
 						</do_all>
 						<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'need found: ' +$needFound" output="false" append="true" />
 
@@ -345,14 +345,18 @@
 							<do_if value="$supplySource.owner.owner == this.ship.owner">
 								<set_value name="$currentProfit" exact="$bestCargo * $supplyTarget.unitprice" />
 								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+
 								<!--Debug: Print profit stats to logfile-->
 								<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+
 							</do_if>
 							<do_else>
 								<set_value name="$currentProfit" exact="$bestCargo * ($supplyTarget.unitprice - $supplySource.unitprice)" />
 								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+
 								<!--Debug: Print profit stats to logfile-->
 								<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+
 							</do_else>
 
 							<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$bestCargo" immediate="false" />
