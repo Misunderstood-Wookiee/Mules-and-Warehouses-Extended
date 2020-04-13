@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<diff>
+    <!-- Distribute Mule Icon -->
+    <add sel="/icons">
+        <icon name="order_distrimule" texture="assets\fx\gui\textures\order\order_tradeexchangepassive.tga" height="32" width="32"></icon>
+    </add>
+    <!-- Supply Mule Icon -->
+    <add sel="/icons">
+        <icon name="order_supplymule" texture="assets\fx\gui\textures\order\order_traderoutine.tga" height="32" width="32"></icon>
+    </add>
+    <!-- Travel Mule Icon -->
+    <add sel="/icons">
+        <icon name="order_travelmule" texture="assets\fx\gui\textures\order\order_traderoutine.tga" height="32" width="32"></icon>
+    </add>
+    <!-- Station Mule Icon -->
+    <add sel="/icons">
+        <icon name="order_stationmule" texture="assets\fx\gui\textures\order\order_traderoutine.tga" height="32" width="32"></icon>
+    </add>
+</diff>
