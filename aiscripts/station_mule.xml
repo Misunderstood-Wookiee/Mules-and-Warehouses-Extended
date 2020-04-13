@@ -62,6 +62,8 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
+			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" append="false" output="false"/>
+
 			<set_value name="$loops" exact="2" />
 			<do_if value="not $forbidTradeAll">
 				<set_value name="$loops" exact="4" />
@@ -81,28 +83,69 @@
 			<create_list name="$prio4" />
 			<create_list name="$prio5" />
 
-			<!-- Sell leftover cargo before regular Mule duty -->
-			<set_value name="$currentcargo" exact="this.ship.cargo.list" />
-			<do_if value="$currentcargo.count">
-				<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" wares="$currentcargo" excludeempty="false" multiple="true">
-					<match_buyer>
-						<match owner="this.ship.owner" />
-					</match_buyer>
-				</find_buy_offer>
-				<sort_trades name="$needs" tradelist="$needs" sorter="totalvolume" />
-				<do_all exact="$currentcargo.count" counter="$cc">
-					<set_value name="$ccNeedFound" exact="false" />
-					<do_all exact="$needs.count" counter="$ccn">
-						<do_if value="$currentcargo.{$cc}" exact="$needs.{$ccn}.ware">
-							<do_if value="not $ccNeedFound">
-								<set_value name="$cargoHauled" exact="[this.ship.cargo.{$currentcargo.{$cc}}.count,$needs.{$ccn}.amount].min" />
-								<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$needs.{$ccn}" amount="$cargoHauled" immediate="false" />
-							</do_if>
-							<set_value name="$ccNeedFound" exact="true" />
-						</do_if>
-					</do_all>
+			<!-- Sell leftover cargo before resuming regular Mule routine -->
+			<set_value name="$profitScale" exact="50"/>
+			<set_value name="$pilotSkill" exact="this.ship.pilot.skill.piloting" />
+			<set_value name="$maxBuyRelPrice" exact="((-0.325-0.025*($pilotSkill)f)/90.0-0.01)*($profitScale)f+1-(-0.325-0.025*($pilotSkill)f)/9.0"/>
+			<set_value name="$searchStep" exact="(1.0-$maxBuyRelPrice)/4.0"/>
+
+			<set_value name="$cargo" exact="this.ship.cargo.list" />
+
+			<do_all exact="$cargo.count" counter="$wareInCargo">
+				<wait exact="100ms"/>
+
+				<set_value name="$currentWare" exact="$cargo.{$wareInCargo}"/>
+				<set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count"/>
+				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'"/>
+
+				<do_all exact="5" counter="$reduction">
+					<!--searching suiting buy offer, will search 5 times reducing requirements each time by 20% (just want to get rid of that stuff at some point)-->
+					<find_buy_offer tradepartner="this.ship" space ="player.galaxy" result="$buyOffer" wares="$currentWare">
+						<match_buyer tradesknownto="this.owner">
+							<match_gate_distance object="this.ship" min="0" max="8">
+								<blacklist group="blacklistgroup.civilian" object="this.ship" />
+							</match_gate_distance>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+							<match_parent>
+								<match_parent>
+								  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+								  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+								</match_parent>
+							</match_parent>
+						</match_buyer>
+						<relativeprice min="-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001"/>
+						<amount min="$amount*(0.8^($reduction-1))"/>
+					</find_buy_offer>
+					<wait exact="100ms" />
+					
+					<do_if value="$buyOffer == null">
+						<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)"/>
+						<continue/>
+					</do_if>
+
+					<set_value name="$amount" exact="[$amount,$buyOffer.amount].min"/>
+
+					<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount"/>
+
+					<do_if value="$buyOffer.available">
+						<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100"/>
+						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer"/>
+						<debug_to_file name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  trade created'"/>
+						<resume label="end"/>
+					</do_if>
+					<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  offer not available anymore'"/>
 				</do_all>
-				<wait exact="100ms" />
+				<show_notification text="['stationmule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
+				<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'"/>
+			</do_all>
+			<remove_value name="$searchStep"/>
+			<remove_value name="$cargo"/>
+			<remove_value name="$buyOffer"/>
+
+			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
+				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'stationmule'" text="'  cargo is full =('"/>
+				<wait exact="100ms"/>
+				<resume label="start"/>
 			</do_if>
 
 			<!-- Add trade ware orders to target station if make target warehouse is checked -->
@@ -152,7 +195,7 @@
 			<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI -->
 			<find_buy_offer tradepartner="this.ship" buyer="$targetStation" result="$needs" excludeempty="false" multiple="true">
 				<match_buyer>
-					<match_gate_distance object="$sourceStation">
+					<match_gate_distance object="$sourceStation" min="0">
 						<blacklist group="blacklistgroup.civilian" object="this.ship" />
 					</match_gate_distance>
 				</match_buyer>
@@ -319,7 +362,7 @@
 					</find_buy_offer>
 					<find_sell_offer tradepartner="this.ship" seller="$targetStation" result="$supplies" multiple="true">
 						<match_seller>
-							<match_gate_distance object="$sourceStation">
+							<match_gate_distance object="$sourceStation" min="0">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 						</match_seller>
@@ -333,7 +376,7 @@
 						<!-- this is checking for player owned stations which need build storage, no blacklist needed -->
 						<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" excludeempty="false" multiple="true">
 							<match_buyer>
-								<match_gate_distance object="$sourceStation">
+								<match_gate_distance object="$sourceStation" min="0">
 									<blacklist group="blacklistgroup.civilian" object="this.ship" />
 								</match_gate_distance>
 								<match owner="this.ship.owner" />
@@ -355,7 +398,7 @@
 						<!-- this is checking for player owned stations which need build storage, no blacklist needed -->
 						<find_buy_offer tradepartner="this.ship" space="$sourceStation.cluster" result="$needs" excludeempty="false" multiple="true">
 							<match_buyer>
-								<match_gate_distance object="$sourceStation">
+								<match_gate_distance object="$sourceStation" min="0">
 									<blacklist group="blacklistgroup.civilian" object="this.ship" />
 								</match_gate_distance>
 								<match owner="this.ship.owner" />
@@ -377,6 +420,7 @@
 
 			<wait exact="10000ms" />
 			<resume label="start" />
+			<label name="end" />
 		</actions>
 	</attention>
 </aiscript>
