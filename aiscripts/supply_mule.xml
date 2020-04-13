@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
-	<!-- Setup context menu order -->
+	<!-- Setup context menu order-->
 	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
 		<params>
-			<!-- menu option: Source Station (Define Source Station) -->
+			<!-- menu option: Source Station (Define Source Station)-->
 			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.) -->
+			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.)-->
 			<param name="assignSrc" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the source station if it's the players." />
-			<!-- menu option: Serve Source Only (will only serve the source station if used) -->
+			<!-- menu option: Serve Source Only (will only serve the source station if used)-->
 			<param name="dedicatedServe" type="bool" default="false" text="Serve Source Only" comment="Will only serve the configured source station" />
-			<!-- menu option: Player Stations Only (will only buy from player owned station if used) -->
+			<!-- menu option: Player Stations Only (will only buy from player owned station if used)-->
 			<param name="tradeWithOwn" required="false" type="bool" default="false" text="Player Stations Only" comment="Buys from player stations only" />
-			<!-- menu option: Max Trades (Maximum trades per buy run) -->
+			<!-- menu option: Max Trades (Maximum trades per buy run)-->
 			<param name="maxtrades" required="false" default="[5 + this.ship.pilot.skill.piloting * 2, 20].min" type="number" text="Max Trades" comment="Max Trades per buy run.">
 				<input_param name="startvalue" value="[5 + this.ship.pilot.skill.piloting * 2, 20].min" />
 				<input_param name="min" value="1" />
 				<input_param name="max" value="5 + this.ship.pilot.skill.piloting * 2" />
 				<input_param name="step" value="1" />
 			</param>
-			<!-- menu option: Max Distance (Maximum Jumpes to buy) -->
+			<!-- menu option: Max Distance (Maximum Jumpes to buy)-->
 			<param name="maxDist" required="false" default="this.ship.pilot.skill.piloting * 2" type="number" text="Max Jumps" comment="Max gate distance to buy.">
 				<input_param name="startvalue" value="this.ship.pilot.skill.piloting * 2" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="this.ship.pilot.skill.piloting * 2" />
 				<input_param name="step" value="1" />
 			</param>
-			<!-- menu option: Give Builders Priority (Supply builder sites before other station needs if used) -->
+			<!-- menu option: Give Builders Priority (Supply builder sites before other station needs if used)-->
 			<param name="builder" type="bool" default="true" text="Give Builders Priority" comment="Prioritizes supplying build sites before station needs." />
-			<!-- menu option: WareBasket List -->
+			<!-- menu option: WareBasket List-->
 			<param name="specialWareBasket" required="false" default="[]" type="list" text="Wares (all by default)" comment="Warebasket">
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
 		</params>
 		<requires>
-			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for -->
+			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for-->
 		</requires>
 	</order>
 
@@ -52,7 +52,7 @@
 	</interrupts>
 
 	<init>
-		<set_value name="$debugchance" exact="100" />
+		<set_value name="$debugchance" exact="100"/>
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
@@ -78,7 +78,7 @@
 				<set_value name="$assignSrc" exact="false" />
 			</do_if>
 
-			<!-- here we want to copy settings to subordinates -->
+			<!--here we want to copy settings to subordinates-->
 			<set_value name="$subordinates" exact="this.ship.subordinates" />
 			<set_value name="$subNr" exact="$subordinates.count" />
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'found subordinates: '+$subNr" output="false" append="true" />
@@ -186,88 +186,31 @@
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Selling leftover cargo used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
-			<!-- Debug: Defined Wares -->
+			<!-- Debug: Defined Wares  -->
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Define Wares'" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'dedicated serve: ' +$dedicatedServe" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'sourceStation: ' +$sourceStation" output="false" append="true" />
+
 			<do_if value="$dedicatedServe and $sourceStation">
+				<!-- I don't understand why there was a need for the level of complexity that was here. -->
+				<!-- It seems like we just need to find all trade offers from the sourceStation? -->
+				<!-- Ah, this strips out some logic that sets trade offers on the station if it thinks it's a trade station. -->
+				<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$specialWareBasket" multiple="true">
+					<match_seller>
+						<match_gate_distance object="this.ship" min="0">
+							<blacklist group="blacklistgroup.civilian" object="this.ship" />
+						</match_gate_distance>
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
+						<match_parent>
+							<match_parent>
+							  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship"/>
+							  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
+							</match_parent>
+						</match_parent>
+					</match_seller>
+				</find_sell_offer>
 
-				<!-- If Warebasket is EMPTY, add the repective wares of the source station -->
-				<do_if value="$specialWareBasket == []">
-					<set_value name="$resources" exact="$sourceStation.resources.list" />
-					<do_all exact="$resources.count" counter="$nr">
-						<append_to_list name="$specialWareBasket" exact="$resources.{$nr}" />
-					</do_all>
-					<remove_value name="$resources" />
-
-					<set_value name="$supplyresources" exact="$sourceStation.supplyresources.list" />
-					<do_all exact="$supplyresources.count" counter="$nr2">
-						<append_to_list name="$specialWareBasket" exact="$supplyresources.{$nr2}" />
-					</do_all>
-					<remove_value name="$supplyresources" />
-
-					<set_value name="$tradewares" exact="$sourceStation.tradewares.list" />
-					<do_all exact="$tradewares.count" counter="$nr3">
-						<append_to_list name="$specialWareBasket" exact="$tradewares.{$nr3}" />
-					</do_all>
-					<remove_value name="$tradewares" />
-				</do_if>
-
-				<!-- If station is a factory/shipyard station, remove all wares which are not wares of that station -->
-				<create_list name="$wareBasket" />
-				<do_if value="$sourceStation.products.count gt 0 or $sourceStation.canbuildships or $sourceStation.canequipships">
-					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Factory/Shipyard detected: Resources: ' + $sourceStation.resources.count + ' Products: ' + $sourceStation.products.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
-					<set_value name="$resources" exact="$sourceStation.resources.list" />
-					<do_all exact="$resources.count" counter="$nr">
-						<do_if value="$specialWareBasket.indexof.{$resources.{$nr}}">
-							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Adding Resource: ' + $resources.{$nr}.id" output="false" append="true" />
-							<append_to_list name="$wareBasket" exact="$resources.{$nr}" />
-						</do_if>
-					</do_all>
-					<remove_value name="$resources" />
-
-					<set_value name="$supplyresources" exact="$sourceStation.supplyresources.list" />
-					<do_all exact="$supplyresources.count" counter="$nr2">
-						<do_if value="$specialWareBasket.indexof.{$supplyresources.{$nr}}">
-							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Adding Supply: ' + $supplyresources.{$nr2}.id" output="false" append="true" />
-							<append_to_list name="$wareBasket" exact="$supplyresources.{$nr2}" />
-						</do_if>
-					</do_all>
-					<remove_value name="$supplyresources" />
-
-					<set_value name="$tradewares" exact="$sourceStation.tradewares.list" />
-					<do_all exact="$tradewares.count" counter="$nr3">
-						<do_if value="$specialWareBasket.indexof.{$tradewares.{$nr}}">
-							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Adding Tradeware: ' + $tradewares.{$nr3}.id" output="false" append="true" />
-							<append_to_list name="$wareBasket" exact="$tradewares.{$nr3}" />
-						</do_if>
-					</do_all>
-					<remove_value name="$tradewares" />
-				</do_if>
-
-				<!-- AI Trade stations, remove everything which is not a trade ware -->
-				<do_elseif value="$sourceStation.tradewares.count gt 0 and $sourceStation.owner != this.ship.owner">
-					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Trade station detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
-					<set_value name="$tradewares" exact="$sourceStation.tradewares.list" />
-					<do_all exact="$tradewares.count" counter="$nr4">
-						<do_if value="$specialWareBasket.indexof.{$tradewares.{$nr}}">
-							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Adding Tradeware: ' + $tradewares.{$nr4}.id" output="false" append="true" />
-							<append_to_list name="$wareBasket" exact="$tradewares.{$nr4}" />
-						</do_if>
-					</do_all>
-					<remove_value name="$tradewares" />
-				</do_elseif>
-
-				<!-- Add trade wares to player warehouse -->
-				<do_elseif value="$sourceStation.owner == this.ship.owner">
-					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Warehouse detected: Tradewares: ' + $sourceStation.tradewares.count + ' Warebasket: ' + $specialWareBasket.count" output="false" append="true" />
-					<set_value name="$wareBasket" exact="$specialWareBasket" />
-					<do_all exact="$wareBasket.count" counter="$v1">
-						<do_if value="not $sourceStation.tradewares.indexof.{$wareBasket.{$v1}}">
-							<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Adding Offer: ' + $wareBasket.{$v1} + ' ' + $wareBasket.count + ' Tradeware count: ' + $sourceStation.tradewares.count" output="false" append="true" />
-							<add_tradeware object="$sourceStation" ware="$wareBasket.{$v1}" allowbuy="true" allowsell="true" lockavgprice="false" />
-							<wait exact="100ms" />
-						</do_if>
-					</do_all>
-				</do_elseif>
+				<set_value name="$wareBasket" exact="$specialWareBasket" />
 			</do_if>
 
 			<do_else>
@@ -287,6 +230,8 @@
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Setting Warebasket used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
+			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'builder: ' +$builder" output="false" append="true" />
+
 			<!-- Find build site demands (used when 'Give Builders Priority') -->
 			<do_if value="$builder">
 				<find_buy_offer space="player.galaxy" result="$needs" wares="$wareBasket" multiple="true" excludeempty="false">
@@ -294,7 +239,7 @@
 						<match_gate_distance object="$StartPosition" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
-						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 						<match_parent>
 							<match_parent>
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
@@ -303,6 +248,8 @@
 						</match_parent>
 					</match_buyer>
 				</find_buy_offer>
+
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'builder needs: ' +$needs" output="false" append="true" />
 
 				<do_if value="$needs.count">
 					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="$needs.count + ' Build demands found'" output="false" append="true" />
@@ -327,7 +274,7 @@
 							<match_gate_distance object="$StartPosition" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 							<match_parent>
 								<match_parent>
 									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
@@ -343,7 +290,7 @@
 							<match_gate_distance object="$StartPosition" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 							<match_parent>
 								<match_parent>
 									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
@@ -355,7 +302,7 @@
 				</do_else>
 			</do_if>
 
-			<!-- Debug: Supply needs performance metrics -->
+			<!-- Debug: Supply needs performance metrics-->
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Finding supply needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
@@ -363,7 +310,9 @@
 			<label name="SortTrades" />
 			<create_list name="$needsValues" />
 			<do_all exact="$needs.count" counter="$vy">
-				<append_to_list name="$needsValues" exact="(($needs.{$vy}.desiredamount)f / ($needs.{$vy}.owner.cargo.{$needs.{$vy}.ware}.target)f)*1000" />
+				<do_if value="$needs.{$vy}.owner.cargo.{$needs.{$vy}.ware}.target">
+					<append_to_list name="$needsValues" exact="(($needs.{$vy}.desiredamount)f / ($needs.{$vy}.owner.cargo.{$needs.{$vy}.ware}.target)f)*1000" />
+				</do_if>	
 			</do_all>
 
 			<!-- This sorting method should be replaced with vanilla function at some stage ;Misunderstood Wookiee -->
@@ -402,7 +351,7 @@
 					<match_seller class="class.station">
 						<match owner="this.ship.owner" />
 						<match_gate_distance object="$StartPosition" max="$maxDist" />
-						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 						<match_parent>
 							<match_parent>
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
@@ -422,7 +371,7 @@
 						<match_gate_distance object="$StartPosition" min="0" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
-						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship"/>
 						<match_parent>
 							<match_parent>
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
@@ -444,7 +393,7 @@
 			<create_list name="$BuyerList" />
 
 			<!-- Trade find logic -->
-			<do_if value="$Supplier.count gt 0 and $wareBasket gt 0">
+			<do_if value="$Supplier.count gt 0 and $wareBasket.count gt 0">
 				<set_value name="$OccupiedCargo" exact="0" />
 				<sort_trades name="$SupplierList" tradelist="$Supplier" sorter="amount" />
 
@@ -530,10 +479,17 @@
 				</do_all>
 
 				<!-- Leave builder area after selling to builder to avoid traffic jam (no longer used) -->
-				<!-- <do_if value="$BuilderList and $TradeTargets.count"> <debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Moving to avoid Traffic Jam'" /> <select_flight_behaviour entity="this" evasive="true" result="$fb"/> <move_to object="this.ship" abortpath="false" destination="this.ship.zone" flightbehaviour="$fb" boost="false"> <position object="this.ship" min="1km" max="2km"/> <interrupt_after_time time="60s"/> </move_to> </do_if> -->
+				<!--  			<do_if value="$BuilderList and $TradeTargets.count">
+				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'Moving to avoid Traffic Jam'" />
+				<select_flight_behaviour entity="this" evasive="true" result="$fb"/>
+				<move_to object="this.ship" abortpath="false" destination="this.ship.zone" flightbehaviour="$fb" boost="false">
+					<position object="this.ship" min="1km" max="2km"/>
+					<interrupt_after_time time="60s"/>
+				</move_to>
+			</do_if> -->
 			</do_if> <!-- the stations have supply and demand -->
 
-			<!-- Debug: Finding trade routes performance metrics -->
+			<!-- Debug: Finding trade routes performance metrics-->
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Finding trade routes used up: ' + (player.age-$PerformanceTime) + ' seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
