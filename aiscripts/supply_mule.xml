@@ -195,8 +195,8 @@
 				<!-- I don't understand why there was a need for the level of complexity that was here. -->
 				<!-- It seems like we just need to find all trade offers from the sourceStation? -->
 				<!-- Ah, this strips out some logic that sets trade offers on the station if it thinks it's a trade station. -->
-				<find_sell_offer tradepartner="this.ship" seller="$sourceStation" result="$specialWareBasket" multiple="true">
-					<match_seller>
+				<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$specialWareBasket" multiple="true">
+					<match_buyer>
 						<match_gate_distance object="this.ship" min="0">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
@@ -207,8 +207,8 @@
 							  <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship"/>
 							</match_parent>
 						</match_parent>
-					</match_seller>
-				</find_sell_offer>
+					</match_buyer>
+				</find_buy_offer>
 
 				<set_value name="$wareBasket" exact="$specialWareBasket" />
 			</do_if>
