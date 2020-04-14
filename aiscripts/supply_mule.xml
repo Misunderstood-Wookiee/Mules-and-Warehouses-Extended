@@ -57,7 +57,7 @@
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
 		<do_if value="$sourceStation and ($sourceStation.owner == this.ship.owner) and $assignSrc">
-			<set_object_commander object="this.ship" commander="$sourceStation" />
+			<set_object_commander object="this.ship" commander="$sourceStation"  assignment="assignment.trade" />
 		</do_if>
 	</init>
 
