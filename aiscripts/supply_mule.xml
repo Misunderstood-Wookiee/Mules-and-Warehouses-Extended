@@ -101,7 +101,7 @@
 					<param name="builder" value="$builder" />
 					<param name="specialWareBasket" value="$specialWareBasket" />
 				</create_order>
-				<wait exact="10ms" />
+				<wait min="50ms" max="150ms" />
 			</do_all>
 			<remove_value name="$subordinates" />
 			<remove_value name="$subNr" />
@@ -126,7 +126,7 @@
 			<set_value name="$cargo" exact="this.ship.cargo.list" />
 
 			<do_all exact="$cargo.count" counter="$wareInCargo">
-				<wait exact="100ms"/>
+				<wait min="50ms" max="150ms"/>
 
 				<set_value name="$currentWare" exact="$cargo.{$wareInCargo}"/>
 				<set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count"/>
@@ -150,7 +150,7 @@
 						<relativeprice min="-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001"/>
 						<amount min="$amount*(0.8^($reduction-1))"/>
 					</find_buy_offer>
-					<wait exact="100ms" />
+					<wait min="50ms" max="150ms" />
 					
 					<do_if value="$buyOffer == null">
 						<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)"/>
@@ -178,7 +178,7 @@
 
 			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
 				<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'TravelMule'" text="'  cargo is full =('"/>
-				<wait exact="100ms"/>
+				<wait min="50ms" max="150ms"/>
 				<resume label="start"/>
 			</do_if>
 
@@ -513,7 +513,7 @@
 			<remove_value name="$Demands" />
 
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Script used up: ' + (player.age-$StartTime) + '  seconds'" />
-			<wait exact="60s" />
+			<wait min="60s" max="180s" />
 			<resume label="start" />
 			<label name="end" />
 		</actions>

@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="5">
-	<!-- Setup context menu order -->
+	<!-- Setup context menu order-->
 	<order id="StationMule" name="M2- Station Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
-			<!-- menu option: Source Station (Define Source Station) -->
+			<!-- menu option: Source Station (Define Source Station)-->
 			<param name="sourceStation" type="object" text="Source Station" comment="The source station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<!-- menu option: Target Station (Defines destination target) -->
+			<!-- menu option: Target Station (Defines destination target)-->
 			<param name="targetStation" type="object" text="Target Station" comment="The recipient station">
 				<input_param name="class" value="[class.station]" />
 			</param>
-			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.) -->
+			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.)-->
 			<param name="assignSrc" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the source station if it's the players." />
-			<!-- menu option: Include Energry Wares (Inlcudes energry cells if used) -->
+			<!-- menu option: Include Energry Wares (Inlcudes energry cells if used)-->
 			<param name="incEgry" type="bool" default="false" text="Include Energy Cells" comment="Includes energy cells in the supply" />
-			<!-- menu option: Include Food & Medical Wares (Inlcudes food and medical wares if used) -->
+			<!-- menu option: Include Food & Medical Wares (Inlcudes food and medical wares if used)-->
 			<param name="incFood" type="bool" default="false" text="Include Food and Meds" comment="Includes food and meds in the supply" />
-			<!-- menu option: Supply First (Prioritize emptying sellers ware stocks if used) -->
+			<!-- menu option: Supply First (Prioritize emptying sellers ware stocks if used)-->
 			<param name="supplyFirst" type="bool" default="false" text="Seller Priority" comment="Put the priority on emptying the seller's stocks" />
-			<!-- menu option: Drug Free (Never trade illegal wares if used) -->
+			<!-- menu option: Drug Free (Never trade illegal wares if used)-->
 			<param name="drugFree" type="bool" default="false" text="Never Illegal " comment="Never trades illegal wares" />
-			<!-- menu option: Drugs Only (Only trade illegal wares if used) -->
+			<!-- menu option: Drugs Only (Only trade illegal wares if used)-->
 			<param name="drugsOnly" type="bool" default="false" text="Illegal Only" comment="Trade only illegal wares" />
-			<!-- menu option: Two-way Trade (Forces trading back and forth between the stations if used) -->
+			<!-- menu option: Two-way Trade (Forces trading back and forth between the stations if used)-->
 			<param name="twoWay" type="bool" default="false" text="Two-way trade" comment="Trades back and forth between stations" />
-			<!-- menu option: Return Seller Priority (Forces seller priority on return if used) -->
+			<!-- menu option: Return Seller Priority (Forces seller priority on return if used)-->
 			<param name="twoWaySupplyFirst" type="bool" default="false" text="Return Seller Priority" comment="Seller priority on return trade" />
-			<!-- menu option: No player in-system trade (Forbids all trades between all player owned objects in sector when ilde if used) -->
+			<!-- menu option: No player in-system trade (Forbids all trades between all player owned objects in sector when ilde if used)-->
 			<param name="forbidTradeAll" type="bool" default="false" text="No in-system trade" comment="Forbid trade between all player objects in system when idle" />
-			<!-- menu option: Allow Low Volumes (Allow trades below 50% cargo capacity and below 80% cargo capacity for in-system trades if used) -->
+			<!-- menu option: Allow Low Volumes (Allow trades below 50% cargo capacity and below 80% cargo capacity for in-system trades if used)-->
 			<param name="allowLowVol" type="bool" default="false" text="Allow Low Volumes" comment="Allow trades below 50% cargo, 80% for system trade" />
-			<!-- menu option: Make Target Warehouse (Mule turns target station into functional Trade Station like NPC, which can buy everything the source sells if used) -->
+			<!-- menu option: Make Target Warehouse (Mule turns target station into functional Trade Station like NPC, which can buy everything the source sells if used)-->
 			<param name="allowCreateTrade" type="bool" default="false" text="Make Target Warehouse" comment="Allow mules to force Target to buy all the Source sells." />
 		</params>
 		<requires>
-			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for -->
+			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for-->
 		</requires>
 	</order>
 
@@ -92,7 +92,7 @@
 			<set_value name="$cargo" exact="this.ship.cargo.list" />
 
 			<do_all exact="$cargo.count" counter="$wareInCargo">
-				<wait exact="100ms"/>
+				<wait min="50ms" max="150ms"/>
 
 				<set_value name="$currentWare" exact="$cargo.{$wareInCargo}"/>
 				<set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count"/>
@@ -116,7 +116,7 @@
 						<relativeprice min="-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001"/>
 						<amount min="$amount*(0.8^($reduction-1))"/>
 					</find_buy_offer>
-					<wait exact="100ms" />
+					<wait min="50ms" max="150ms" />
 					
 					<do_if value="$buyOffer == null">
 						<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)"/>
@@ -144,11 +144,11 @@
 
 			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
 				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'stationmule'" text="'  cargo is full =('"/>
-				<wait exact="100ms"/>
+				<wait min="50ms" max="150ms" />
 				<resume label="start"/>
 			</do_if>
 
-			<!-- Add trade ware orders to target station if make target warehouse is checked -->
+			<!-- Add trade ware orders to target station if make target warehouse is checked-->
 			<do_if value="$allowCreateTrade and ($targetStation.owner == this.ship.owner)">
 				<set_value name="$sourceTradeWares" exact="0" />
 				<set_value name="$targetTradeWares" exact="0" />
@@ -180,11 +180,11 @@
 					<do_if value="not $wareFound">
 						<do_if value="$sourceStation.products.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.products.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
-							<wait exact="100ms" />
+							<wait min="50ms" max="150ms" />
 						</do_if>
 						<do_elseif value="$sourceStation.tradewares.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.tradewares.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
-							<wait exact="100ms" />
+							<wait min="50ms" max="150ms" />
 						</do_elseif>
 					</do_if>
 				</do_all>
@@ -192,7 +192,7 @@
 				<remove_value name="$targetTradeWares" />
 			</do_if>
 
-			<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI -->
+			<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI  -->
 			<find_buy_offer tradepartner="this.ship" buyer="$targetStation" result="$needs" excludeempty="false" multiple="true">
 				<match_buyer>
 					<match_gate_distance object="$sourceStation" min="0">
@@ -264,7 +264,7 @@
 						<do_if value="not $needFound">
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
 							<set_value name="$wareName" exact="$someOuter.ware.name" />
-							<!-- target is 0 when ware used only to build drones -->
+							<!--target is 0 when ware used only to build drones-->
 							<do_if value="($someOuter.ware.id == 'energycells') and not $incEgry and (not $someOuter.owner.class == class.buildstorage)">
 								<set_value name="$wareName" exact="'NOPE'" />
 							</do_if>
@@ -279,7 +279,7 @@
 								</do_if>
 							</do_if>
 
-							<!-- exclude illegal wares (Whoop whopp this is the police.) -->
+							<!-- exclude illegal wares (Whoop whopp this is the police.)-->
 							<do_if value="$drugFree">
 								<do_if value="$someOuter.ware.id" exact="'spacefuel'">
 									<set_value name="$wareName" exact="'NOPE'" />
@@ -292,7 +292,7 @@
 								</do_if>
 							</do_if>
 
-							<!-- Only allow illegal wares (Infected Mushroom...) -->
+							<!-- Only allow illegal wares (Infected Mushroom...)-->
 							<do_if value="$drugsOnly">
 								<do_if value="$someOuter.ware.id" exact="not 'spacefuel'">
 									<do_if value="$someOuter.ware.id" exact="not 'spaceweed'">
@@ -304,7 +304,7 @@
 							</do_if>
 
 							<do_all exact="$innerList.count" counter="$ctr">
-								<!-- need found -->
+								<!--need found -->
 								<do_if value="not $needFound">
 									<set_value name="$someInner" exact="$innerList.{$ctr}" />
 									<do_if value="$wareName" exact="$someInner.ware.name">
@@ -317,9 +317,9 @@
 											<set_value name="$supplySource" exact="$someInner" />
 										</do_else>
 
-										<!-- never trade between warehouses -->
-										<set_value name="$sourceIsWarehouse" exact="$supplySource.owner.tradewares.{$supplySource.ware}.exists and not $supplySource.owner.products.{$supplySource.ware}.exists" />
-										<set_value name="$targetIsWarehouse" exact="$supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and not $supplyTarget.owner.products.{$supplyTarget.ware}.exists" />
+										<!--never trade between warehouses -->
+										<set_value name="$sourceIsWarehouse" exact="$supplySource.owner.tradewares.{$supplySource.ware}.exists and not $supplySource.owner.products.{$supplySource.ware}.exists"/>
+										<set_value name="$targetIsWarehouse" exact="$supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and not $supplyTarget.owner.products.{$supplyTarget.ware}.exists"/>
 										<do_if value="not ($sourceIsWarehouse and $targetIsWarehouse)">
 											<do_if value="$supplyTarget.owner.owner == this.ship.owner">
 												<set_value name="$targetAmount" exact="$supplyTarget.desiredamount" />
@@ -328,7 +328,7 @@
 												<set_value name="$targetAmount" exact="$supplyTarget.amount" />
 											</do_else>
 
-											<!-- $cargoHauled == $targetAmount means it is the last few units needed to finish a station or drones -->
+											<!--$cargoHauled == $targetAmount means it is the last few units needed to finish a station or drones-->
 											<set_value name="$cargoHauled" exact="[this.ship.cargo.{$supplyTarget.ware}.free,$targetAmount,$supplySource.amount].min" />
 											<do_if value="$cargoHauled gt 0 and ($allowLowVol or $cargoHauled gt (this.ship.cargo.{$supplyTarget.ware}.max / 1.25) or ($cargoHauled == $targetAmount and ($supplyTarget.owner.class == class.buildstorage or $supplyTarget.owner.cargo.{$supplyTarget.ware}.target == 0)))">
 												<set_value name="$needFound" exact="true" />
@@ -352,7 +352,7 @@
 					<set_value name="$needFound2" exact="$needFound" />
 					<set_value name="$needFound" exact="false" />
 					<set_value name="$supplyFirstLocal" exact="$twoWaySupplyFirst" />
-					<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI, except for potential pathing -->
+					<!-- these don't need blacklist filtering because the player picked the stations themselves in the UI, except for potential pathing  -->
 					<find_buy_offer tradepartner="this.ship" buyer="$sourceStation" result="$needs" excludeempty="false" multiple="true">
 						<match_buyer>
 							<match_gate_distance object="this.ship" min="0">
@@ -418,7 +418,7 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
-			<wait exact="10000ms" />
+			<wait min="8000ms" max="12000ms" />
 			<resume label="start" />
 			<label name="end" />
 		</actions>
