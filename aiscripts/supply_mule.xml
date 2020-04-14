@@ -258,6 +258,7 @@
 					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Finding building needs used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 					<set_value name="$PerformanceTime" exact="player.age" />
 
+					<!-- here we're skipping ahead past the next block!!! -->
 					<resume label="SortTrades" />
 				</do_if>
 			</do_if>
@@ -460,7 +461,9 @@
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $cargoSpace" />
 								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Query Buy: : ' + $someSeller.ware.id + ' Amount: ' + $cargoHauled + ' DesiredAmount left: ' + ($buyofferamount-$WareCountBought)" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' New occupied space : ' + $OccupiedCargo + ' MaxSpace: ' + $ShipCapacity" output="false" append="true" />
-								<create_trade_order name="$getSupply" object="this.object" tradeoffer="$someSeller" amount="$cargoHauled" immediate="false" />
+								<do_if value="$someSeller.available">
+									<create_trade_order name="$getSupply" object="this.object" tradeoffer="$someSeller" amount="$cargoHauled" immediate="false" />
+								</do_if>
 							</do_if>
 						</do_if>
 					</do_all>
@@ -469,13 +472,16 @@
 				<do_if value="$BuilderList and $TradeTargets.count == 0">
 					<remove_value name="$SupplierSorted" />
 					<remove_value name="$Demands" />
-					<remove_value name="$needs" />
+					<!-- if this block is reached then $needs is checked for count right as soon as we hit the resume -->
+					<set_value name="$needs" exact="[]" />
 					<resume label="Supply" />
 				</do_if>
 
 				<do_all exact="$TradeTargets.count" counter="$idc">
-					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Query Sell: : ' + $TradeTargets.{$idc}.ware.id + ' Target:  ' + $TradeTargets.{$idc}.owner.knownname + ' ' + $TradeTargets.{$idc}.owner.idcode + ' Amount ' + $TradeAmounts.{$idc}" output="false" append="true" />
-					<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$TradeTargets.{$idc}" amount="$TradeAmounts.{$idc}" immediate="false" />
+					<do_if value="$TradeTargets.{$idc}.available">
+						<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$TradeTargets.{$idc}" amount="$TradeAmounts.{$idc}" immediate="false" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Query Sell: : ' + $TradeTargets.{$idc}.ware.id + ' Target:  ' + $TradeTargets.{$idc}.owner.knownname + ' ' + $TradeTargets.{$idc}.owner.idcode + ' Amount ' + $TradeAmounts.{$idc}" output="false" append="true" />
+					</do_if>
 				</do_all>
 
 				<!-- Leave builder area after selling to builder to avoid traffic jam (no longer used) -->
