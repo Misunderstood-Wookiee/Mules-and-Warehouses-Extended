@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="MulesAndWarehousesExtended_Setup" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="md.xsd">
+  <cues>
+    <cue name="MWEX_SettingUp" instantiate="true" version="2">
+      <conditions>
+        <event_cue_signalled cue="md.Setup.Start" />
+      </conditions>
+      <actions>
+        <!-- Safety -->
+        <remove_value name="global.$mwex_AllMulesCommandTags"/>
+
+        <!-- Setting the list -->
+        <set_value name="global.$mwex_AllMulesCommandTags" exact="[]" />
+
+        <!--
+          This list stores all the default behavior IDs of the many Mules. Change the values here when necessary.
+          The list is then used to protect the Mules from losing their orders when assigned to stations.
+          Combining with mods such as Subordinate Order Access https://www.nexusmods.com/x4foundations/mods/289
+          it is possible to modify the orders of the Mules even after station assignment.
+        -->
+        <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'SupplyMule'" />
+        <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'TravelMule'" />
+        <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'StationMule'" />
+        <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'DistriMule'" />
+
+        <!-- Setup complete. -->
+      </actions>
+    </cue>
+  </cues>
+</mdscript>

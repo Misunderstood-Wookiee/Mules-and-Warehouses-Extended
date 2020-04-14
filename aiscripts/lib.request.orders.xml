@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+Whenever a ship tries to obtain "initial" orders...
+1. Because it has just been freshly constructed (NOT OUR MAIN POINT)
+2. Because it has just received a new assignment
+Do:
+1. Check if it is a ship-to-station assignment (passively checked as a result of original code structure)
+2. Check if it is running one of our Mules command
+3. If [2] returns true, protect the Mules and exempt them from getting the station assignment AutoTrade.
+Note:
+Requires the MD file in the other folder to work properly.
+Effect:
+Now possible to assign Mules to station with assignment="assignment.trade" while still retaining the Mules order.
+-->
+<diff>
+    <!-- Ship is now assigned to station. -->
+    <!-- pos="prepend" inserts XML nodes as the 1st child node of the given node. -->
+    <add sel="/aiscript[@name='lib.request.orders']/attention/actions/do_else/do_elseif" pos="prepend">
+        <!-- Check if the ship is running our Mules command -->
+        <!--
+            One-liner explanation:
+            $commander: the station; unused, but used to explain:
+            $object: the ship; could be running a Mule
+            $object.defaultorder.id: the id of the default order; e.g. if $object is running DistriMule, this property will be 'DistriMule' 
+                                     as per the id attribute from /aiscripts/distrib_mule.xml
+            {$list}.indexof.{$value}: returns true if value exists in the list, 0 otherwise
+            
+            In X4, a non-zero value will be evaluated to be TRUE.
+
+            Overall, this has the effect of checking if the ship is running our Mules command
+        -->
+        <do_if value="global.$mwex_AllMulesCommandTags.indexof.{$object.defaultorder.id}">
+            <set_value name="$flag_mwex_shipismule" exact="false" comment="Actual value not important; we simply need this variable to be here" />
+        </do_if>
+    </add>
+
+    <!-- Ship is now about to be given the AutoTrade script -->
+    <add sel="/aiscript[@name='lib.request.orders']/attention/actions/do_else/do_elseif/do_elseif" pos="before">
+        <!--
+            This position is just below Mining Assignment, and right above Trading Assignment.
+            It is convenient that there is only 1 do_elseif in the entire block of code describing what to do when there is a ship-to-station assignment
+            And that this do_elseif is exactly what we want.
+        -->
+        <!--
+            {$value}? checks if any variable with this name exists;
+            here, if we detected the ship running a Mules command, this variable will be here, and so the expression will be TRUE -->
+        <do_elseif value="$flag_mwex_shipismule?" comment="Our inaction here blocks the vanilla AutoTrade behavior from being applied.">
+            <debug_text text="'%1 (%2) is using one of the Mules script, and is now exempted from the AutoTrade assignment.'.[$object.knownname, $object]" chance="$debugchance" />
+        </do_elseif>
+    </add>
+</diff>
