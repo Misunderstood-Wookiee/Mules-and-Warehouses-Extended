@@ -160,8 +160,8 @@
 				</do_elseif>
 				<do_if value="$targetStation.tradewares.count gt 0">
 					<set_value name="$targetTradeWares" exact="$targetStation.tradewares.count" />
-					<set_value name="$didWeCallAddTradeware" exact="false" />
 				</do_if>
+				<set_value name="$didWeCallAddTradeware" exact="false" />
 				<do_all exact="$sourceTradeWares" counter="$cts">
 					<set_value name="$wareFound" exact="false" />
 					<do_if value="$sourceStation.products.count gt 0">
