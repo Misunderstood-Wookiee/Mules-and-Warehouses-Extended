@@ -178,8 +178,6 @@
 					</match_parent>
 				</match_seller>
 			</find_sell_offer>
-			
-			<wait min="50ms" max="150ms" />
 
 			<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'supplies: ' +$supplies" output="false" append="true" />
 
@@ -208,7 +206,6 @@
 								</match_parent>
 							</match_buyer>
 						</find_buy_offer>
-						<wait min="50ms" max="150ms" />
 					</do_if>
 					<do_elseif value="$tradeWithBig">
 						<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$needs" wares="$wareBasket" multiple="true">
@@ -233,7 +230,6 @@
 								</match_any>
 							</match_buyer>
 						</find_buy_offer>
-						<wait min="50ms" max="150ms" />
 					</do_elseif>
 				</do_if>
 				<do_else>
@@ -260,7 +256,6 @@
 									</match_parent>
 								</match_buyer>
 							</find_buy_offer>
-							<wait min="50ms" max="150ms" />
 						</do_if>
 						<do_elseif value="$tradeWithBig">
 							<find_buy_offer tradepartner="this.ship" space="$sellspaces.{$sector}" result="$tempList" wares="$wareBasket" multiple="true">
@@ -285,7 +280,6 @@
 									</match_any>
 								</match_buyer>
 							</find_buy_offer>
-							<wait min="50ms" max="150ms" />
 						</do_elseif>
 
 						<do_all exact="$tempList.count" counter="$tl">
@@ -314,7 +308,6 @@
 							</match_parent>
 						</match_buyer>
 					</find_buy_offer>
-					<wait min="50ms" max="150ms" />
 
 					<do_all exact="$tempList.count" counter="$tl">
 						<append_to_list name="$needs" exact="$tempList.{$tl}" />
@@ -383,7 +376,6 @@
 
 							<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$bestCargo" immediate="false" />
 							<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$bestCargo" immediate="false" />
-							<wait min="50ms" max="150ms" />
 						</do_if>
 					</do_if>
 				</do_all>
@@ -396,8 +388,9 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
-			<wait min="1000ms" max="5000ms" />
 			<label name="end" />
+			<wait min="1000ms" max="5000ms" />
+			
 		</actions>
 	</attention>
 </aiscript>
