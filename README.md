@@ -23,3 +23,27 @@ There are branches of priorities depending on whether a station is set in the UI
 - **Factory Supply ONLY** - will only supply wares needed for production on your factories.
 - **Player Buy Mod** - can be used to fake the sell prices on player owned stations for profit calculations. As an extreme example, you can set it to 0 and the sell plrices from player stations will be ignored.
 
+**Mule Priorities**
+#### When No Station is Set
+1. Buy from player, sell to player build storage
+2. Buy from anyone, sell to player build storage
+3. Buy from player, sell to player factories for production
+4. Buy from anyone, sell to player factories for production
+5. Buy from player, sell to player tradewares
+6. Buy from anyone, sell to player tradewares
+
+#### When the set station is player owned
+1. Buy from player, sell to station build storage
+2. Buy from anyone, sell to station build storage
+3. Buy from player, sell to station production needs
+4. Buy from anyone, sell to station production needs
+5. Buy from player, sell to station tradewares
+6. Buy from anyone, sell to station tradewares
+continue with *no station set* logic.
+
+#### When the set station is an AI station.
+1. Buy from Player, sell to station
+2. Buy from anyone, sell to station
+3. Buy from player, sell anywhere in same sector
+4. Buy from anyone, sell anywhere in same sector
+
