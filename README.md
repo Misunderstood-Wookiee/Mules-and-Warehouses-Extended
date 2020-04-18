@@ -6,6 +6,8 @@ An continuation of Mules and Warehouses v4 & Mules Extentsion.
 * Nexus Mods: https://www.nexusmods.com/x4foundations/mods/416
 
 ### New Supply Mule Instructions
+TLDR; just set some haulers to the Supply Mule without changing the defaults and they will supply your empires buy offers. You should never really need to touch them.
+
 What is the point of the Supply Mule? The supply mule attempts to fulfill all of the buy orders in your empire at the cheapest price possible. While this may not directly produce profit, it reduces theoretical losses. For instance, lets say you have a factory that wants to sell graphene at 130 Cr/unit, and a tradestation that wants to buy it at 150 Cr/unit. The AI could theoretically come along and buy from your factory, then sell to your trade station, and you would realize a loss. The supply mule will see this trade and attempt to fill it. It reduces price inefficiencies in your empire. 
 
 In general, the mule prioritizes build storage, then production needs, then tradewares. It prefers to source from player owned resources and will take any trade that reduces inefficiency before going out to AI stations. It has the ability to queue up multiple trades until it's cargo is full before coming to sell everything (this particular routine isn't optimal in terms of pathing).
