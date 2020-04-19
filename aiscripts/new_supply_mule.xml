@@ -419,7 +419,7 @@
 
 					<!-- finding the player build storage needs again, just in case -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
-						<match_buyer owner="this.ship.owner"/>
+						<match_buyer class="class.buildstorage" owner="this.ship.owner"/>
 					</find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
@@ -544,6 +544,10 @@
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
+											<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" 
+												text="$someNeed.ware
+												+ ' ' +$tradeAmount + ' ' +$tradeAmount*$someNeed.ware.volume + ' ' 
+												+$minCargoSize" />
 											<continue />
 										</do_if>
 
@@ -934,7 +938,7 @@
 							<do_all exact="$playerProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerProductNeeds.{$i}" />
 								<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'    ' 
-									+$offer.owner.base.knownname +' '
+									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
@@ -1091,12 +1095,12 @@
 								<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" 
 								directory="'MulesExtended'" 
 								text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 
 								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode"
 								interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})"/>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
@@ -1641,7 +1645,7 @@
 					<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- player supply to station build storage'" />
 
 					<!-- finding the player build storage needs -->
-					<find_buy_offer space="player.galaxy" tradepartner="this.ship" buyer="$sourceStation" result="$stationBuildNeeds" multiple="true">
+					<find_buy_offer space="player.galaxy" tradepartner="this.ship" buyer="$sourceStation.buildstorage" result="$stationBuildNeeds" multiple="true">
 						<match_buyer class="class.buildstorage" owner="this.ship.owner" />
 					</find_buy_offer>
 
@@ -1845,8 +1849,8 @@
 					<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- ai to station build storage'" />
 
 					<!-- finding the player build storage needs again, just in case -->
-					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$stationBuildNeeds" multiple="true">
-						<match_buyer owner="this.ship.owner"/>
+					<find_buy_offer space="player.galaxy" buyer="$sourceStation.buildstorage" tradepartner="this.ship" result="$stationBuildNeeds" multiple="true">
+						<match_buyer class="class.buildstorage" owner="this.ship.owner"/>
 					</find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
@@ -3266,7 +3270,7 @@
 
 					<!-- finding the player build storage needs again, just in case -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
-						<match_buyer owner="this.ship.owner"/>
+						<match_buyer class="class.buildstorage" owner="this.ship.owner"/>
 					</find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
@@ -4860,12 +4864,12 @@
 								<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" 
 								directory="'MulesExtended'" 
 								text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 
 								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode"
 								interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})"/>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
@@ -5317,7 +5321,7 @@
 			<debug_to_file chance="$debugchance"  name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" 
 								directory="'MulesExtended'" 
 								text="'******* went to end'" />
-			<wait exact="150ms" />
+			<wait min="3min" max="5min" />
 		</actions>
 	</attention>
 </aiscript>
