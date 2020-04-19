@@ -388,9 +388,9 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
-			<wait min="1000ms" max="5000ms" />
-			<resume label="start" />
 			<label name="end" />
+			<wait min="1000ms" max="5000ms" />
+			
 		</actions>
 	</attention>
 </aiscript>
