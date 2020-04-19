@@ -1,4 +1,4 @@
-## Mules-and-Warehosues-Extended: A mod for X4 Foundations
+## Mules-and-Warehouses-Extended: A mod for X4 Foundations
 An continuation of Mules and Warehouses v4 & Mules Extentsion.
 
 ### For general releases of this project please see the follwing
