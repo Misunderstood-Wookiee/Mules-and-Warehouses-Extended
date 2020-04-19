@@ -305,8 +305,7 @@
 			<remove_value name="$sellspaces" />
 			<remove_value name="$tempList" />
 
-			<wait min="1000ms" max="5000ms" />
-			<resume label="start" />
+			<wait min="3min" max="5min" />
 			<label name="end" />
 		</actions>
 	</attention>

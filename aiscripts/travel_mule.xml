@@ -388,8 +388,8 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
+			<wait min="3min" max="5min" />
 			<label name="end" />
-			<wait min="1000ms" max="5000ms" />
 			
 		</actions>
 	</attention>
