@@ -1,5 +1,5 @@
 ## Mules-and-Warehouses-Extended: A mod for X4 Foundations
-An continuation of Mules and Warehouses v4 & Mules Extentsion.
+An continuation of Mules and Warehouses v4 & Mules Extentsion. That has been optimised and improved for current versions of X4 Foundation.
 
 ### For general releases of this project please see the following
 * Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2013772865
