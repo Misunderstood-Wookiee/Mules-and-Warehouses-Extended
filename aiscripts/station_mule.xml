@@ -51,6 +51,7 @@
 	</interrupts>
 
 	<init>
+		<set_value name="$debugchance" exact="100" />
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
@@ -62,7 +63,7 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" append="false" output="false" />
+			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
 
 			<set_value name="$loops" exact="2" />
 			<do_if value="not $forbidTradeAll">
@@ -99,7 +100,7 @@
 				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" />
 
 				<do_all exact="5" counter="$reduction">
-					<!-- searching suiting buy offer, will search 5 times reducing requirements each time by 20% (just want to get rid of that stuff at some point) -->
+					<!--searching suiting buy offer, will search 5 times reducing requirements each time by 20% (just want to get rid of that stuff at some point)-->
 					<find_buy_offer tradepartner="this.ship" space="player.galaxy" result="$buyOffer" wares="$currentWare">
 						<match_buyer tradesknownto="this.owner">
 							<match_gate_distance object="this.ship" min="0" max="8">
@@ -182,20 +183,26 @@
 						<do_if value="$sourceStation.products.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.products.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<wait min="50ms" max="150ms" />
+							<set_value name="$didWeCallAddTradeware" exact="true" />
 						</do_if>
 						<do_elseif value="$sourceStation.tradewares.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.tradewares.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<wait min="50ms" max="150ms" />
+							<set_value name="$didWeCallAddTradeware" exact="true" />
 						</do_elseif>
-						<set_value name="$didWeCallAddTradeware" exact="true" />
 					</do_if>
 				</do_all>
 				<remove_value name="$sourceTradeWares" />
 				<remove_value name="$targetTradeWares" />
 				<do_if value="$didWeCallAddTradeware">
 					<!-- show notification on warehouse created and call create log-book entry. -->
-					<show_notification text="['stationmule: '+this.ship.knownname+' ('+this.ship.idcode+')', 'Has created a new Warehouse'" sound="null" />
-					<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'Has created a new Warehouse from your '+$targetstation+' '" />
+					<create_list name="$notif" />
+					<!-- message needs to be short or it won't fit -->
+					<append_to_list name="$notif" exact="'StM ' +this.ship.idcode" />
+					<append_to_list name="$notif" exact="'I added tradewares to a warehouse' " />
+					<show_notification text="$notif" sound="null" />
+					<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'Has added tradewares to '+$targetStation.name+' '" />
+					<remove_value name="$notif" />
 				</do_if>
 			</do_if>
 
@@ -324,7 +331,7 @@
 											<set_value name="$supplySource" exact="$someInner" />
 										</do_else>
 
-										<!-- never trade between warehouses -->
+										<!--never trade between warehouses -->
 										<set_value name="$sourceIsWarehouse" exact="$supplySource.owner.tradewares.{$supplySource.ware}.exists and not $supplySource.owner.products.{$supplySource.ware}.exists" />
 										<set_value name="$targetIsWarehouse" exact="$supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and not $supplyTarget.owner.products.{$supplyTarget.ware}.exists" />
 										<do_if value="not ($sourceIsWarehouse and $targetIsWarehouse)">
@@ -425,8 +432,7 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
-			<wait min="8000ms" max="12000ms" />
-			<resume label="start" />
+			<wait min="3min" max="5min" />
 			<label name="end" />
 		</actions>
 	</attention>
