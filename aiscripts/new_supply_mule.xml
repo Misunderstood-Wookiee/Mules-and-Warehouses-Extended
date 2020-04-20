@@ -1022,12 +1022,14 @@
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
-										<do_if value="$cargoHauled*$someNeed.ware.volume lt $minCargoSize">
-											<continue />
-										</do_if>
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
 										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+
+										<!-- if the trade is too small, move on -->
+										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
+											<continue />
+										</do_if>
 
 										<!-- how much profit for this trade? -->
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
