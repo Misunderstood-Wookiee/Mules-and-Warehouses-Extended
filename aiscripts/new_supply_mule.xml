@@ -31,13 +31,13 @@
 			<param name="builder" type="bool" default="false" text="Build Storage ONLY" comment="Will wait for build storage needs instead of finding something to do" />
 			<!-- only supply products for factories -->
 			<param name="producer" type="bool" default="false" text="Factory Supply ONLY" comment="Will look to supply only factories with products" />
+			<!-- lock wares to player selection -->
+			<param name="lockWares" type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
 			<!-- menu option: WareBasket List-->
 			<param name="specialWareBasket" required="false" default="[]" type="list" text="Wares (all by default)" comment="Warebasket">
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
-			<!-- lock wares to player selection -->
-			<param name="lockWares" type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
 			<param name="playerBuyMod" default="100" type="number" text="Player Buy Mod" comment="Owned Station Buy price adjustment, 0=ignore manager price 100= Obey Station Manager's buy offer.">
 				<input_param name="startvalue" value="100" />
