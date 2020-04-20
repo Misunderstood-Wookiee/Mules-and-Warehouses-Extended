@@ -36,6 +36,8 @@
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
+			<!-- lock wares to player selection -->
+			<param name="lockWares" type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
 			<param name="playerBuyMod" default="100" type="number" text="Player Buy Mod" comment="Owned Station Buy price adjustment, 0=ignore manager price 100= Obey Station Manager's buy offer.">
 				<input_param name="startvalue" value="100" />
@@ -239,7 +241,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerBuildNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerBuildNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerBuildNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerBuildNeeds.{$i}.ware" />
 						</do_all>
@@ -437,7 +440,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerBuildNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerBuildNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerBuildNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerBuildNeeds.{$i}.ware" />
 						</do_all>
@@ -690,7 +694,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerProductNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerProductNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerProductNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerProductNeeds.{$i}.ware" />
 						</do_all>
@@ -926,7 +931,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerProductNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerProductNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerProductNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerProductNeeds.{$i}.ware" />
 						</do_all>
@@ -1173,7 +1179,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerTradeNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerTradeNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerTradeNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerTradeNeeds.{$i}.ware" />
 						</do_all>
@@ -1409,7 +1416,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerTradeNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerTradeNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerTradeNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerTradeNeeds.{$i}.ware" />
 						</do_all>
@@ -1617,7 +1625,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationBuildNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationBuildNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationBuildNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationBuildNeeds.{$i}.ware" />
 						</do_all>
@@ -1814,7 +1823,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationBuildNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationBuildNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationBuildNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationBuildNeeds.{$i}.ware" />
 						</do_all>
@@ -2066,7 +2076,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationProductNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationProductNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationProductNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationProductNeeds.{$i}.ware" />
 						</do_all>
@@ -2302,7 +2313,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationProductNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationProductNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationProductNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationProductNeeds.{$i}.ware" />
 						</do_all>
@@ -2551,7 +2563,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationTradeNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationTradeNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationTradeNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationTradeNeeds.{$i}.ware" />
 						</do_all>
@@ -2787,7 +2800,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationTradeNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationTradeNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationTradeNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationTradeNeeds.{$i}.ware" />
 						</do_all>
@@ -2990,7 +3004,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerBuildNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerBuildNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerBuildNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerBuildNeeds.{$i}.ware" />
 						</do_all>
@@ -3186,7 +3201,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerBuildNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerBuildNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerBuildNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerBuildNeeds.{$i}.ware" />
 						</do_all>
@@ -3438,7 +3454,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerProductNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerProductNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerProductNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerProductNeeds.{$i}.ware" />
 						</do_all>
@@ -3674,7 +3691,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerProductNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerProductNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerProductNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerProductNeeds.{$i}.ware" />
 						</do_all>
@@ -3923,7 +3941,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerTradeNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerTradeNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerTradeNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerTradeNeeds.{$i}.ware" />
 						</do_all>
@@ -4159,7 +4178,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($playerTradeNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($playerTradeNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$playerTradeNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$playerTradeNeeds.{$i}.ware" />
 						</do_all>
@@ -4365,7 +4385,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationNeeds.{$i}.ware" />
 						</do_all>
@@ -4556,7 +4577,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($stationNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($stationNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationNeeds.{$i}.ware" />
 						</do_all>
@@ -4756,7 +4778,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($sectorNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($sectorNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$sectorNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$sectorNeeds.{$i}.ware" />
 						</do_all>
@@ -4947,7 +4970,8 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<do_if value="($sectorNeeds.count > 0) and ($specialWareBasket.count == 0)">
+					<do_if value="($sectorNeeds.count > 0) and (not $lockWares)">
+						<create_list name="$specialWareBasket" />
 						<do_all exact="$stationNeeds.count" counter="$i">
 							<append_to_list name="$specialWareBasket" exact="$stationNeeds.{$i}.ware" />
 						</do_all>
@@ -5120,9 +5144,10 @@
 
 
 			</do_if>
+
+			<wait min="3min" max="5min" />
 			<label name="end" />
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'******* went to end'" />
-			<wait min="3min" max="5min" />
 		</actions>
 	</attention>
 </aiscript>
