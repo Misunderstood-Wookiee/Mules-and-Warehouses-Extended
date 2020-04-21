@@ -515,8 +515,7 @@
 			<remove_value name="$Demands" />
 
 			<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="' Script used up: ' + (player.age-$StartTime) + '  seconds'" />
-			<wait min="60s" max="180s" />
-			<resume label="start" />
+			<wait min="3min" max="5min" />
 			<label name="end" />
 		</actions>
 	</attention>
