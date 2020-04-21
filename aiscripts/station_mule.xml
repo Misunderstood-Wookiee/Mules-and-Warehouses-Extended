@@ -150,50 +150,64 @@
 			</do_if>
 
 			<!-- Add trade ware orders to target station if make target warehouse is checked -->
+			<!-- a trade station seems to have both tradewares and products, so I modified this -->
+			<!-- TODO review/rewrite this -->
 			<do_if value="$allowCreateTrade and ($targetStation.owner == this.ship.owner)">
 				<set_value name="$sourceTradeWares" exact="0" />
+				<set_value name="$sourceProductWares" exact="0" />
 				<set_value name="$targetTradeWares" exact="0" />
+				<set_value name="$targetProductWares" exact="0" />
 				<do_if value="$sourceStation.products.count gt 0">
-					<set_value name="$sourceTradeWares" exact="$sourceStation.products.count" />
+					<set_value name="$sourceProductWares" exact="$sourceStation.products.count" />
 				</do_if>
-				<do_elseif value="$sourceStation.tradewares.count gt 0">
+				<do_if value="$sourceStation.tradewares.count gt 0">
 					<set_value name="$sourceTradeWares" exact="$sourceStation.tradewares.count" />
-				</do_elseif>
+				</do_if>
 				<do_if value="$targetStation.tradewares.count gt 0">
 					<set_value name="$targetTradeWares" exact="$targetStation.tradewares.count" />
 				</do_if>
+				<do_if value="$targetStation.products.count gt 0">
+					<set_value name="$targetProductWares" exact="$targetStation.products.count" />
+				</do_if>
 				<set_value name="$didWeCallAddTradeware" exact="false" />
+				<!-- trade wares -->
 				<do_all exact="$sourceTradeWares" counter="$cts">
 					<set_value name="$wareFound" exact="false" />
-					<do_if value="$sourceStation.products.count gt 0">
-						<do_if value="$targetTradeWares gt 0">
-							<do_if value="$targetStation.tradewares.{$sourceStation.products.{$cts}}.exists">
-								<set_value name="$wareFound" exact="true" />
-							</do_if>
-						</do_if>
-					</do_if>
-					<do_elseif value="$sourceStation.tradewares.count gt 0">
+					<do_if value="$sourceStation.tradewares.count gt 0">
 						<do_if value="$targetTradeWares gt 0">
 							<do_if value="$targetStation.tradewares.{$sourceStation.tradewares.{$cts}}.exists">
 								<set_value name="$wareFound" exact="true" />
 							</do_if>
 						</do_if>
-					</do_elseif>
+					</do_if>
+					<do_if value="not $wareFound">
+						<do_if value="$sourceStation.tradewares.count gt 0">
+							<add_tradeware object="$targetStation" ware="$sourceStation.tradewares.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
+							<set_value name="$didWeCallAddTradeware" exact="true" />
+						</do_if>
+					</do_if>
+				</do_all>
+				<!-- product wares -->
+				<do_all exact="$sourceProductWares" counter="$cts">
+					<set_value name="$wareFound" exact="false" />
+					<do_if value="$sourceStation.products.count gt 0">
+						<do_if value="$targetProductWares gt 0">
+							<do_if value="$targetStation.products.{$sourceStation.products.{$cts}}.exists">
+								<set_value name="$wareFound" exact="true" />
+							</do_if>
+						</do_if>
+					</do_if>
 					<do_if value="not $wareFound">
 						<do_if value="$sourceStation.products.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.products.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
-							<wait min="50ms" max="150ms" />
 							<set_value name="$didWeCallAddTradeware" exact="true" />
 						</do_if>
-						<do_elseif value="$sourceStation.tradewares.count gt 0">
-							<add_tradeware object="$targetStation" ware="$sourceStation.tradewares.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
-							<wait min="50ms" max="150ms" />
-							<set_value name="$didWeCallAddTradeware" exact="true" />
-						</do_elseif>
 					</do_if>
 				</do_all>
 				<remove_value name="$sourceTradeWares" />
+				<remove_value name="$sourceProductWares" />
 				<remove_value name="$targetTradeWares" />
+				<remove_value name="$targetProductWares" />
 				<do_if value="$didWeCallAddTradeware">
 					<!-- show notification on warehouse created and call create log-book entry. -->
 					<create_list name="$notif" />
@@ -279,7 +293,7 @@
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
 							<set_value name="$wareName" exact="$someOuter.ware.name" />
 							<!-- target is 0 when ware used only to build drones -->
-							<do_if value="($someOuter.ware.id == 'energycells') and not $incEgry and (not $someOuter.owner.class == class.buildstorage)">
+							<do_if value="($someOuter.ware.id == 'energycells') and (not $incEgry) and  ($someOuter.owner.class != class.buildstorage)">
 								<set_value name="$wareName" exact="'NOPE'" />
 							</do_if>
 
