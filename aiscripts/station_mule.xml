@@ -65,7 +65,6 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-
 			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
 
 			<set_value name="$loops" exact="2" />

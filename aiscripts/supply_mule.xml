@@ -47,9 +47,7 @@
 			</param>
 		</params>
 		<requires>
-			<!-- The requirements of ships in order to be eligible get this order (requirements can be skill-level requirements or ship-type requirements) -->
-			<!-- This denies laser towers from being able to get this order (more precisely in our case, this default behaviour) -->
-			<match shiptype="shiptype.lasertower" negate="true" />
+			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for-->
 		</requires>
 	</order>
 
@@ -2548,8 +2546,8 @@
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
 						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- player station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'player tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'stationTradeNeeds count: ' +$stationTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'station tradeware needs:'" />
 						<do_if value="$stationTradeNeeds.count and $debugchance">
 							<do_all exact="$stationTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationTradeNeeds.{$i}" />
