@@ -1593,7 +1593,7 @@
 
 			</do_if> <!-- end of no $sourceStation if-->
 
-			<do_if value="$sourceStation.owner==this.ship.owner">
+			<do_if value="$sourceStation and ($sourceStation.owner==this.ship.owner)">
 				<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- Source Station set to ' +$sourceStation.knownname +'. Entering Source Station owned by Player block '" />
 
 				<!-- ************************ buy from player, sell to station build storage ************************** -->
@@ -4387,6 +4387,10 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'    ' 
+									+$stationNeeds.count + ' '
+									+$lockWares + ' '
+									+$specialWareBasket"/>
 					<do_if value="($stationNeeds.count > 0) and (not $lockWares)">
 						<remove_from_list name="$specialWareBasket" />
 						<do_all exact="$stationNeeds.count" counter="$i">
@@ -4753,21 +4757,21 @@
 
 				<!-- ************************ buy from player, sell in sector of station ************************** -->
 				<do_if value="(not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- player supply to ai station'" />
+					<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- player supply to ai sector'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="$sourceStation.sector" tradepartner="this.ship" result="$sectorNeeds" multiple="true"></find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- station needs'" />
-						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'stationNeeds count: ' +$stationNeeds.count" />
-						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'station needs:'" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- sector needs'" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'sectorNeeds count: ' +$sectorNeeds.count" />
+						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'sector needs:'" />
 						<do_if value="$sectorNeeds.count and $debugchance">
 							<do_all exact="$sectorNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$sectorNeeds.{$i}" />
 								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'    ' 
-									+$offer.owner.base.knownname +' '
+									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
@@ -4957,9 +4961,9 @@
 						<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'sector needs:'" />
 						<do_if value="$sectorNeeds.count and $debugchance">
 							<do_all exact="$sectorNeeds.count" counter="$i">
-								<set_value name="$offer" exact="$sectornNeeds.{$i}" />
+								<set_value name="$offer" exact="$sectorNeeds.{$i}" />
 								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'    ' 
-									+$offer.owner.base.knownname +' '
+									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
@@ -5109,11 +5113,11 @@
 								</do_else>
 
 								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 
 								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
