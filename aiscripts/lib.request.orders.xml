@@ -34,16 +34,15 @@ Now possible to assign Mules to station with assignment="assignment.trade" while
         </do_if>
     </add>
 
-    <!-- Ship is now about to be given the AutoTrade script -->
-    <add sel="/aiscript[@name='lib.request.orders']/attention/actions/do_else/do_elseif/do_elseif" pos="before">
-        <!--
-            This position is just below Mining Assignment, and right above Trading Assignment.
-            It is convenient that there is only 1 do_elseif in the entire block of code describing what to do when there is a ship-to-station assignment
-            And that this do_elseif is exactly what we want.
-        -->
+    <!-- It is known that the ship is assigned to a certain station; game is now deciding what orders to give. -->
+    <!-- Inserting as the first do_elseif in decision making so to exempt the Mules; -->
+    <!-- Mules will enter the following custom block of code instead of the vanilla AutoTrade code further down below. -->
+    <add sel="/aiscript[@name='lib.request.orders']/attention/actions/do_else/do_elseif/do_elseif[0]" pos="before">
         <!--
             {$value}? checks if any variable with this name exists;
-            here, if we detected the ship running a Mules command, this variable will be here, and so the expression will be TRUE -->
+            here, if we detected the ship running a Mules command, this variable will be here, and so the expression will be TRUE.
+            This detects the presence of Mules.
+        -->
         <do_elseif value="$flag_mwex_shipismule?" comment="Our inaction here blocks the vanilla AutoTrade behavior from being applied.">
             <debug_text text="'%1 (%2) is using one of the Mules script, and is now exempted from the AutoTrade assignment.'.[$object.knownname, $object]" chance="$debugchance" />
         </do_elseif>

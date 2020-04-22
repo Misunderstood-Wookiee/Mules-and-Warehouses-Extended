@@ -35,7 +35,9 @@
 			<param name="allowCreateTrade" type="bool" default="false" text="Make Target Warehouse" comment="Allow mules to force Target to buy all the Source sells." />
 		</params>
 		<requires>
-			<match shiptype="shiptype.lasertower" negate="true" /> <!-- no idea wtf this is for -->
+			<!-- The requirements of ships in order to be eligible get this order (requirements can be skill-level requirements or ship-type requirements) -->
+			<!-- This denies laser towers from being able to get this order (more precisely in our case, this default behaviour) -->
+			<match shiptype="shiptype.lasertower" negate="true" />
 		</requires>
 	</order>
 
