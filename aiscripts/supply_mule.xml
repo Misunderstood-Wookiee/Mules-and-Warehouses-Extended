@@ -363,6 +363,16 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
+
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
@@ -371,16 +381,6 @@
 								</do_else>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<append_to_list name="$needTrades" exact="$bestNeedTrade" />
 								<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
@@ -574,20 +574,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -811,20 +811,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -1061,20 +1061,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -1298,20 +1298,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -1548,20 +1548,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -1748,6 +1748,14 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
@@ -1758,14 +1766,6 @@
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
 								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<append_to_list name="$needTrades" exact="$bestNeedTrade" />
 								<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
@@ -1958,20 +1958,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -2195,20 +2195,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -2445,20 +2445,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -2682,20 +2682,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -2932,20 +2932,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -3127,6 +3127,16 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
+
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
@@ -3135,16 +3145,6 @@
 								</do_else>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<append_to_list name="$needTrades" exact="$bestNeedTrade" />
 								<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
@@ -3336,20 +3336,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -3573,20 +3573,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -3823,20 +3823,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -4060,20 +4060,19 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -4310,20 +4309,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -4508,6 +4507,16 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
+
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
@@ -4516,16 +4525,6 @@
 								</do_else>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<append_to_list name="$needTrades" exact="$bestNeedTrade" />
 								<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
@@ -4712,20 +4711,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
@@ -4901,6 +4900,16 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
+
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
@@ -4909,16 +4918,6 @@
 								</do_else>
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'----- trade found'" />
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<append_to_list name="$needTrades" exact="$bestNeedTrade" />
 								<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
@@ -5105,20 +5104,20 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+									<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
+	
+									<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
+									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
+
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
 									<continue />
 								</do_else>
-
-								<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
-
-								<write_to_logbook category="upkeep" title="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
-								+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
-								+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
