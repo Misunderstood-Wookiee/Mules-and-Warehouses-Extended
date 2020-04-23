@@ -14,7 +14,7 @@ The way I've been using station mules is that every factory has one pointed to a
 ### Distribution Mule Tips
 The new supply mule and the Distribution Mule have a little bit of overlap. The distribution mule can be a little bit confusing on what the three sliders do, but here's how it works.
 - **Min Storage** - the desired percentage of storage for each ware on each target station in the list
-- **static storage** - the desired stock level on the source station
+- **Static storage** - the desired stock level on the source station
 - **Max Storage** - an amount on the source station that will force a distribution even if the target is above min storage.
 
 Most of the time distribution mule bumps up against either min storage or static storage. To be less restrictive, you generally need to INCREASE min storage and DECREASE static storage to get wares moving. 
