@@ -2402,13 +2402,15 @@
 
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<!-- how much can the need afford/store? -->
+										<set_value name="$targetAmount" exact="$someNeed.amount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$targetAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2421,6 +2423,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target affordable amount: ' +$targetAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
