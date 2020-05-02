@@ -1915,18 +1915,17 @@
 
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station (not build storage) afford/store? -->
 										<!-- This is required because we issue a trade order using the ship, which only interacts with the stations account. -->
 										<!-- Buyoffers are based on the buildstorage account -->
 										<!-- The actual buying is done using the stations account (egosofts implementation as of 02.05.2020), when ordering your own ships that are assigned to the station or stations buildstorage -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
-										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
@@ -1950,7 +1949,7 @@
 												+ ' need unitprice: ' + $someNeed.unitprice
 												+ ' supp unitprice: ' + $someSupply.unitprice
 												+ ' player buy modifier: ' + $playerBuyMod
-												+ ' profit: ' +$currentProfit" />
+												+ ' profit: ' + $currentProfit" />
 										</do_if>
 
 										<!-- if we found a new best trade, set it! -->
@@ -2412,15 +2411,14 @@
 
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
-										<!-- how much can the need afford/store? -->
-										<set_value name="$targetAmount" exact="$someNeed.amount" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<!-- how much can the station afford/store? -->
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$targetAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2432,15 +2430,15 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
-												+ ' target affordable amount: ' +$targetAmount
-												+ ' supply amount: ' +$supplyAmount
-												+ ' ship can hold: ' +$cargoHauled
-												+ ' amount will be: ' +$tradeAmount
-												+ ' need unitprice: ' +$someNeed.unitprice
-												+ ' supp unitprice: ' +$someSupply.unitprice
-												+ ' player buy modifier: ' +$playerBuyMod
-												+ ' profit: ' +$currentProfit" />
+												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' supply amount: ' + $someSupply.amount
+												+ ' target affordable amount: ' + $affordableAmount
+												+ ' ship can hold: ' + $cargoHauled
+												+ ' amount will be: ' + $tradeAmount
+												+ ' need unitprice: ' + $someNeed.unitprice
+												+ ' supp unitprice: ' + $someSupply.unitprice
+												+ ' player buy modifier: ' + $playerBuyMod
+												+ ' profit: ' + $currentProfit" />
 										</do_if>
 
 										<!-- if we found a new best trade, set it! -->
@@ -2903,7 +2901,8 @@
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<!-- how much can the station afford/store? -->
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
@@ -2920,14 +2919,15 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
-												+ ' supply amount: ' +$supplyAmount
-												+ ' ship can hold: ' +$cargoHauled
-												+ ' amount will be: ' +$tradeAmount
-												+ ' need unitprice: ' +$someNeed.unitprice
-												+ ' supp unitprice: ' +$someSupply.unitprice
-												+ ' player buy modifier: ' +$playerBuyMod
-												+ ' profit: ' +$currentProfit" />
+												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' supply amount: ' + $someSupply.amount
+												+ ' target affordable amount: ' + $affordableAmount
+												+ ' ship can hold: ' + $cargoHauled
+												+ ' amount will be: ' + $tradeAmount
+												+ ' need unitprice: ' + $someNeed.unitprice
+												+ ' supp unitprice: ' + $someSupply.unitprice
+												+ ' player buy modifier: ' + $playerBuyMod
+												+ ' profit: ' + $currentProfit" />
 										</do_if>
 
 										<!-- if we found a new best trade, set it! -->
@@ -3304,12 +3304,13 @@
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<!-- how much can the station afford/store? -->
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
@@ -3325,13 +3326,14 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
-												+ ' supply amount: ' +$supplyAmount
-												+ ' ship can hold: ' +$cargoHauled
-												+ ' amount will be: ' +$tradeAmount
-												+ ' need unitprice: ' +$someNeed.unitprice
-												+ ' supp unitprice: ' +$someSupply.unitprice
-												+ ' player buy modifier: ' +$playerBuyMod
-												+ ' profit: ' +$currentProfit" />
+												+ ' supply amount: ' + $someSupply.amount
+												+ ' target affordable amount: ' + $affordableAmount
+												+ ' ship can hold: ' + $cargoHauled
+												+ ' amount will be: ' + $tradeAmount
+												+ ' need unitprice: ' + $someNeed.unitprice
+												+ ' supp unitprice: ' + $someSupply.unitprice
+												+ ' player buy modifier: ' + $playerBuyMod
+												+ ' profit: ' + $currentProfit" />
 										</do_if>
 
 										<!-- if we found a new best trade, set it! -->
@@ -3794,12 +3796,13 @@
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<!-- how much can the station afford/store? -->
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -3811,14 +3814,15 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
-												+ ' supply amount: ' +$supplyAmount
-												+ ' ship can hold: ' +$cargoHauled
-												+ ' amount will be: ' +$tradeAmount
-												+ ' need unitprice: ' +$someNeed.unitprice
-												+ ' supp unitprice: ' +$someSupply.unitprice
-												+ ' player buy modifier: ' +$playerBuyMod
-												+ ' profit: ' +$currentProfit" />
+												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' supply amount: ' + $someSupply.amount
+												+ ' target affordable amount: ' + $affordableAmount
+												+ ' ship can hold: ' + $cargoHauled
+												+ ' amount will be: ' + $tradeAmount
+												+ ' need unitprice: ' + $someNeed.unitprice
+												+ ' supp unitprice: ' + $someSupply.unitprice
+												+ ' player buy modifier: ' + $playerBuyMod
+												+ ' profit: ' + $currentProfit" />
 										</do_if>
 
 										<!-- if we found a new best trade, set it! -->
@@ -4280,12 +4284,13 @@
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<!-- how much can the station afford/store? -->
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4297,14 +4302,15 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
-												+ ' supply amount: ' +$supplyAmount
-												+ ' ship can hold: ' +$cargoHauled
-												+ ' amount will be: ' +$tradeAmount
-												+ ' need unitprice: ' +$someNeed.unitprice
-												+ ' supp unitprice: ' +$someSupply.unitprice
-												+ ' player buy modifier: ' +$playerBuyMod
-												+ ' profit: ' +$currentProfit" />
+												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' supply amount: ' + $someSupply.amount
+												+ ' target affordable amount: ' + $affordableAmount
+												+ ' ship can hold: ' + $cargoHauled
+												+ ' amount will be: ' + $tradeAmount
+												+ ' need unitprice: ' + $someNeed.unitprice
+												+ ' supp unitprice: ' + $someSupply.unitprice
+												+ ' player buy modifier: ' + $playerBuyMod
+												+ ' profit: ' + $currentProfit" />
 										</do_if>
 
 										<!-- if we found a new best trade, set it! -->
