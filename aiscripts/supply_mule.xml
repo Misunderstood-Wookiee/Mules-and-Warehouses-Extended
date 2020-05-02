@@ -70,6 +70,7 @@
 		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode"/>
 		<set_value name="$debugDirName" exact="'MulesExtended'"/>
 		<!-- init section for mule script -->
+		<set_value name="$logbookEntryTitle" exact="'SupplyMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'"/>
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
@@ -189,7 +190,7 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="'SupplyMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
 						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'  trade created'" />
 						<resume label="end" />
@@ -197,7 +198,7 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  offer not available anymore'" />
 				</do_all>
 				<show_notification text="['SupplyMule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
-				<write_to_logbook category="general" title="'SupplyMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
+				<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
 			</do_all>
 			<remove_value name="$searchStep" />
 			<remove_value name="$cargo" />
@@ -382,7 +383,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -591,7 +592,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -828,7 +829,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -1078,7 +1079,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -1315,7 +1316,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -1565,7 +1566,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -1750,7 +1751,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -1963,7 +1964,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -2200,7 +2201,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -2452,7 +2453,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -2689,7 +2690,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -2941,7 +2942,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -3138,7 +3139,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -3347,7 +3348,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -3584,7 +3585,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -3836,7 +3837,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -4073,7 +4074,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
@@ -4324,7 +4325,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -4525,7 +4526,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -4727,7 +4728,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -4918,7 +4919,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
@@ -5120,7 +5121,7 @@
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
-									<write_to_logbook category="upkeep" title="$debugFileName" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
