@@ -68,6 +68,7 @@
 	<!-- debug settings -->
 		<set_value name="$debugchance" exact="100" />
 		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode"/>
+		<set_value name="$debugDirName" exact="'MulesExtended'"/>
 		<!-- init section for mule script -->
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
@@ -80,32 +81,46 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ScriptStart'" output="false" append="false" />
-			<set_value name="$StartTime" exact="player.age" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" output="false" append="false" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
+			<!-- Dump Mule Settings -->
+			<do_if value="$debugchance">
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    sourceStation: %1 (%2)'.[$sourceStation.knownname,$sourceStation.idcode]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignSrc: %1'.[$assignSrc]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    tradeWithOwn: %1'.[$tradeWithOwn]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxtrades: %1'.[$maxtrades]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxDist: %1'.[$maxDist]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    builder: %1'.[$builder]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    producer: %1'.[$producer]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %1'.[$lockWares]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %1'.[$specialWareBasket]" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %1'.[$playerBuyMod]" output="false" append="true" />
+			</do_if>
+			
 			<do_if value="$dedicatedServe and not $sourceStation">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Invalid Config: dedicatedServe (No Station configured)'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: dedicatedServe (No Station configured)'" output="false" append="true" />
 				<set_value name="$dedicatedServe" exact="false" />
 			</do_if>
 
 			<do_if value="$assignSrc and not $sourceStation">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Invalid Config: assignSrc (No Station configured)'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: assignSrc (No Station configured)'" output="false" append="true" />
 				<set_value name="$assignSrc" exact="false" />
 			</do_if>
 
 			<!--here we want to copy settings to subordinates-->
 			<set_value name="$subordinates" exact="this.ship.subordinates" />
 			<set_value name="$subNr" exact="$subordinates.count" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'found subordinates: '+$subNr" output="false" append="true" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'found subordinates: '+$subNr" output="false" append="true" />
 			<do_all exact="$subNr" counter="$nr">
 				<set_value name="$subordinate" exact="$subordinates.{$nr}" />
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  '+$nr+' '+$subordinate.knownname" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  '+$nr+' '+$subordinate.knownname" output="false" append="true" />
 				<do_if value="$subordinate.type != this.ship.type">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    not same shiptype: '+$subordinate.type+' and '+this.ship.type" output="false" append="true" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    not same shiptype: '+$subordinate.type+' and '+this.ship.type" output="false" append="true" />
 					<continue />
 				</do_if>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    copying default behavior'" output="false" append="true" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    copying default behavior'" output="false" append="true" />
 				<remove_object_commander object="$subordinate" />
 				<create_order object="$subordinate" default="true" id="'SupplyMule'">
 					<param name="sourceStation" value="$sourceStation" />
@@ -125,7 +140,7 @@
 			<remove_value name="$subNr" />
 			<remove_value name="$subordinate" />
 
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="' Setting subordinates used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Performance - Setting subordinates used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
 
 			<!-- Sell leftover cargo before resuming regular Mule routine -->
@@ -142,7 +157,7 @@
 
 				<set_value name="$currentWare" exact="$cargo.{$wareInCargo}" />
 				<set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count" />
-				<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" />
 
 				<do_all exact="5" counter="$reduction">
 					<!--searching suiting buy offer, will search 5 times reducing requirements each time by 20% (just want to get rid of that stuff at some point)-->
@@ -165,43 +180,38 @@
 					<wait min="50ms" max="150ms" />
 
 					<do_if value="$buyOffer == null">
-						<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
 						<continue />
 					</do_if>
 
 					<set_value name="$amount" exact="[$amount,$buyOffer.amount].min" />
 
-					<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="'SupplyMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
-						<debug_to_file name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  trade created'" />
+						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'  trade created'" />
 						<resume label="end" />
 					</do_if>
-					<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  offer not available anymore'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  offer not available anymore'" />
 				</do_all>
-				<show_notification text="['TravelMule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
-				<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
+				<show_notification text="['SupplyMule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
+				<write_to_logbook category="general" title="'SupplyMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
 			</do_all>
 			<remove_value name="$searchStep" />
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
 
 			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
-				<debug_to_file chance="$debugchance" name="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'TravelMule'" text="'  cargo is full =('" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'SupplyMule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
 			</do_if>
 
 			<!-- Debug: Selling left over wares performance metrics -->
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="' Selling leftover cargo used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Performance - Selling leftover cargo used up: ' + (player.age-$PerformanceTime) + ' Seconds'" />
 			<set_value name="$PerformanceTime" exact="player.age" />
-
-			<!-- Debug: Defined Wares  -->
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Define Wares'" output="false" append="true" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'dedicated serve: ' +$dedicatedServe" output="false" append="true" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sourceStation: ' +$sourceStation" output="false" append="true" />
 
 			<!-- we're going to step through everything in logical order. It will make the code longer in lines but it will
 			hopefully make things more maintainable and readable for the future -->
@@ -210,12 +220,12 @@
 
 			<!-- ************************ case where no station is set ************************** -->
 			<do_if value="not $sourceStation">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- No Source Station set. Entering logic block for not $sourceStation'" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- No Source Station set. Entering logic block for not $sourceStation'" />
 
 				<!-- ************************ buy from player, sell to player build storage ************************** -->
 				<do_if value="($builder) or (not $producer)">
 					<!-- ************************ buy from player, sell to player build storage ************************** -->
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- buy from player sell to player build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- buy from player sell to player build storage'" />
 
 					<!-- finding the player build storage needs -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
@@ -224,13 +234,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station build needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player build storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station build needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player build storage needs:'" />
 						<do_if value="$playerBuildNeeds.count and $debugchance">
 							<do_all exact="$playerBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.base.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -257,13 +267,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player owned supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player owned supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -280,7 +290,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -291,14 +301,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -340,7 +350,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -366,9 +376,9 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade found'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade found'" />
 
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
@@ -414,7 +424,7 @@
 
 				<!-- ************************ buy from anyone, sell to player build storage ************************** -->
 				<do_if value="(not $tradeWithOwn) and (($builder) or (not $producer))">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai to player build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to player build storage'" />
 
 					<!-- finding the player build storage needs again, just in case -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
@@ -423,13 +433,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station build needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player build storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station build needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player build storage needs:'" />
 						<do_if value="$playerBuildNeeds.count and $debugchance">
 							<do_all exact="$playerBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.base.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -469,13 +479,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -492,7 +502,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -503,14 +513,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -551,7 +561,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -577,7 +587,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -622,7 +632,7 @@
 
 				<!-- ************************ buy from player, sell to player products ************************** -->
 				<do_if value="(not $builder) or ($producer)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to player production goods'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to player production goods'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -652,7 +662,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -677,13 +687,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station product needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player product storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station product needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player product storage needs:'" />
 						<do_if value="$playerProductNeeds.count and $debugchance">
 							<do_all exact="$playerProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerProductNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -710,13 +720,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -733,7 +743,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -744,14 +754,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -788,7 +798,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -814,7 +824,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -859,7 +869,7 @@
 
 				<!-- ************************ buy from anyone, sell to player products ************************** -->
 				<do_if value="((not $builder) or ($producer)) and (not $tradeWithOwn)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- anyone to player production goods'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- anyone to player production goods'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -889,7 +899,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -914,13 +924,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station product needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player product storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station product needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player product storage needs:'" />
 						<do_if value="$playerProductNeeds.count and $debugchance">
 							<do_all exact="$playerProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerProductNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -960,13 +970,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -983,7 +993,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -994,14 +1004,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -1038,7 +1048,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -1064,7 +1074,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -1109,7 +1119,7 @@
 
 				<!-- ************************ buy from player, sell to player tradewares ************************** -->
 				<do_if value="(not $builder) and (not $producer)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to player tradewares'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to player tradewares'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -1139,7 +1149,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -1164,13 +1174,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station tradeware needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player tradeware needs:'" />
 						<do_if value="$playerTradeNeeds.count and $debugchance">
 							<do_all exact="$playerTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerTradeNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -1197,13 +1207,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -1220,7 +1230,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -1231,14 +1241,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -1275,7 +1285,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -1301,7 +1311,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -1346,7 +1356,7 @@
 
 				<!-- ************************ buy from anyone, sell to player tradewares ************************** -->
 				<do_if value="((not $builder) and (not $producer)) and (not $tradeWithOwn)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- anyone to player tradewares'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- anyone to player tradewares'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -1376,7 +1386,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -1401,13 +1411,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station tradeware needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player tradeware needs:'" />
 						<do_if value="$playerTradeNeeds.count and $debugchance">
 							<do_all exact="$playerTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerTradeNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.base.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -1447,13 +1457,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -1470,7 +1480,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -1481,14 +1491,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -1525,7 +1535,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -1551,7 +1561,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -1598,11 +1608,11 @@
 
       <!-- ************************ case where station is set and owned by plaver ************************** -->
 			<do_if value="$sourceStation and ($sourceStation.owner==this.ship.owner)">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- Source Station set to ' +$sourceStation.knownname +'. Entering Source Station owned by Player block '" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- Source Station owned by Player block '" />
 
 				<!-- ************************ buy from player, sell to station build storage ************************** -->
 				<do_if value="($builder) or (not $producer)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply to station build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply to station build storage'" />
 
 					<!-- finding the player build storage needs -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" buyer="$sourceStation.buildstorage" result="$stationBuildNeeds" multiple="true">
@@ -1611,19 +1621,11 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station build needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationBuildNeeds count: ' +$stationBuildNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station build storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station build needs (count: %1)'.[$stationBuildNeeds.count]" />
 						<do_if value="$stationBuildNeeds.count and $debugchance">
 							<do_all exact="$stationBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
-									+$offer.owner.base.knownname +' '
-									+$offer.ware +' '
-									+$offer.amount +' '
-									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
-									+$offer.stocklevel" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    %1 (%2): %3 %4 %5 %6 %7'.[$offer.owner.base.knownname, $offer.owner.base.idcode, $offer.ware, $offer.amount, $offer.relativeprice, $offer.desiredamount, $offer.stocklevel]" />
 							</do_all>
 							<remove_value name="$offer" />
 						</do_if>
@@ -1644,19 +1646,11 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player owned supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player owned supply offers (count: %1)'.[$playerSupplyOffers.count]" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
-									+$offer.owner.knownname +' '
-									+$offer.ware +' '
-									+$offer.amount +' '
-									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
-									+$offer.stocklevel" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    %1 (%2): %3 %4 %5 %6 %7'.[$offer.owner.knownname, $offer.owner.idcode, $offer.ware, $offer.amount, $offer.relativeprice, $offer.desiredamount, $offer.stocklevel]" />
 							</do_all>
 							<remove_value name="$offer" />
 						</do_if>
@@ -1667,7 +1661,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -1678,14 +1672,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -1726,7 +1720,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -1752,7 +1746,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
@@ -1769,7 +1763,7 @@
 
 								<set_value name="$OccupiedCargo" exact="$OccupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade found'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade found'" />
 
 								<append_to_list name="$needTrades" exact="$bestNeedTrade" />
 								<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
@@ -1800,7 +1794,7 @@
 
 				<!-- ************************ buy from anyone, sell to station build storage ************************** -->
 				<do_if value="(not $tradeWithOwn) and (($builder) or (not $producer))">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai to station build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to station build storage'" />
 
 					<!-- finding the player build storage needs again, just in case -->
 					<find_buy_offer space="player.galaxy" buyer="$sourceStation.buildstorage" tradepartner="this.ship" result="$stationBuildNeeds" multiple="true">
@@ -1809,13 +1803,11 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station build needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationBuildNeeds count: ' +$stationBuildNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station build storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- station build needs (count: %1)'.[$stationBuildNeeds.count]" />
 						<do_if value="$stationBuildNeeds.count and $debugchance">
 							<do_all exact="$stationBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.base.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -1854,13 +1846,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -1877,7 +1869,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -1888,14 +1880,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -1940,7 +1932,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' + $targetDesiredAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' affordable amount: ' + $affordableAmount
@@ -1967,7 +1959,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -2012,7 +2004,7 @@
 
 				<!-- ************************ buy from player, sell to station products ************************** -->
 				<do_if value="(not $builder) or ($producer)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to station production goods'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to station production goods'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -2042,7 +2034,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -2067,13 +2059,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station product needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationProductNeeds count: ' +$stationProductNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station product storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- station product needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'stationProductNeeds count: ' +$stationProductNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station product storage needs:'" />
 						<do_if value="$stationProductNeeds.count and $debugchance">
 							<do_all exact="$stationProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationProductNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2100,13 +2092,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2123,7 +2115,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -2134,14 +2126,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -2178,7 +2170,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -2204,7 +2196,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -2249,7 +2241,7 @@
 
 				<!-- ************************ buy from anyone, sell to station products ************************** -->
 				<do_if value="((not $builder) or ($producer)) and (not $tradeWithOwn)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- anyone to station production goods'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- anyone to station production goods'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -2279,7 +2271,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -2304,13 +2296,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station product needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationProductNeeds count: ' +$stationProductNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station product storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- station product needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'stationProductNeeds count: ' +$stationProductNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station product storage needs:'" />
 						<do_if value="$stationProductNeeds.count and $debugchance">
 							<do_all exact="$stationProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationProductNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2350,13 +2342,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2373,7 +2365,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -2384,14 +2376,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -2429,7 +2421,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' + $targetDesiredAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
@@ -2456,7 +2448,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -2501,7 +2493,7 @@
 
 				<!-- ************************ buy from player, sell to station tradewares ************************** -->
 				<do_if value="(not $builder) and (not $producer)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to station tradewares'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to station tradewares'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -2531,7 +2523,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -2556,13 +2548,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationTradeNeeds count: ' +$stationTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station tradeware needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'stationTradeNeeds count: ' +$stationTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station tradeware needs:'" />
 						<do_if value="$stationTradeNeeds.count and $debugchance">
 							<do_all exact="$stationTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationTradeNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2589,13 +2581,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2612,7 +2604,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -2623,14 +2615,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -2667,7 +2659,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -2693,7 +2685,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -2738,7 +2730,7 @@
 
 				<!-- ************************ buy from anyone, sell to station tradewares ************************** -->
 				<do_if value="((not $builder) and (not $producer)) and (not $tradeWithOwn)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- anyone to station tradewares'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- anyone to station tradewares'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -2768,7 +2760,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -2793,13 +2785,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationTradeNeeds count: ' +$stationTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- station tradeware needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'stationTradeNeeds count: ' +$stationTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station tradeware needs:'" />
 						<do_if value="$stationTradeNeeds.count and $debugchance">
 							<do_all exact="$stationTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationTradeNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2839,13 +2831,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -2862,7 +2854,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -2873,14 +2865,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -2918,7 +2910,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' + $targetDesiredAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
@@ -2945,7 +2937,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -2990,7 +2982,7 @@
 
 				<!-- ************************ buy from player, sell to player build storage ************************** -->
 				<do_if value="(($builder) or (not $producer)) and (not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to player build storage '" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to player build storage '" />
 
 					<!-- finding the player build storage needs -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
@@ -2999,13 +2991,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station build needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player build storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station build needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player build storage needs:'" />
 						<do_if value="$playerBuildNeeds.count and $debugchance">
 							<do_all exact="$playerBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.base.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3032,13 +3024,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player owned supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player owned supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3055,7 +3047,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -3066,14 +3058,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -3114,7 +3106,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -3140,9 +3132,9 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade found'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade found'" />
 
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
@@ -3187,7 +3179,7 @@
 
 				<!-- ************************ buy from anyone, sell to player build storage ************************** -->
 				<do_if value="(not $tradeWithOwn) and (($builder) or (not $producer)) and (not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai to player build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to player build storage'" />
 
 					<!-- finding the player build storage needs again, just in case -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
@@ -3196,13 +3188,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station build needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player build storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station build needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerBuildNeeds count: ' +$playerBuildNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player build storage needs:'" />
 						<do_if value="$playerBuildNeeds.count and $debugchance">
 							<do_all exact="$playerBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.base.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3242,13 +3234,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3265,7 +3257,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -3276,14 +3268,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -3324,7 +3316,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
@@ -3351,7 +3343,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -3396,7 +3388,7 @@
 
 				<!-- ************************ buy from player, sell to player products ************************** -->
 				<do_if value="((not $builder) or ($producer)) and (not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to player production goods'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to player production goods'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -3426,7 +3418,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -3451,13 +3443,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station product needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player product storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station product needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player product storage needs:'" />
 						<do_if value="$playerProductNeeds.count and $debugchance">
 							<do_all exact="$playerProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerProductNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3484,13 +3476,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3507,7 +3499,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -3518,14 +3510,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -3562,7 +3554,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -3588,7 +3580,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -3633,7 +3625,7 @@
 
 				<!-- ************************ buy from anyone, sell to player products ************************** -->
 				<do_if value="((not $builder) or ($producer)) and (not $tradeWithOwn) and (not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- anyone to player production goods'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- anyone to player production goods'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -3663,7 +3655,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -3688,13 +3680,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station product needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player product storage needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station product needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerProductNeeds count: ' +$playerProductNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player product storage needs:'" />
 						<do_if value="$playerProductNeeds.count and $debugchance">
 							<do_all exact="$playerProductNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerProductNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3734,13 +3726,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3757,7 +3749,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -3768,14 +3760,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -3813,7 +3805,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' + $targetDesiredAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
@@ -3840,7 +3832,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -3885,7 +3877,7 @@
 
 				<!-- ************************ buy from player, sell to player tradewares ************************** -->
 				<do_if value="((not $builder) and (not $producer)) and (not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player to player tradewares'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player to player tradewares'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -3915,7 +3907,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -3940,13 +3932,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station tradeware needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player tradeware needs:'" />
 						<do_if value="$playerTradeNeeds.count and $debugchance">
 							<do_all exact="$playerTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerTradeNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3973,13 +3965,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -3996,7 +3988,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -4007,14 +3999,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -4051,7 +4043,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$playerBuyMod/100)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -4077,7 +4069,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -4121,7 +4113,7 @@
 
 				<!-- ************************ buy from anyone, sell to player tradewares ************************** -->
 				<do_if value="((not $builder) and (not $producer)) and (not $tradeWithOwn) and (not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- anyone to player tradewares'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- anyone to player tradewares'" />
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
@@ -4151,7 +4143,7 @@
 						<set_value name="$isResPri" exact="$owner.resources.{$ware}.primary" />
 						<set_value name="$isResSec" exact="$owner.resources.{$ware}.secondary" />
 						<debug_to_file chance="$debugchance"  name="$debugFileName" 
-						directory="'MulesExtended'" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
+						directory="$debugDirName" text="$owner.knownname + ' ' +$ware + ' ' +$isResource + ' ' +$isProduct + ' ' +$isTradeware
 						+' ' +$isProductInter +' ' +$isResInter +' ' +$isResPri +' ' +$isResSec " /> -->
 					</do_all>
 
@@ -4176,13 +4168,13 @@
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player station tradeware needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player tradeware needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player station tradeware needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerTradeNeeds count: ' +$playerTradeNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player tradeware needs:'" />
 						<do_if value="$playerTradeNeeds.count and $debugchance">
 							<do_all exact="$playerTradeNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$playerTradeNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4222,13 +4214,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4245,7 +4237,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -4256,14 +4248,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -4301,7 +4293,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' + $targetDesiredAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
@@ -4328,7 +4320,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -4375,24 +4367,24 @@
 
       <!-- ************************ case where station is set but not owned by plaver ************************** -->
 			<do_if value="($sourceStation) and ($sourceStation.owner != this.ship.owner)">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Source Station set to ' +$sourceStation.knownname +' Entering Source Station owned by AI block'" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Source Station set to ' +$sourceStation.knownname +' Entering Source Station owned by AI block'" />
 
 				<!-- ************************ buy from player, sell to AI station ************************** -->
 				<do_if value="true">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply to ai station'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply to ai station'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" buyer="$sourceStation" result="$stationNeeds" multiple="true"></find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationNeeds count: ' +$stationNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- station needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'stationNeeds count: ' +$stationNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station needs:'" />
 						<do_if value="$stationNeeds.count and $debugchance">
 							<do_all exact="$stationNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4406,7 +4398,7 @@
 
 					<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 					<!-- but only if the player didn't set them manually -->
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$stationNeeds.count + ' '
 									+$lockWares + ' '
 									+$specialWareBasket"/>
@@ -4423,13 +4415,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player owned supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player owned supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4446,7 +4438,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -4457,14 +4449,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -4501,7 +4493,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -4527,9 +4519,9 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade found'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade found'" />
 
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
@@ -4575,20 +4567,20 @@
 
 				<!-- ************************ buy from anyone, sell to AI station ************************** -->
 				<do_if value="(not $tradeWithOwn)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai to station build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to station build storage'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="player.galaxy" buyer="$sourceStation" tradepartner="this.ship" result="$stationNeeds" multiple="true"></find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- station needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'stationNeeds count: ' +$stationNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'station needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- station needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'stationNeeds count: ' +$stationNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'station needs:'" />
 						<do_if value="$stationNeeds.count and $debugchance">
 							<do_all exact="$stationNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4627,13 +4619,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4650,7 +4642,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -4661,14 +4653,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -4705,7 +4697,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -4731,7 +4723,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -4776,20 +4768,20 @@
 
 				<!-- ************************ buy from player, sell in sector of station ************************** -->
 				<do_if value="(not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player supply to ai sector'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player supply to ai sector'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="$sourceStation.sector" tradepartner="this.ship" result="$sectorNeeds" multiple="true"></find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- sector needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sectorNeeds count: ' +$sectorNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sector needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- sector needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'sectorNeeds count: ' +$sectorNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'sector needs:'" />
 						<do_if value="$sectorNeeds.count and $debugchance">
 							<do_all exact="$sectorNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$sectorNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4816,13 +4808,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- player owned supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'player Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- player owned supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'playerSupplyOffers count: ' +$playerSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player Supply Offers:'" />
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -4839,7 +4831,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -4850,14 +4842,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -4894,7 +4886,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -4920,9 +4912,9 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade found'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade found'" />
 
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'}" />
 	
@@ -4968,20 +4960,20 @@
 
 				<!-- ************************ buy from anyone, sell in sector of AI station ************************** -->
 				<do_if value="(not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai to station build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to station build storage'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="$sourceStation.sector" tradepartner="this.ship" result="$sectorNeeds" multiple="true"></find_buy_offer>
 
 					<!-- dumping all needs to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- sector needs'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sectorNeeds count: ' +$sectorNeeds.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sector needs:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- sector needs'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'sectorNeeds count: ' +$sectorNeeds.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'sector needs:'" />
 						<do_if value="$sectorNeeds.count and $debugchance">
 							<do_all exact="$sectorNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$sectorNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -5020,13 +5012,13 @@
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- ai supply offers'" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ai Supply Offers:'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai supply offers'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'aiSupplyOffers count: ' +$aiSupplyOffers.count" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ai Supply Offers:'" />
 						<do_if value="$aiSupplyOffers.count and $debugchance">
 							<do_all exact="$aiSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$aiSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' 
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    ' 
 									+$offer.owner.knownname +' '
 									+$offer.ware +' '
 									+$offer.amount +' '
@@ -5043,7 +5035,7 @@
 						<!-- some setup, repeats in every block for readability -->
 						<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 						<set_value name="$minCargoSize" exact="$ShipCapacity / $maxtrades" />
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'ship capacity: ' +$ShipCapacity" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' +$ShipCapacity" />
 						<!-- <set_value name="$StartPosition" exact="if $dedicatedServe and $sourceStation then $sourceStation else this.ship" /> -->
 
 						<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -5054,14 +5046,14 @@
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
 						<set_value name="$OccupiedCargo" exact="0" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Occupied Cargo: ' +$OccupiedCargo" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Cargo Full, No More Trades'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, No More Trades'" />
 								<break />
 							</do_if>
 
 
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- trade offer comparisons'" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 							<!-- nested loop(s) over the trade offers -->
 							<set_value name="$bestProfit" exact="0" />
 							<set_value name="$bestAmount" exact="0" />
@@ -5098,7 +5090,7 @@
 										<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
 
 										<do_if value="$debugchance">
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="$someNeed.ware
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetDesiredAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
@@ -5124,7 +5116,7 @@
 							<!-- if we end up with more than one need, we'll move it down with move_order later -->
 							<do_if value="$bestProfit gt 0">
 								<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +$bestSupplyTrade.unitprice.formatted.{'%s %Cr'} + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +$bestNeedTrade.unitprice.formatted.{'%s %Cr'} + ' for a profit of ' +$bestProfit.formatted.{'%s %Cr'} " />
 	
@@ -5170,9 +5162,12 @@
 
 			</do_if>
 
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Performance - Trade selection: %.5s Seconds'.[player.age-$PerformanceTime]" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Nothing found, check back in a couple of minuites....'" />
 			<wait min="3min" max="5min" />
 			<label name="end" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'******* went to end'" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Performance - Trade selection/Wait: %.5s Seconds'.[player.age-$PerformanceTime]" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'******* went to end'" />
 		</actions>
 	</attention>
 </aiscript>
