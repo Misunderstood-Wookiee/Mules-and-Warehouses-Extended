@@ -1911,13 +1911,18 @@
 
 										<!-- how much does the need want? -->
 										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<!-- how much can the station (not build storage) afford/store? -->
+										<!-- This is required because we issue a trade order using the ship, which only interacts with the stations account. -->
+										<!-- Buyoffers are based on the buildstorage account -->
+										<!-- The actual buying is done using the stations account (egosofts implementation as of 02.05.2020), when ordering your own ships that are assigned to the station or stations buildstorage -->
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
@@ -1933,7 +1938,8 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="'SupplyMule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' affordable amount: ' + $affordableAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
