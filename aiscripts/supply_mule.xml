@@ -129,7 +129,7 @@
 					<param name="dedicatedServe" value="$dedicatedServe" />
 					<param name="tradeWithOwn" value="$tradeWithOwn" />
 					<param name="maxtrades" value="$maxtrades" />
-					<param name="maxDist" value="@this.ship.pilot.skill.piloting * 2" />
+					<param name="maxDist" value="[$subordinate.pilot.skill.piloting * 2, $maxDist].min" />
 					<param name="builder" value="$builder" />
 					<param name="producer" value="$producer" />
 					<param name="specialWareBasket" value="$specialWareBasket" />
