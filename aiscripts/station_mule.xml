@@ -65,6 +65,7 @@
 	<attention min="unknown">
 		<actions>
 			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
+
 			<label name="start" />
 			<set_value name="$loops" exact="2" />
 			<do_if value="not $forbidTradeAll">
@@ -150,6 +151,9 @@
 				<resume label="start" />
 			</do_if>
 
+			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'sourceStation: ' +$sourceStation.knownname" />
+			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'targetStation: ' +$targetStation.knownname" />
+
 			<!-- Add trade ware orders to target station if make target warehouse is checked -->
 			<!-- a trade station seems to have both tradewares and products, so I modified this -->
 			<!-- TODO review/rewrite this -->
@@ -175,6 +179,7 @@
 				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  targetProductWares: ' +$targetProductWares" />
 				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  sourceTradetWares: ' +$sourceTradeWares" />
 				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  targetTradeWares: ' +$targetTradeWares" />
+
 				<set_value name="$didWeCallAddTradeware" exact="false" />
 				<!-- trade wares -->
 				<do_all exact="$sourceTradeWares" counter="$cts">
@@ -190,7 +195,7 @@
 						<do_if value="$sourceStation.tradewares.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.tradewares.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<set_value name="$didWeCallAddTradeware" exact="true" />
-							<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  added tradewware: ' +$sourceStation.tradewares.{$cts}" />
+							<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  added tradewware 1: ' +$sourceStation.tradewares.{$cts}" />
 						</do_if>
 					</do_if>
 				</do_all>
@@ -202,16 +207,19 @@
 							<do_if value="$targetStation.products.{$sourceStation.products.{$cts}}.exists">
 								<set_value name="$wareFound" exact="true" />
 							</do_if>
-							<do_elseif value="$targetStation.tradewares.{$sourceStation.products.{$cts}}.exists">
-								<set_value name="$wareFound" exact="true" />
-							</do_elseif>
 						</do_if>
+						<do_elseif value="$targetTradeWares gt 0">
+							<do_if value="$targetStation.tradewares.{$sourceStation.products.{$cts}}.exists">
+								<set_value name="$wareFound" exact="true" />
+							</do_if>
+						</do_elseif>
 					</do_if>
+
 					<do_if value="not $wareFound">
 						<do_if value="$sourceStation.products.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.products.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<set_value name="$didWeCallAddTradeware" exact="true" />
-							<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  added tradewware: ' +$sourceStation.products.{$cts}" />
+							<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  added tradeware 2: ' +$sourceStation.products.{$cts}" />
 						</do_if>
 					</do_if>
 				</do_all>
