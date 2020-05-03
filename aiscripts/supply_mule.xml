@@ -88,7 +88,12 @@
 			<!-- Dump Mule Settings -->
 			<do_if value="$debugchance">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'" output="false" append="true" />
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    sourceStation: %1 (%2)'.[$sourceStation.knownname,$sourceStation.idcode]" output="false" append="true" />
+				<do_if value="$sourceStation">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    sourceStation: %1 (%2)'.[$sourceStation.knownname,$sourceStation.idcode]" output="false" append="true" />
+				</do_if>
+				<do_else>
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    sourceStation: not set)'" output="false" append="true" />
+				</do_else>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignSrc: %1'.[$assignSrc]" output="false" append="true" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    tradeWithOwn: %1'.[$tradeWithOwn]" output="false" append="true" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxtrades: %1'.[$maxtrades]" output="false" append="true" />
@@ -465,7 +470,8 @@
 						<match_seller tradesknownto="this.owner">
 							<!-- this next bit of mess is just blacklist handling -->
 							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="$playerBuildNeeds.random.owner" min="0" max="$maxDist">
+							<!-- hate to suppress errors but this is by far the cleanest way to deal with this list being -->
+							<match_gate_distance object="@$playerBuildNeeds.random.owner" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
@@ -956,7 +962,7 @@
 						<match_seller tradesknownto="this.owner">
 							<!-- this next bit of mess is just blacklist handling -->
 							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="$playerProductNeeds.random.owner" min="0" max="$maxDist">
+							<match_gate_distance object="@$playerProductNeeds.random.owner" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
@@ -1443,7 +1449,7 @@
 						<match_seller tradesknownto="this.owner">
 							<!-- this next bit of mess is just blacklist handling -->
 							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="$playerTradeNeeds.random.owner" min="0" max="$maxDist">
+							<match_gate_distance object="@$playerTradeNeeds.random.owner" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
@@ -3220,7 +3226,7 @@
 						<match_seller tradesknownto="this.owner">
 							<!-- this next bit of mess is just blacklist handling -->
 							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="$playerBuildNeeds.random.owner" min="0" max="$maxDist">
+							<match_gate_distance object="@$playerBuildNeeds.random.owner" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
@@ -3712,7 +3718,7 @@
 						<match_seller tradesknownto="this.owner">
 							<!-- this next bit of mess is just blacklist handling -->
 							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="$playerProductNeeds.random.owner" min="0" max="$maxDist">
+							<match_gate_distance object="@$playerProductNeeds.random.owner" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
@@ -4200,7 +4206,7 @@
 						<match_seller tradesknownto="this.owner">
 							<!-- this next bit of mess is just blacklist handling -->
 							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="$playerTradeNeeds.random.owner" min="0" max="$maxDist">
+							<match_gate_distance object="@$playerTradeNeeds.random.owner" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
