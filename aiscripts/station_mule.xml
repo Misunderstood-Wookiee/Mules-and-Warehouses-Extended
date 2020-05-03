@@ -60,13 +60,14 @@
 		<do_if value="($sourceStation.owner == this.ship.owner) and ($assignSrc)">
 			<set_object_commander object="this.ship" commander="$sourceStation" assignment="assignment.trade" />
 		</do_if>
+		<set_value name="$debugFileName" exact="'stationmule- ' + this.ship.idcode" />
 	</init>
 
 	<attention min="unknown">
 		<actions>
-			<label name="start" />
-			<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
 
+			<label name="start" />
 			<set_value name="$loops" exact="2" />
 			<do_if value="not $forbidTradeAll">
 				<set_value name="$loops" exact="4" />
@@ -99,7 +100,7 @@
 
 				<set_value name="$currentWare" exact="$cargo.{$wareInCargo}" />
 				<set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count" />
-				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" />
 
 				<do_all exact="5" counter="$reduction">
 					<!--searching suiting buy offer, will search 5 times reducing requirements each time by 20% (just want to get rid of that stuff at some point)-->
@@ -122,21 +123,21 @@
 					<wait min="50ms" max="150ms" />
 
 					<do_if value="$buyOffer == null">
-						<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
 						<continue />
 					</do_if>
 
 					<set_value name="$amount" exact="[$amount,$buyOffer.amount].min" />
 
-					<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
 						<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
-						<debug_to_file name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  trade created'" />
+						<debug_to_file name="$debugFileName" directory="'MulesExtended'" text="'  trade created'" />
 						<resume label="end" />
 					</do_if>
-					<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  offer not available anymore'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  offer not available anymore'" />
 				</do_all>
 				<show_notification text="['stationmule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
 				<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
@@ -146,15 +147,19 @@
 			<remove_value name="$buyOffer" />
 
 			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
-				<debug_to_file chance="$debugchance" name="'stationmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'stationmule'" text="'  cargo is full =('" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'stationmule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
 			</do_if>
+
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sourceStation: ' +$sourceStation.knownname" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'targetStation: ' +$targetStation.knownname" />
 
 			<!-- Add trade ware orders to target station if make target warehouse is checked -->
 			<!-- a trade station seems to have both tradewares and products, so I modified this -->
 			<!-- TODO review/rewrite this -->
 			<do_if value="$allowCreateTrade and ($targetStation.owner == this.ship.owner)">
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'-----entering make target warehouse block'" />
 				<set_value name="$sourceTradeWares" exact="0" />
 				<set_value name="$sourceProductWares" exact="0" />
 				<set_value name="$targetTradeWares" exact="0" />
@@ -171,6 +176,11 @@
 				<do_if value="$targetStation.products.count gt 0">
 					<set_value name="$targetProductWares" exact="$targetStation.products.count" />
 				</do_if>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceProductWares: ' +$sourceProductWares" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetProductWares: ' +$targetProductWares" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceTradetWares: ' +$sourceTradeWares" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetTradeWares: ' +$targetTradeWares" />
+
 				<set_value name="$didWeCallAddTradeware" exact="false" />
 				<!-- trade wares -->
 				<do_all exact="$sourceTradeWares" counter="$cts">
@@ -186,6 +196,7 @@
 						<do_if value="$sourceStation.tradewares.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.tradewares.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<set_value name="$didWeCallAddTradeware" exact="true" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  added tradewware 1: ' +$sourceStation.tradewares.{$cts}" />
 						</do_if>
 					</do_if>
 				</do_all>
@@ -198,11 +209,18 @@
 								<set_value name="$wareFound" exact="true" />
 							</do_if>
 						</do_if>
+						<do_elseif value="$targetTradeWares gt 0">
+							<do_if value="$targetStation.tradewares.{$sourceStation.products.{$cts}}.exists">
+								<set_value name="$wareFound" exact="true" />
+							</do_if>
+						</do_elseif>
 					</do_if>
+
 					<do_if value="not $wareFound">
 						<do_if value="$sourceStation.products.count gt 0">
 							<add_tradeware object="$targetStation" ware="$sourceStation.products.{$cts}" allowbuy="true" allowsell="true" lockavgprice="false" />
 							<set_value name="$didWeCallAddTradeware" exact="true" />
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  added tradeware 2: ' +$sourceStation.products.{$cts}" />
 						</do_if>
 					</do_if>
 				</do_all>
@@ -239,21 +257,26 @@
 			</find_sell_offer>
 
 			<!-- Station Mule Routines -->
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- main station mule routine'" />
 			<do_all exact="$loops" counter="$loop">
 				<do_if value="$needs.count gt 0 and $supplies.count gt 0">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  found ' +$needs.count +' needs and ' +$supplies.count + ' supplies'" />
 					<set_value name="$outerList" exact="[]" />
 					<!-- Sort Trades -->
 					<do_if value="$supplyFirstLocal">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceStation priority setting needs to innerList and supplies to outerList sorted by volume'" />
 						<set_value name="$innerList" exact="$needs" />
 						<sort_trades name="$outerList" tradelist="$supplies" sorter="volume" />
 					</do_if>
 					<do_else>
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceStation priority not set, evaluating our own priorities '" />
 						<set_value name="$prio2" exact="[]" />
 						<set_value name="$prio3" exact="[]" />
 						<set_value name="$prio4" exact="[]" />
 						<set_value name="$prio5" exact="[]" />
 						<set_value name="$innerList" exact="$supplies" />
 						<shuffle_list list="$needs" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  needs'" />
 						<do_all exact="$needs.count" counter="$nSort">
 							<set_value name="$someTrade" exact="$needs.{$nSort}" />
 							<set_value name="$isMadeAndUsed" exact="$someTrade.owner.products.{$someTrade.ware}.exists" />
@@ -261,18 +284,23 @@
 							<set_value name="$cargoRatio" exact="($someTrade.owner.cargo.{$someTrade.ware}.count * 100 / [$someTrade.owner.cargo.{$someTrade.ware}.target, 1].max)" />
 							<do_if value="(not $isMadeAndUsed) and (not $isTradeWare) and $cargoRatio lt 10">
 								<append_to_list name="$outerList" exact="$someTrade" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' +$someTrade.ware + ' not isMadeAndUsed and not isTradeWare and cargoRatio lt 10. appended to outerList'" />
 							</do_if>
 							<do_elseif value="(not $isMadeAndUsed) and (not $isTradeWare) and $cargoRatio lt 25">
 								<append_to_list name="$prio2" exact="$someTrade" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' +$someTrade.ware + ' not isMadeAndUsed and not isTradeWare and cargoRatio lt 25. appended to prio2'" />
 							</do_elseif>
 							<do_elseif value="(not $isTradeWare) and $cargoRatio lt 50">
 								<append_to_list name="$prio3" exact="$someTrade" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' +$someTrade.ware + ' not isTradeWare and cargoRatio lt 50. appended to prio3'" />
 							</do_elseif>
 							<do_elseif value="(not $isTradeWare) and $cargoRatio lt 75">
 								<append_to_list name="$prio4" exact="$someTrade" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' +$someTrade.ware + '  not isTradeWare and cargoRatio lt 75. appended to prio4'" />
 							</do_elseif>
 							<do_else>
 								<append_to_list name="$prio5" exact="$someTrade" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' +$someTrade.ware + ' no other criteria met. appended to prio5'" />
 							</do_else>
 						</do_all>
 						<do_all exact="$prio2.count" counter="$p2">
@@ -297,15 +325,19 @@
 							<!-- target is 0 when ware used only to build drones -->
 							<do_if value="($someOuter.ware.id == 'energycells') and (not $incEgry) and  ($someOuter.owner.class != class.buildstorage)">
 								<set_value name="$wareName" exact="'NOPE'" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed an energy cells trade'" />
 							</do_if>
 
+							<!-- TODO: other food needs to be excluded too right? Nostrop oil, soja stuff? -->
 							<!-- exclude food & meds -->
 							<do_if value="not $incFood">
 								<do_if value="$someOuter.ware.id" exact="'foodrations'">
 									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a food rations trade.'" />
 								</do_if>
 								<do_if value="$someOuter.ware.id" exact="'medicalsupplies'">
 									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a medical supplies trade'" />
 								</do_if>
 							</do_if>
 
@@ -313,12 +345,15 @@
 							<do_if value="$drugFree">
 								<do_if value="$someOuter.ware.id" exact="'spacefuel'">
 									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a spacefuel trade'" />
 								</do_if>
 								<do_if value="$someOuter.ware.id" exact="'spaceweed'">
 									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a spaceweed trade'" />
 								</do_if>
 								<do_if value="$someOuter.ware.id" exact="'majadust'">
 									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a majadust trade'" />
 								</do_if>
 							</do_if>
 
@@ -328,6 +363,7 @@
 									<do_if value="$someOuter.ware.id" exact="not 'spaceweed'">
 										<do_if value="$someOuter.ware.id" exact="not 'majadust'">
 											<set_value name="$wareName" exact="'NOPE'" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed ' +$someOuter.ware +' because its not illegal'" />
 										</do_if>
 									</do_if>
 								</do_if>
@@ -350,6 +386,8 @@
 										<!--never trade between warehouses -->
 										<set_value name="$sourceIsWarehouse" exact="$supplySource.owner.tradewares.{$supplySource.ware}.exists and not $supplySource.owner.products.{$supplySource.ware}.exists" />
 										<set_value name="$targetIsWarehouse" exact="$supplyTarget.owner.tradewares.{$supplyTarget.ware}.exists and not $supplyTarget.owner.products.{$supplyTarget.ware}.exists" />
+										<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceIsWareHouse ' +$sourceIsWarehouse" />
+										<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetIsWareHouse ' +$targetIsWarehouse" />
 										<do_if value="not ($sourceIsWarehouse and $targetIsWarehouse)">
 											<do_if value="$supplyTarget.owner.owner == this.ship.owner">
 												<set_value name="$targetAmount" exact="$supplyTarget.desiredamount" />
@@ -360,10 +398,18 @@
 
 											<!-- $cargoHauled == $targetAmount means it is the last few units needed to finish a station or drones -->
 											<set_value name="$cargoHauled" exact="[this.ship.cargo.{$supplyTarget.ware}.free,$targetAmount,$supplySource.amount].min" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'-----crazy insane logic block checking'" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  cargoHauled ' +$cargoHauled" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  allowLowVol ' +$allowLowVol" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  this.ship.cargo.{$supplyTarget.ware}.max / 1.25 ' +this.ship.cargo.{$supplyTarget.ware}.max / 1.25" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetAmount ' +$targetAmount" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  supplyTarget owner class ' +$supplyTarget.owner.class" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  $supplyTarget.owner.cargo.{$supplyTarget.ware}.target ' +$supplyTarget.owner.cargo.{$supplyTarget.ware}.target" />
 											<do_if value="$cargoHauled gt 0 and ($allowLowVol or $cargoHauled gt (this.ship.cargo.{$supplyTarget.ware}.max / 1.25) or ($cargoHauled == $targetAmount and ($supplyTarget.owner.class == class.buildstorage or $supplyTarget.owner.cargo.{$supplyTarget.ware}.target == 0)))">
 												<set_value name="$needFound" exact="true" />
 												<create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$cargoHauled" immediate="false" />
 												<create_trade_order name="$dropSupply" object="this.object" tradeoffer="$supplyTarget" amount="$cargoHauled" immediate="false" />
+												<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'moving ' +$cargoHauled + ' ' + $supplySource.ware +' from ' +$supplySource.owner.knownname + ' to ' +$supplyTarget.owner.knownname " />
 											</do_if>
 										</do_if>
 									</do_if>
@@ -373,12 +419,17 @@
 					</do_all>
 				</do_if> <!-- the stations have supply and demand -->
 
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'-----after main trade logic block'" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  loop: ' +$loop" />
 				<do_if value="not ($loop ge 3)">
 					<set_value name="$supplies" exact="[]" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  resetting supplies list'" />
 				</do_if>
 				<set_value name="$needs" exact="[]" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  resetting needs list'" />
 
 				<do_if value="$twoWay and ($loop == 1)">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'--entering two way block'" />
 					<set_value name="$needFound2" exact="$needFound" />
 					<set_value name="$needFound" exact="false" />
 					<set_value name="$supplyFirstLocal" exact="$twoWaySupplyFirst" />
@@ -437,7 +488,7 @@
 						</find_buy_offer>
 					</do_elseif>
 				</do_if>
-			</do_all>
+			</do_all> <!-- end of main $loops loop-->
 
 			<remove_value name="$supplyTarget" />
 			<remove_value name="$supplySource" />
