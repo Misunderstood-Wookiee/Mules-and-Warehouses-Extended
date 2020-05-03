@@ -186,7 +186,7 @@
 					<wait min="50ms" max="150ms" />
 
 					<do_if value="$buyOffer == null">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates : 8'" />
 						<continue />
 					</do_if>
 
@@ -202,9 +202,12 @@
 					</do_if>
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  offer not available anymore'" />
 				</do_all>
-				<show_notification text="['SupplyMule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
-				<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
+				<!-- if we got to this point without finding a buyer, we're just going to dump the ware -->
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  had to drop %1 of %2'.[$amount,$currentWare]" />
+				<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" text="'had to drop %1 of %2 due to no buyers'.[$amount,$currentWare]" />
+				<drop_cargo object="this.ship" ware="$currentWare"  exact="$amount"/>
 			</do_all>
+			
 			<remove_value name="$searchStep" />
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
@@ -251,7 +254,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -284,7 +287,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -305,7 +308,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -333,18 +336,18 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
-										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetDesiredAmount) and ($tradeAmount != 0)">
+										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetOfferedAmount) and ($tradeAmount != 0)">
 											<continue />
 										</do_if>
 										<do_elseif value="$tradeAmount == 0">
@@ -357,7 +360,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -450,7 +453,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -466,23 +469,27 @@
 						</do_all>
 					</do_if>
 
-					<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
-						<match_seller tradesknownto="this.owner">
-							<!-- this next bit of mess is just blacklist handling -->
-							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<!-- hate to suppress errors but this is by far the cleanest way to deal with this list being -->
-							<match_gate_distance object="@$playerBuildNeeds.random.owner" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
+					<do_if value="$playerBuildNeeds.count">
+						<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
+							<match_seller tradesknownto="this.owner">
+								<!-- this next bit of mess is just blacklist handling -->
+								<!-- for the object in the gate distance I need a way to start us near a human station -->
+								<match_gate_distance object="$playerBuildNeeds.random.owner" min="0" max="$maxDist">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									<match_parent>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									</match_parent>
 								</match_parent>
-							</match_parent>
-						</match_seller>
-					</find_sell_offer>
+							</match_seller>
+						</find_sell_offer>
+					</do_if>
+					<do_else>
+						<set_value name="$aiSupplyOffers" exact="[]" />
+					</do_else>
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
@@ -497,7 +504,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -518,7 +525,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -546,18 +553,18 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, let it through -->
-										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetDesiredAmount) and ($tradeAmount != 0)">
+										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetOfferedAmount) and ($tradeAmount != 0)">
 											<continue />
 										</do_if>
 										<do_elseif value="$tradeAmount == 0">
@@ -569,7 +576,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -705,7 +712,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -738,7 +745,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -759,7 +766,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -787,14 +794,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -806,7 +813,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -942,7 +949,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -958,22 +965,27 @@
 						</do_all>
 					</do_if>
 
-					<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
-						<match_seller tradesknownto="this.owner">
-							<!-- this next bit of mess is just blacklist handling -->
-							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="@$playerProductNeeds.random.owner" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
+					<do_if value="$playerProductNeeds.count">
+						<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
+							<match_seller tradesknownto="this.owner">
+								<!-- this next bit of mess is just blacklist handling -->
+								<!-- for the object in the gate distance I need a way to start us near a human station -->
+								<match_gate_distance object="$playerProductNeeds.random.owner" min="0" max="$maxDist">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									<match_parent>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									</match_parent>
 								</match_parent>
-							</match_parent>
-						</match_seller>
-					</find_sell_offer>
+							</match_seller>
+						</find_sell_offer>
+					</do_if>
+					<do_else>
+						<set_value name="$aiSupplyOffers" exact="[]" />
+					</do_else>
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
@@ -988,7 +1000,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1009,7 +1021,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -1037,14 +1049,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -1056,7 +1068,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -1192,7 +1204,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1225,7 +1237,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1246,7 +1258,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -1274,14 +1286,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -1293,7 +1305,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -1429,7 +1441,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1445,22 +1457,27 @@
 						</do_all>
 					</do_if>
 
-					<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
-						<match_seller tradesknownto="this.owner">
-							<!-- this next bit of mess is just blacklist handling -->
-							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="@$playerTradeNeeds.random.owner" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
+					<do_if value="$playerTradeNeeds.count">
+						<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
+							<match_seller tradesknownto="this.owner">
+								<!-- this next bit of mess is just blacklist handling -->
+								<!-- for the object in the gate distance I need a way to start us near a human station -->
+								<match_gate_distance object="$playerTradeNeeds.random.owner" min="0" max="$maxDist">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									<match_parent>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									</match_parent>
 								</match_parent>
-							</match_parent>
-						</match_seller>
-					</find_sell_offer>
+							</match_seller>
+						</find_sell_offer>
+					</do_if>
+					<do_else>
+						<set_value name="$aiSupplyOffers" exact="[]" />
+					</do_else>
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
@@ -1475,7 +1492,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1496,7 +1513,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -1524,14 +1541,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -1543,7 +1560,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -1632,7 +1649,7 @@
 						<do_if value="$stationBuildNeeds.count and $debugchance">
 							<do_all exact="$stationBuildNeeds.count" counter="$i">
 								<set_value name="$offer" exact="$stationBuildNeeds.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    %1 (%2): %3 %4 %5 %6 %7'.[$offer.owner.base.knownname, $offer.owner.base.idcode, $offer.ware, $offer.amount, $offer.relativeprice, $offer.desiredamount, $offer.stocklevel]" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    %1 (%2): %3 %4 %5 %6 %7'.[$offer.owner.base.knownname, $offer.owner.base.idcode, $offer.ware, $offer.amount, $offer.relativeprice, $offer.offeramount, $offer.stocklevel]" />
 							</do_all>
 							<remove_value name="$offer" />
 						</do_if>
@@ -1657,7 +1674,7 @@
 						<do_if value="$playerSupplyOffers.count and $debugchance">
 							<do_all exact="$playerSupplyOffers.count" counter="$i">
 								<set_value name="$offer" exact="$playerSupplyOffers.{$i}" />
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    %1 (%2): %3 %4 %5 %6 %7'.[$offer.owner.knownname, $offer.owner.idcode, $offer.ware, $offer.amount, $offer.relativeprice, $offer.desiredamount, $offer.stocklevel]" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    %1 (%2): %3 %4 %5 %6 %7'.[$offer.owner.knownname, $offer.owner.idcode, $offer.ware, $offer.amount, $offer.relativeprice, $offer.offeramount, $offer.stocklevel]" />
 							</do_all>
 							<remove_value name="$offer" />
 						</do_if>
@@ -1677,7 +1694,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -1705,18 +1722,18 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
-										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetDesiredAmount) and ($tradeAmount != 0)">
+										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetOfferedAmount) and ($tradeAmount != 0)">
 											<continue />
 										</do_if>
 										<do_elseif value="$tradeAmount == 0">
@@ -1728,7 +1745,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -1819,7 +1836,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1864,7 +1881,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -1885,7 +1902,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -1913,7 +1930,7 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station (not build storage) afford/store? -->
 										<!-- This is required because we issue a trade order using the ship, which only interacts with the stations account. -->
@@ -1921,14 +1938,14 @@
 										<!-- The actual buying is done using the stations account (egosofts implementation as of 02.05.2020), when ordering your own ships that are assigned to the station or stations buildstorage -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
-										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetDesiredAmount) and ($tradeAmount != 0)">
+										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetOfferedAmount) and ($tradeAmount != 0)">
 											<continue />
 										</do_if>
 										<do_elseif value="$tradeAmount == 0">
@@ -1940,7 +1957,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' target desired amount ' + $targetOfferedAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' affordable amount: ' + $affordableAmount
 												+ ' ship can hold: ' + $cargoHauled
@@ -2077,7 +2094,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2110,7 +2127,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2131,7 +2148,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -2159,14 +2176,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2178,7 +2195,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -2314,7 +2331,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2360,7 +2377,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2381,7 +2398,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -2409,15 +2426,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2429,7 +2446,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' target desired amount ' + $targetOfferedAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
 												+ ' ship can hold: ' + $cargoHauled
@@ -2566,7 +2583,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2599,7 +2616,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2620,7 +2637,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -2648,14 +2665,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2667,7 +2684,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -2803,7 +2820,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2849,7 +2866,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -2870,7 +2887,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -2898,15 +2915,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2918,7 +2935,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' target desired amount ' + $targetOfferedAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
 												+ ' ship can hold: ' + $cargoHauled
@@ -3009,7 +3026,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3042,7 +3059,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3063,7 +3080,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -3091,18 +3108,18 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
-										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetDesiredAmount) and ($tradeAmount != 0)">
+										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetOfferedAmount) and ($tradeAmount != 0)">
 											<continue />
 										</do_if>
 										<do_elseif value="$tradeAmount == 0">
@@ -3114,7 +3131,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -3206,7 +3223,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3222,22 +3239,27 @@
 						</do_all>
 					</do_if>
 
-					<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
-						<match_seller tradesknownto="this.owner">
-							<!-- this next bit of mess is just blacklist handling -->
-							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="@$playerBuildNeeds.random.owner" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
+					<do_if value="$playerBuildNeeds.count">
+						<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
+							<match_seller tradesknownto="this.owner">
+								<!-- this next bit of mess is just blacklist handling -->
+								<!-- for the object in the gate distance I need a way to start us near a human station -->
+								<match_gate_distance object="$playerBuildNeeds.random.owner" min="0" max="$maxDist">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									<match_parent>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									</match_parent>
 								</match_parent>
-							</match_parent>
-						</match_seller>
-					</find_sell_offer>
+							</match_seller>
+						</find_sell_offer>
+					</do_if>
+					<do_else>
+						<set_value name="$aiSupplyOffers" exact="[]" />
+					</do_else>
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
@@ -3252,7 +3274,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3273,7 +3295,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -3301,19 +3323,19 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
-										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetDesiredAmount) and ($tradeAmount != 0)">
+										<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and ($tradeAmount != $targetOfferedAmount) and ($tradeAmount != 0)">
 											<continue />
 										</do_if>
 										<do_elseif value="$tradeAmount == 0">
@@ -3324,7 +3346,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
 												+ ' ship can hold: ' + $cargoHauled
@@ -3403,7 +3425,6 @@
 						<match_buyer owner="this.ship.owner">
 							<match class="class.buildstorage" negate="true" />
 						</match_buyer>
-
 					</find_buy_offer>
 
 					<!-- so we'll do our filtering here -->
@@ -3461,7 +3482,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3494,7 +3515,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3515,7 +3536,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -3543,14 +3564,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -3562,7 +3583,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -3698,7 +3719,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3714,22 +3735,27 @@
 						</do_all>
 					</do_if>
 
-					<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
-						<match_seller tradesknownto="this.owner">
-							<!-- this next bit of mess is just blacklist handling -->
-							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="@$playerProductNeeds.random.owner" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
+					<do_if value="$playerProductNeeds.count">
+						<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
+							<match_seller tradesknownto="this.owner">
+								<!-- this next bit of mess is just blacklist handling -->
+								<!-- for the object in the gate distance I need a way to start us near a human station -->
+								<match_gate_distance object="$playerProductNeeds.random.owner" min="0" max="$maxDist">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									<match_parent>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									</match_parent>
 								</match_parent>
-							</match_parent>
-						</match_seller>
-					</find_sell_offer>
+							</match_seller>
+						</find_sell_offer>
+					</do_if>
+					<do_else>
+						<set_value name="$aiSupplyOffers" exact="[]" />
+					</do_else>
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
@@ -3744,7 +3770,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3765,7 +3791,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -3793,15 +3819,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -3813,7 +3839,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' target desired amount ' + $targetOfferedAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
 												+ ' ship can hold: ' + $cargoHauled
@@ -3950,7 +3976,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -3983,7 +4009,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4004,7 +4030,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -4032,14 +4058,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4051,7 +4077,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -4186,7 +4212,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4202,22 +4228,27 @@
 						</do_all>
 					</do_if>
 
-					<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
-						<match_seller tradesknownto="this.owner">
-							<!-- this next bit of mess is just blacklist handling -->
-							<!-- for the object in the gate distance I need a way to start us near a human station -->
-							<match_gate_distance object="@$playerTradeNeeds.random.owner" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
+					<do_if value="$playerTradeNeeds.count">
+						<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$aiSupplyOffers" multiple="true">
+							<match_seller tradesknownto="this.owner">
+								<!-- this next bit of mess is just blacklist handling -->
+								<!-- for the object in the gate distance I need a way to start us near a human station -->
+								<match_gate_distance object="$playerTradeNeeds.random.owner" min="0" max="$maxDist">
+									<blacklist group="blacklistgroup.civilian" object="this.ship" />
+								</match_gate_distance>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
 								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									<match_parent>
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+									</match_parent>
 								</match_parent>
-							</match_parent>
-						</match_seller>
-					</find_sell_offer>
+							</match_seller>
+						</find_sell_offer>
+					</do_if>
+					<do_else>
+						<set_value name="$aiSupplyOffers" exact="[]" />
+					</do_else>
 
 					<!-- dumping all supplies to the log file -->
 					<do_if value="$debugchance">
@@ -4232,7 +4263,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4253,7 +4284,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -4281,15 +4312,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$affordableAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4301,7 +4332,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' + $targetDesiredAmount
+												+ ' target desired amount ' + $targetOfferedAmount
 												+ ' supply amount: ' + $someSupply.amount
 												+ ' target affordable amount: ' + $affordableAmount
 												+ ' ship can hold: ' + $cargoHauled
@@ -4396,7 +4427,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4433,7 +4464,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4454,7 +4485,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -4482,14 +4513,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4501,7 +4532,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -4592,7 +4623,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4637,7 +4668,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4658,7 +4689,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -4686,14 +4717,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4705,7 +4736,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -4793,7 +4824,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4826,7 +4857,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -4847,7 +4878,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -4875,14 +4906,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4894,7 +4925,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
@@ -4985,7 +5016,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -5030,7 +5061,7 @@
 									+$offer.ware +' '
 									+$offer.amount +' '
 									+$offer.relativeprice +' '
-									+$offer.desiredamount +' '
+									+$offer.offeramount +' '
 									+$offer.stocklevel" />
 							</do_all>
 							<remove_value name="$offer" />
@@ -5051,7 +5082,7 @@
 						<create_list name="$tradeAmounts" />
 						<create_list name="$needOrders" />
 						<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-						<set_value name="$OccupiedCargo" exact="0" />
+						<set_value name="$OccupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
 						<do_all exact="$maxtrades" counter="$maxtradeCtr">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' +$OccupiedCargo" />
 							<do_if value="$OccupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
@@ -5079,14 +5110,14 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetDesiredAmount" exact="$someNeed.desiredamount" />
+										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
 										<!-- how much does the supply have to offer? -->
 										<set_value name="$supplyAmount" exact="$someSupply.amount" />
 										<!-- how much can we haul? -->
-										<set_value name="$cargoHauled" exact="this.ship.cargo.{$someNeed.ware}.free" />
+										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetDesiredAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -5098,7 +5129,7 @@
 
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
-												+ ' target desired amount ' +$targetDesiredAmount
+												+ ' target desired amount ' +$targetOfferedAmount
 												+ ' supply amount: ' +$supplyAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount

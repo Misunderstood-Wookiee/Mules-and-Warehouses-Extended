@@ -128,7 +128,7 @@
 					<wait min="50ms" max="150ms" />
 
 					<do_if value="$buyOffer == null">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :8'" />
 						<continue />
 					</do_if>
 
