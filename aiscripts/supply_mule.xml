@@ -336,14 +336,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
@@ -361,7 +362,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -395,7 +396,7 @@
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -411,12 +412,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -553,14 +549,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, let it through -->
@@ -577,7 +574,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -609,7 +606,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -625,12 +622,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -794,14 +786,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -814,7 +807,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -846,7 +839,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -862,12 +855,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -1049,14 +1037,17 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
+
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<get_ware_reservation object="$someSupply.owner" type="sell" ware="$someSupply.ware" result="$supplyReservations" />
+										<set_value name="$affordableAmount" exact="[$someSupply.amount-$supplyReservations,0].max" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -1069,7 +1060,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -1101,7 +1092,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -1117,12 +1108,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -1286,14 +1272,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -1306,7 +1293,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -1338,7 +1325,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -1354,12 +1341,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -1541,14 +1523,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -1561,7 +1544,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -1593,7 +1576,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -1609,12 +1592,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -1722,14 +1700,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
@@ -1746,7 +1725,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -1778,7 +1757,7 @@
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -1796,12 +1775,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -1930,7 +1904,8 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station (not build storage) afford/store? -->
 										<!-- This is required because we issue a trade order using the ship, which only interacts with the stations account. -->
@@ -1991,7 +1966,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -2007,12 +1982,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -2176,14 +2146,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2196,7 +2167,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -2228,7 +2199,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -2244,12 +2215,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -2426,7 +2392,8 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
@@ -2480,7 +2447,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -2496,12 +2463,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -2665,14 +2627,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2685,7 +2648,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -2717,7 +2680,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -2733,12 +2696,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -2915,7 +2873,8 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
@@ -2923,7 +2882,7 @@
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -2969,7 +2928,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -2985,12 +2944,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -3108,14 +3062,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<!-- however, if the trade will finish off the build storage for that good, do it anyway -->
@@ -3132,7 +3087,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -3166,7 +3121,7 @@
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -3182,12 +3137,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -3323,7 +3273,8 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
@@ -3380,7 +3331,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.base.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -3396,12 +3347,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -3564,14 +3510,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -3584,7 +3531,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -3616,7 +3563,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -3632,12 +3579,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -3819,7 +3761,8 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
@@ -3873,7 +3816,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -3889,12 +3832,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -4058,14 +3996,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4078,7 +4017,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -4109,7 +4048,7 @@
 									<write_to_logbook category="upkeep" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="'buying ' +$bestAmount + ' ' +$bestNeedTrade.ware +' from ' +$bestSupplyTrade.owner.knownname
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -4125,12 +4064,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -4312,7 +4246,8 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.desiredamount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
 										<!-- how much can the station afford/store? -->
 										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
@@ -4366,7 +4301,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -4382,12 +4317,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -4513,14 +4443,16 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.amount-$needReservations,0].max" />
+
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4533,7 +4465,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -4567,7 +4499,7 @@
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -4583,12 +4515,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -4605,7 +4532,7 @@
 
 				<!-- ************************ buy from anyone, sell to AI station ************************** -->
 				<do_if value="(not $tradeWithOwn)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to station build storage'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to station general needs'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="player.galaxy" buyer="$sourceStation" tradepartner="this.ship" result="$stationNeeds" multiple="true"></find_buy_offer>
@@ -4717,14 +4644,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.amount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4737,7 +4665,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -4769,7 +4697,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -4785,12 +4713,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -4906,14 +4829,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.amount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -4926,7 +4850,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -4960,7 +4884,7 @@
 										+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 										+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -4976,12 +4900,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
@@ -4997,8 +4916,8 @@
 				</do_if> <!-- end of player to ai sector-->
 
 				<!-- ************************ buy from anyone, sell in sector of AI station ************************** -->
-				<do_if value="(not $dedicatedServe)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to station build storage'" />
+				<do_if value="(not $dedicatedServe) and (not $tradeWithOwn)">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- ai to same sector as station'" />
 
 					<!-- finding the station needs -->
 					<find_buy_offer space="$sourceStation.sector" tradepartner="this.ship" result="$sectorNeeds" multiple="true"></find_buy_offer>
@@ -5028,7 +4947,7 @@
 					<do_if value="($sectorNeeds.count > 0) and (not $lockWares)">
 						<remove_from_list name="$specialWareBasket" />
 						<do_all exact="$stationNeeds.count" counter="$i">
-							<append_to_list name="$specialWareBasket" exact="$stationNeeds.{$i}.ware" />
+							<append_to_list name="$specialWareBasket" exact="$sectorNeeds.{$i}.ware" />
 						</do_all>
 					</do_if>
 
@@ -5110,14 +5029,15 @@
 									<do_if value="$someNeed.ware.id == $someSupply.ware.id">
 
 										<!-- how much does the need want? -->
-										<set_value name="$targetOfferedAmount" exact="$someNeed.offeramount" />
+										<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
+										<set_value name="$targetOfferedAmount" exact="[$someNeed.amount-$needReservations,0].max" />
 										<!-- how much does the supply have to offer? -->
-										<set_value name="$supplyAmount" exact="$someSupply.amount" />
+										<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="this.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 										<!-- how much can we haul? -->
 										<set_value name="$cargoHauled" exact="[((this.ship.cargo.capacity.container-$OccupiedCargo)/$someNeed.ware.volume)i, this.ship.cargo.{$someNeed.ware}.free].min" />
 
 										<!-- the amount for the trade is the minimum of the three amounts -->
-										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$supplyAmount,$cargoHauled].min" />
+										<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
 
 										<!-- if the trade is too small, move on -->
 										<do_if value="$tradeAmount*$someNeed.ware.volume lt $minCargoSize">
@@ -5130,7 +5050,7 @@
 										<do_if value="$debugchance">
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
 												+ ' target desired amount ' +$targetOfferedAmount
-												+ ' supply amount: ' +$supplyAmount
+												+ ' supply amount: ' +$affordableAmount
 												+ ' ship can hold: ' +$cargoHauled
 												+ ' amount will be: ' +$tradeAmount
 												+ ' need unitprice: ' +$someNeed.unitprice
@@ -5162,7 +5082,7 @@
 									+' at ' +($bestSupplyTrade.unitprice.formatted.{'%s %Cr'}) + ' to sell to ' +$bestNeedTrade.owner.knownname
 									+' at ' +($bestNeedTrade.unitprice.formatted.{'%s %Cr'}) + ' for a profit of ' +($bestProfit.formatted.{'%s %Cr'})" />
 
-									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount" />
+									<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
 									<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 								</do_if>
 								<do_else>
@@ -5178,12 +5098,7 @@
 							</do_if>
 						</do_all>
 
-						<!-- if we had more than one order we need to move the sell orders to the end -->
-						<do_all exact="this.ship.orders.count" counter="$i">
-							<do_if value="($i gt 1) and (($i % 2) gt 0)">
-								<move_order order="this.ship.orders.{$i}" newindex="1" />
-							</do_if>
-						</do_all>
+
 						<do_if value="this.ship.orders.count gt 0">
 							<resume label="end" />
 						</do_if>
