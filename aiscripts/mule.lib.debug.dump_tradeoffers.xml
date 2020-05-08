@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="mule.lib.debug.dump_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="p:\X4\Database\libraries\aiscripts.xsd" version="8">
+	<params>
+		<!-- describtive header to be included before dump of offers -->
+		<param name="headerline" default="offers"/>
+		<!-- list of possible offers -->
+		<param name="offers"/>
+		<!-- enable/disable debug messages -->
+		<param name="debugchance"/>
+		<param name="debugFileName"/>
+		<param name="debugDirName"/>
+  </params>
+  <attention min="unknown">
+    <actions>
+			<do_if value="$debugchance">
+				<!-- print headerline -->
+				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %1:'.[$headerline]" />
+				<!-- print offer count -->
+				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'Offers (%1):'.[$offers.count]"/>
+				<!-- loop over offers and print every single one-->
+				<do_if value="$offers.count">
+					<do_all exact="$offers.count" counter="$i">
+						<set_value name="$offer" exact="$offers.{$i}" />
+						<do_if value="$offer.owner == $offer.seller">
+							<!-- sell offers -->
+							<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%1 wants to sell %2 %3 to %4 for %5 (%6)'.[$offer.seller.knownname, $offer.amount, $offer.ware, $offer.buyer, $offer.unitprice, $offer.relativeprice]" />
+						</do_if>
+						<do_else>
+							<!-- buy offers -->
+							<!-- If we buy for build storage, add this information to the name -->
+							<do_if value="$offer.buyer.isclass.buildstorage">
+								<set_value name="$buyerName" exact="$offer.buyer.base.knownname + '(build storage)'"/>
+							</do_if>
+							<do_else>
+								<set_value name="$buyerName" exact="$offer.buyer.knownname"/>
+							</do_else>
+							<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%1 wants to buy %2 %3 from %4 for %5 (%6)'.[$buyerName, $offer.amount, $offer.ware, $offer.buyer, $offer.unitprice, $offer.relativeprice]" />
+						</do_else>
+					</do_all>
+					<remove_value name="$offer" /> <!-- TODO: not needed?! -->
+					<!-- TODO: include ID code & sector in debug message -->
+					<!-- TODO: use %s instead of %1 -->
+				</do_if>
+			</do_if>
+    </actions>
+  </attention>
+</aiscript>
