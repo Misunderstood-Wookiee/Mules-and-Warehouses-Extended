@@ -54,7 +54,7 @@
 					<!-- how much does the supply have to offer? -->
 					<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="$shipEntity.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
 					<!-- how much can we haul? -->
-					<set_value name="$cargoHauled" exact="[($shipEntity.ship.cargo.{$someSupply.ware}.max-($OccupiedCargo)f/$someNeed.ware.volume)i, $shipEntity.ship.cargo.{$someNeed.ware}.free].min" />
+					<set_value name="$cargoHauled" exact="[($shipEntity.ship.cargo.{$someSupply.ware}.max-($occupiedCargo)f/$someNeed.ware.volume)i, $shipEntity.ship.cargo.{$someNeed.ware}.free].min" />
 
 					<!-- the amount for the trade is the minimum of the three amounts -->
 					<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
