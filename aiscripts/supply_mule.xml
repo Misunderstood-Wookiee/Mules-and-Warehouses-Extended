@@ -126,6 +126,15 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    not same shiptype: '+$subordinate.type+' and '+this.ship.type" output="false" append="true" />
 					<continue />
 				</do_if>
+				<do_if value="global.$v1024cf_mod_loaded?" comment="Checking that this value exists; true if Civilian Fleets is loaded.">
+					<!-- Civilian Fleets loaded. -->
+					<!-- Check also, where Civ-Fleet is loaded but the user is not using the Civ-Fleet Supply Mules fleet -->
+					<do_if value="$subordinate.assignment == assignment.trade" comment="Checking if the Mule is being handled by Civ-Fleets, that is the characteristic property.">
+						<!-- Skip the handling on this side, stay in the fleet, and let Civilian Fleets handle the order sync. -->
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    is handled by Civilian Fleets; skipping'" output="false" append="true" />
+						<continue />
+					</do_if>
+				</do_if>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    copying default behavior'" output="false" append="true" />
 				<remove_object_commander object="$subordinate" />
 				<create_order object="$subordinate" default="true" id="'SupplyMule'">
