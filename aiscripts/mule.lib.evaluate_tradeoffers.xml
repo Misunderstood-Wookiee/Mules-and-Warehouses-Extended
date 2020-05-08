@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="mule.lib.evaluate_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="p:\X4\Database\libraries\aiscripts.xsd" version="8">
+<aiscript name="mule.lib.evaluate_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
 	<!-- Compare tradeoffers by profit and return the most profitable one -->
 	<params>
 		<!-- list of possible buyoffers -->

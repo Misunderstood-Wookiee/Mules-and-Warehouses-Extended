@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="p:\X4\Database\libraries\aiscripts.xsd" version="2">
+<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="2">
 	<!-- Setup context menu order-->
 	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
 		<params>
@@ -38,6 +38,8 @@
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
+			<!-- Internal parameter used to restart the script on version update if required -->
+			<param name="restartScript" type="internal" default="false"/>
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
 			<param name="playerBuyMod" default="100" type="number" text="Player Buy Mod" comment="Owned Station Buy price adjustment, 0=ignore manager price 100= Obey Station Manager's buy offer.">
 				<input_param name="startvalue" value="100" />
@@ -79,7 +81,13 @@
 			<set_object_commander object="this.ship" commander="$sourceStation" assignment="assignment.trade" />
 		</do_if>
 	</init>
-
+	<patch sinceversion="2">
+		<!-- This will reissue any standing supply mule orders -->
+		<!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
+		<!-- It might not ensure help with removing this script from a savegame -->
+		<debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %1'.[this.ship.idcode]" filter="savegame"/>
+		<edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
+	</patch>
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
@@ -231,12 +239,10 @@
 			<!-- ************************ case where no station is set ************************** -->
 			<do_if value="not $sourceStation">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- No Source Station set. Entering logic block for not $sourceStation'" />
-
 				<!-- ************************ buy from player, sell to player build storage ************************** -->
 				<do_if value="($builder) or (not $producer)">
 					<!-- ************************ buy from player, sell to player build storage ************************** -->
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- buy from player sell to player build storage'" />
-
 					<!-- finding the player build storage needs -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$playerBuildNeeds" multiple="true">
 						<match_buyer class="class.buildstorage" owner="this.ship.owner" />
