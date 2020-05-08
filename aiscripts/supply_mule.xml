@@ -307,6 +307,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="true"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -455,6 +456,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="true"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -628,6 +630,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -819,6 +822,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -992,6 +996,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -1184,6 +1189,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -1318,6 +1324,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="true"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -1456,6 +1463,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="true"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -1625,6 +1633,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -1807,6 +1816,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -1976,6 +1986,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -2158,6 +2169,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -2281,6 +2293,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="true"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -2424,6 +2437,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="true"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -2592,6 +2606,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -2779,6 +2794,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -2948,6 +2964,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -3134,6 +3151,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -3266,6 +3284,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -3402,6 +3421,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -3523,6 +3543,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>
@@ -3659,6 +3680,7 @@
 								<param name="usedSelloffers" value="$supplyTrades"/>
 								<param name="occupiedCargo" value="$OccupiedCargo"/>
 								<param name="tradeForBuildStorage" value="false"/>
+								<param name="minCargoSize" value="$minCargoSize"/>
 								<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 								<param name="debugchance" value="$debugchance"/>
 								<param name="debugFileName" value="$debugFileName"/>

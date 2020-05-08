@@ -16,6 +16,8 @@
 		<param name="sameFactionBuyMod"/>
 		<!-- current amount of cargo reserved for other wares -->
 		<param name="occupiedCargo"/>
+		<!-- minimum cargo size for allowed transport -->
+		<param name="minCargoSize"/>
 		<!-- Enable trading for build storage -->
 		<!-- if the trade will finish off the build storage for that good it will be allowed for low volumes -->
 		<param name="tradeForBuildStorage" default="false"/>
