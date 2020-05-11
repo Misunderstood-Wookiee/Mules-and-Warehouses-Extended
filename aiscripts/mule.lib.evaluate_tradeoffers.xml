@@ -49,6 +49,10 @@
 					<do_if value="$someNeed.ware.id != $someSupply.ware.id">
 						<continue />
 					</do_if>
+					<!-- don't allow trades between the same station -->
+					<do_if value="$someNeed.buyer == $someSupply.seller ">
+						<continue />
+					</do_if>
 
 					<!-- how much does the need want? -->
 					<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
