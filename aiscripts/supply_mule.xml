@@ -284,6 +284,8 @@
 				<append_to_list name="$prioritylist" exact="table[ $buyFromFaction = $allFactions,   $serve = $sourceStation.sector , $type = 'any' ]" />
 			</do_elseif>
 
+			<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$needs" multiple="true" />
+			
 			<!-- station that is currently served (determined by the first set of orders issued) -->
 			<set_value name="$alreadyServing" exact="null"/>
 			<!-- Current number of issued trades -->
@@ -349,7 +351,9 @@
 
 				<!-- Filter needs(buyoffers) depending on resources, products, tradewares -->
 				<do_if value="$priority.$type != 'any'">
+					<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
 					<create_list name="$filteredNeeds" />
+					<!-- Check for every need if it fullfills the requirement and add -->
 					<do_for_each name="$need" in="$needs">
 						<do_if value="
 								 ($priority.$type == 'resources'  and $need.owner.resources.{$need.ware}.exists) or
@@ -497,8 +501,20 @@
 
 							<!-- might be able remove $occupiedCargo in the future -->
 							<set_value name="$occupiedCargo" exact="$occupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
-							<!-- Lock in out trading station (prevents us from serving other stations in the same run) -->
-							<set_value name="$alreadyServing" exact="$currentlyServing"/>
+							<!-- Lock in out trading station -->
+							<do_if value="$alreadyServing == null">
+								<!-- prevent the mule from using any other trade stations on this run/priority, by removing all other buyoffers/needs from different stations -->
+								<create_list name="$filteredNeeds" />
+								<do_for_each name="$need" in="$needs">
+									<do_if value="$needs.buyer == $bestNeedTrade.buyer">
+										<append_to_list name="$filteredNeeds" exact="$need" />
+									</do_if>
+								</do_for_each>
+								<set_value name="$needs" exact="$filteredNeeds"/>
+								<remove_value name="$filteredNeeds"/>
+								<!-- prevent searching for buyoffers from other stations in the next run/priority -->
+								<set_value name="$alreadyServing" exact="$bestNeedTrade.buyer"/>
+							</do_if>
 							<!-- remove used supply offers from evaluation -->
 							<remove_from_list name="$supplyOffers" exact="$bestSupplyTrade"/>
 							<!-- Trade Count -->
