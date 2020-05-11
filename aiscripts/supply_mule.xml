@@ -2528,7 +2528,7 @@
 
 					<!-- finding the player needs -->
 					<!-- unfortunately at this level it's not possible to filter for only goods that are products on the station -->
-					<find_buy_offer space="player.galaxy" tradepartner="this.ship" result="$tmpTradeNeeds" multiple="true">
+					<find_buy_offer space="player.galaxy" buyer="$sourceStation" tradepartner="this.ship" result="$tmpTradeNeeds" multiple="true">
 						<match_buyer owner="this.ship.owner">
 							<match class="class.buildstorage" negate="true" />
 						</match_buyer>
