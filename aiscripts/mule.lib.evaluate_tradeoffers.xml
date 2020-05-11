@@ -10,8 +10,6 @@
 		<!-- determines the account used to perform trades -->
 		<!-- determines the cargo size -->
 		<param name="shipEntity"/>
-		<!-- list of already used selloffers -->
-		<param name="usedSelloffers"/>
 		<!-- player buy modifier to adjust supply prices -->
 		<param name="sameFactionBuyMod"/>
 		<!-- current amount of cargo reserved for other wares -->
@@ -41,10 +39,6 @@
 				<do_all exact="$selloffers.count" counter="$j">
 					<set_value name="$someSupply" exact="$selloffers.{$j}" />
 					
-					<!-- ignores supply side trades already found -->
-					<do_if value="$usedSelloffers.indexof.{$someSupply}">
-						<continue />
-					</do_if>
 					<!-- only do any work if the offers are for the same ware -->
 					<do_if value="$someNeed.ware.id != $someSupply.ware.id">
 						<continue />

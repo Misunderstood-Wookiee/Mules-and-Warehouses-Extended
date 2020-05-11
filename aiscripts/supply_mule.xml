@@ -81,12 +81,14 @@
 			<set_object_commander object="this.ship" commander="$sourceStation" assignment="assignment.trade" />
 		</do_if>
 	</init>
+
 	<patch sinceversion="2">
 		<!-- This will reissue any standing supply mule orders -->
 		<!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
 		<debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %1'.[this.ship.idcode]" filter="savegame"/>
 		<edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
 	</patch>
+
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
@@ -224,7 +226,7 @@
 
 			<!-- Create shotcuts for all factions that could be docked/traded at -->
 			<get_factions_by_relation relation="dock" result="$allFactions" object="this.ship"/>
-			
+
 			<!-- Create shotcuts for all wares that could be used in searches -->
 			<do_if value="$lockWares">
 				<set_value name="$allowedWares" exact="$specialWareBasket"/>
@@ -281,7 +283,7 @@
 				<append_to_list name="$prioritylist" exact="table[ $buyFromFaction = faction.player, $serve = $sourceStation.sector , $type = 'any' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $buyFromFaction = $allFactions,   $serve = $sourceStation.sector , $type = 'any' ]" />
 			</do_elseif>
-			
+
 			<!-- station that is currently served (determined by the first set of orders issued) -->
 			<set_value name="$alreadyServing" exact="null"/>
 			<!-- Current number of issued trades -->
@@ -382,7 +384,7 @@
 					<do_for_each name="$need" in="$needs">
 						<set_value name="$uniqueWareTable.{$need.ware}" exact="$need.ware"/>
 					</do_for_each>
-					
+
 					<!-- now flush the old warebasket -->
 					<remove_from_list name="$specialWareBasket" />
 					<!-- and add all unique wares -->
@@ -408,7 +410,7 @@
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 							</match_parent>
 						</match_parent>
-							<!-- TODO: Ignore Blacklists for your own faction. or is it better to create a different blacklist for the ship? -->
+						<!-- TODO: Ignore Blacklists for your own faction. or is it better to create a different blacklist for the ship? -->
 					</match_seller>
 				</find_sell_offer>
 
@@ -421,6 +423,7 @@
 					<param name="debugDirName" value="$debugDirName"/>
 				</run_script>
 
+				<!-- ************************ evalute offers & issue orders ************************ -->
 				<!-- If we have found matching supply start profit calculation and issue orders -->
 				<do_if value="$supplyOffers.count">
 					<!-- some setup, repeats in every block for readability -->
@@ -436,7 +439,7 @@
 					<set_value name="$emergencyBreak" exact="0"/>
 					<do_while value="true">
 						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' + $occupiedCargo" />
-						
+
 						<!-- emergency break to prevent mule from freezing the screen (in theory they should never crash) -->
 						<set_value name="$emergencyBreak" operation="add" exact="1"/>
 						<do_if value="$emergencyBreak > 100">
@@ -446,7 +449,7 @@
 							<create_order object="this.ship" id="Wait" default="true"/>
 							<return/>
 						</do_if>
-						
+
 						<do_if value="$occupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, skip to end'" />
 							<!-- cargo full, skip to end -->
@@ -463,7 +466,6 @@
 							<param name="buyoffers" value="$needs"/>
 							<param name="selloffers" value="$supplyOffers"/>
 							<param name="shipEntity" value="this"/>
-							<param name="usedSelloffers" value="$supplyTrades"/>
 							<param name="occupiedCargo" value="$occupiedCargo"/>
 							<param name="tradeForBuildStorage" value="false"/>
 							<param name="minCargoSize" value="$minCargoSize"/>
@@ -483,7 +485,7 @@
 							<!-- No more profitable trades, move on to next priority! -->
 							<break/>
 						</do_if>
-						
+
 						<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
 							<set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$tradeText" />
@@ -496,7 +498,8 @@
 							<set_value name="$occupiedCargo" exact="$occupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
 							<!-- Lock in out trading station (prevents us from serving other stations in the same run) -->
 							<set_value name="$alreadyServing" exact="$currentlyServing"/>
-							<append_to_list name="$supplyTrades" exact="$bestSupplyTrade" />
+							<!-- remove used supply offers from evaluation -->
+							<remove_from_list name="$supplyOffers" exact="$bestSupplyTrade"/>
 							<!-- Trade Count -->
 							<set_value name="$tradeCount" operation="add" exact="1"/>
 						</do_if>
