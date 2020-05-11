@@ -29,7 +29,7 @@
   <attention min="unknown">
     <actions>
 			<!-- Default values for best trade -->
-			<set_value name="$bestProfit" exact="0" />
+			<set_value name="$bestProfit" exact="0Cr" />
 			<set_value name="$bestAmount" exact="0" />
 			<set_value name="$bestNeedTrade" exact="null" />
 			<set_value name="$bestSupplyTrade" exact="null" />
@@ -88,7 +88,7 @@
 											+ ' need unitprice: ' + $someNeed.unitprice
 											+ ' supp unitprice: ' + $someSupply.unitprice
 											+ ' faction buy modifier: ' + $sameFactionBuyMod
-											+ ' profit: ' + $currentProfit" /> <!-- TODO: better debug message to show owners of tradepartners -->
+											+ ' profit: ' + $currentProfit.formatted.{'%.s %Cr'}" /> <!-- TODO: better debug message to show owners of tradepartners -->
 					</do_if>
 
 					<!-- if we found a new best trade, set it! -->
@@ -100,7 +100,14 @@
 					</do_if>
 				</do_all>
 			</do_all>
-
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Suggested Trade is: Buy %s %s from %s (%s) and sell to %s (%s) with %s of profit.'.[
+										 $bestAmount,
+										 $bestSupplyTrade.ware,
+										 $bestSupplyTrade.seller.knownname,
+										 $bestSupplyTrade.seller.idcode,
+										 $bestNeedTrade.buyer.knownname,
+										 $bestNeedTrade.buyer.idcode,
+										 $bestProfit.formatted.{'%.s %Cr'}]" />
 			<!-- Return the best avalible trade combination -->
 			<return>
 				<retval name="bestProfit" value="$bestProfit"/>
