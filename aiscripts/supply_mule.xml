@@ -222,12 +222,9 @@
 				<resume label="start" />
 			</do_if>
 
-			<!-- Create a list of prorities for our mule -->
-			<!-- It's an ordered tasklist of what out mule should try to do first  -->
-			<create_list name="$prioritylist" />
-
 			<!-- Create shotcuts for all factions that could be docked/traded at -->
 			<get_factions_by_relation relation="dock" result="$allFactions" object="this.ship"/>
+			
 			<!-- Create shotcuts for all wares that could be used in searches -->
 			<do_if value="$lockWares">
 				<set_value name="$allowedWares" exact="$specialWareBasket"/>
@@ -236,6 +233,9 @@
 				<get_ware_definition result="$allowedWares" flags="economy" />
 			</do_else>
 
+			<!-- Create a list of prorities for our mule -->
+			<!-- It's an ordered tasklist of what out mule should try to do first  -->
+			<create_list name="$prioritylist" />
 			<!-- ************************ supply mule logic ************************ -->
 			<!-- $buyFrom: faction (opt. list) -->
 			<!-- $serve: specific station, specific ship, faction, sector -->
@@ -329,7 +329,7 @@
 					<!-- $factions -->
 					<set_value name="$factions" exact="if (typeof $priority.$serve == datatype.faction) then $priority.$serve else $allFactions"/>
 					<!-- $space -->
-					<set_value name="$space" exact="if ($priority.$serve.isclass.sector) then $priority.$serve else player.galaxy"/>
+					<set_value name="$space" exact="if ((typeof $priority.$serve == datatype.component) and ($priority.$serve.isclass.sector)) then $priority.$serve else player.galaxy"/>
 					<!-- $classes (buildstorage) -->
 					<set_value name="$class" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
 
@@ -401,19 +401,19 @@
 						<match_gate_distance object="$needs.random.owner" min="0" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
-						<match_any>
-							<!-- Ignore Blacklists for your own faction -->
+						<!--<match_any>
+							--><!-- Ignore Blacklists for your own faction --><!--
 							<match owner="this.ship.owner"/>
 							<match>
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-								<match_parent>
+								<match_parent >
 									<match_parent>
 										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
 										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 									</match_parent>
 								</match_parent>
 							</match>
-						</match_any>
+						</match_any>-->
 					</match_seller>
 				</find_sell_offer>
 
@@ -484,7 +484,7 @@
 
 						<!-- if we found a good trade, create the buy order for the supply and the sell order for the need. -->
 						<!-- if we end up with more than one need, we'll move it down with move_order later -->
-						<do_if value="$bestProfit gt 0">
+						<do_if value="$bestProfit le 0">
 							<!-- No more profitable trades, move on to next priority! -->
 							<break/>
 						</do_if>
