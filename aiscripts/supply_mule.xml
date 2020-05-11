@@ -228,7 +228,6 @@
 
 			<!-- Create shotcuts for all factions that could be docked/traded at -->
 			<get_factions_by_relation relation="dock" result="$allFactions" object="this.ship"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'allFactions: '.[$allFactions]" />
 			<!-- Create shotcuts for all wares that could be used in searches -->
 			<do_if value="$lockWares">
 				<set_value name="$allowedWares" exact="$specialWareBasket"/>
@@ -282,7 +281,7 @@
 				<append_to_list name="$prioritylist" exact="table[ $buyFromFaction = faction.player, $serve = $sourceStation.sector , $type = 'any' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $buyFromFaction = $allFactions,   $serve = $sourceStation.sector , $type = 'any' ]" />
 			</do_elseif>
-
+			
 			<!-- station that is currently served (determined by the first set of orders issued) -->
 			<set_value name="$alreadyServing" exact="null"/>
 			<!-- Current number of issued trades -->
@@ -291,7 +290,13 @@
 			<!-- ************************ main loop ************************-->
 			<!-- Start looping over our prioritiylist to determine what to do-->
 			<do_for_each name="$priority" in="$prioritylist">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- Current priority is %1 -----'.[$priority]" />
+				<!-- Print current priority to debuglog -->
+				<run_script chance="$debugchance" sinceversion="2" name="'mule.lib.debug.dump_priority'">
+					<param name="priority" value="$priority"/>
+					<param name="debugchance" value="$debugchance"/>
+					<param name="debugFileName" value="$debugFileName"/>
+					<param name="debugDirName" value="$debugDirName"/>
+				</run_script>
 
 				<!-- Once a station has been determined to be served by issuing the first orders, we will stick to this station -->
 				<!-- This can lead to dublicate searches at the moment -->
@@ -354,20 +359,20 @@
 					<remove_value name="$filteredNeeds"/>
 				</do_if>
 
-				<!-- If there are no needs, just continue with the next on the priority list-->
-				<do_if value="$needs.count == 0">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'No offers found'" />
-					<continue/>
-				</do_if>
-
 				<!-- dump all tradeoffers to debug log -->
-				<run_script sinceversion="2" name="'mule.lib.debug.dump_tradeoffers'">
+				<run_script chance="$debugchance" sinceversion="2" name="'mule.lib.debug.dump_tradeoffers'">
 					<param name="headerline" value="'needs'"/>
 					<param name="offers" value="$needs"/>
 					<param name="debugchance" value="$debugchance"/>
 					<param name="debugFileName" value="$debugFileName"/>
 					<param name="debugDirName" value="$debugDirName"/>
 				</run_script>
+
+				<!-- If there are no needs, just continue with the next on the priority list-->
+				<do_if value="$needs.count == 0">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'No offers found'" />
+					<continue/>
+				</do_if>
 
 				<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 				<!-- but only if the player didn't set them manually -->
@@ -413,7 +418,7 @@
 				</find_sell_offer>
 
 				<!-- dump all tradeoffers to debug log -->
-				<run_script sinceversion="2" name="'mule.lib.debug.dump_tradeoffers'">
+				<run_script chance="$debugchance" sinceversion="2" name="'mule.lib.debug.dump_tradeoffers'">
 					<param name="headerline" value="'supply offers'"/>
 					<param name="offers" value="$supplyOffers"/>
 					<param name="debugchance" value="$debugchance"/>

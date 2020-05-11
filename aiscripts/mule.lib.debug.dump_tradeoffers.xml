@@ -13,10 +13,8 @@
   <attention min="unknown">
     <actions>
 			<do_if value="$debugchance">
-				<!-- print headerline -->
-				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %1:'.[$headerline]" />
-				<!-- print offer count -->
-				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'Offers (%1):'.[$offers.count]"/>
+				<!-- print headerline & count -->
+				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
 				<!-- loop over offers and print every single one-->
 				<do_if value="$offers.count">
 					<do_all exact="$offers.count" counter="$i">
