@@ -372,10 +372,18 @@
 				<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 				<!-- but only if the player didn't set them manually -->
 				<do_if value="(not $lockWares)">
+					<!-- To eliminate dublicates, just create a table with the ware as index -->
+					<set_value name="$uniqueWareTable" exact="table[]"/>
+					<do_for_each name="$need" in="$needs">
+						<set_value name="$uniqueWareTable.{$need.ware}" exact="$need.ware"/>
+					</do_for_each>
+					
+					<!-- now flush the old warebasket -->
 					<remove_from_list name="$specialWareBasket" />
-					<do_all exact="$needs.count" counter="$i">
-						<append_to_list name="$specialWareBasket" exact="$needs.{$i}.ware" />
-					</do_all>
+					<!-- and add all unique wares -->
+					<do_for_each name="$ware" in="$uniqueWareTable">
+						<append_to_list name="$specialWareBasket" exact="$ware" />
+					</do_for_each>
 				</do_if>
 
 				<!-- ************************ search for suppliers ************************ -->
