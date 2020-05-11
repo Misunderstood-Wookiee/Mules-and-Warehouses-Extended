@@ -311,6 +311,7 @@
 				<do_else>
 					<set_value name="$currentlyServing" exact="null"/>
 				</do_else>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Currently Serving: %1'.[$currentlyServing.knownname]" />
 
 				<!-- ************************ check needs ************************ -->
 				<!-- Search for buyoffers/needs -->
@@ -318,7 +319,7 @@
 					<!-- specific station/ship -->
 					<!-- if we search for build storage, we actually don't serve the station, but the storage -->
 					<do_if value="($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)">
-						<set_value name="$currentlyServing" exact="$currentlyServing.base"/>
+						<set_value name="$currentlyServing" exact="$currentlyServing.buildstorage"/>
 					</do_if>
 					<!-- search buyoffers -->
 					<find_buy_offer space="player.galaxy" tradepartner="this.ship" wares="$allowedWares" buyer="$currentlyServing" result="$needs" multiple="true" />
@@ -354,7 +355,7 @@
 								 ($priority.$type == 'resources'  and $need.owner.resources.{$need.ware}.exists) or
 								 ($priority.$type == 'products'   and $need.owner.products.{$need.ware}.exists) or
 								 ($priority.$type == 'tradewares' and $need.owner.tradewares.{$need.ware}.exists)" >
-							<append_to_list name="$filteredNeeds" exact="$needs.{$i}" />
+							<append_to_list name="$filteredNeeds" exact="$need" />
 						</do_if>
 					</do_for_each>
 					<set_value name="$needs" exact="$filteredNeeds"/>
