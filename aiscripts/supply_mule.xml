@@ -305,7 +305,7 @@
 				<do_if value="$alreadyServing">
 					<set_value name="$currentlyServing" exact="$alreadyServing"/>
 				</do_if>
-				<do_elseif value="$priority.$serve.isclass.{[class.ship, class.station]}">
+				<do_elseif value="(typeof $priority.$serve == datatype.component) and ($priority.$serve.isclass.{[class.ship, class.station]})">
 					<set_value name="$currentlyServing" exact="$priority.$serve"/>
 				</do_elseif>
 				<do_else>
