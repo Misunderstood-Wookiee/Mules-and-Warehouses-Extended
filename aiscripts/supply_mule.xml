@@ -401,19 +401,14 @@
 						<match_gate_distance object="$needs.random.owner" min="0" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
-						<!--<match_any>
-							--><!-- Ignore Blacklists for your own faction --><!--
-							<match owner="this.ship.owner"/>
-							<match>
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-								<match_parent >
-									<match_parent>
-										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-										<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
-									</match_parent>
-								</match_parent>
-							</match>
-						</match_any>-->
+						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+						<match_parent>
+							<match_parent>
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+							</match_parent>
+						</match_parent>
+							<!-- TODO: Ignore Blacklists for your own faction. or is it better to create a different blacklist for the ship? -->
 					</match_seller>
 				</find_sell_offer>
 
