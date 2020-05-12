@@ -332,15 +332,15 @@
 					<!-- TODO: implement list later on to combine searchtypes -->
 
 					<!-- $factions -->
-					<set_value name="$factions" exact="if (typeof $priority.$serve == datatype.faction) then $priority.$serve else $allFactions"/>
+					<set_value name="$serveFactions" exact="if (typeof $priority.$serve == datatype.faction) then $priority.$serve else $allFactions"/>
 					<!-- $space -->
-					<set_value name="$space" exact="if ((typeof $priority.$serve == datatype.component) and ($priority.$serve.isclass.sector)) then $priority.$serve else player.galaxy"/>
+					<set_value name="$serveSpace" exact="if ((typeof $priority.$serve == datatype.component) and ($priority.$serve.isclass.sector)) then $priority.$serve else player.galaxy"/>
 					<!-- $classes (buildstorage) -->
-					<set_value name="$class" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
+					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
 
 					<!-- search buyoffers -->
-					<find_buy_offer space="$space" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
-						<match_buyer class="$class" owner="$factions"/>
+					<find_buy_offer space="$serveSpace" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
+						<match_buyer class="$serveClass" owner="$serveFactions"/>
 					</find_buy_offer>
 				</do_elseif>
 				<do_else>
