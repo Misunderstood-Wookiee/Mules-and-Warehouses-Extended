@@ -98,6 +98,7 @@
 					</do_if>
 				</do_all>
 			</do_all>
+			<do_if value="$bestProfit > 0">
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Suggested Trade is: Buy %s %s from %s (%s) and sell to %s (%s) with %s of profit.'.[
 										 $bestAmount,
 										 $bestSupplyTrade.ware,
@@ -106,6 +107,11 @@
 										 $bestNeedTrade.buyer.knownname,
 										 $bestNeedTrade.buyer.idcode,
 										 $bestProfit.formatted.{'%.s %Cr'}]" />
+			
+			</do_if>
+			<do_else>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'no valid trade found'" />
+			</do_else>
 			<!-- Return the best avalible trade combination -->
 			<return>
 				<retval name="bestProfit" value="$bestProfit"/>

@@ -313,7 +313,7 @@
 				<do_else>
 					<set_value name="$currentlyServing" exact="null"/>
 				</do_else>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Currently Serving: %1'.[$currentlyServing.knownname]" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Currently Serving: %1'.[if $currentlyServing.knownname? then $currentlyServing.knownname else null]" />
 
 				<!-- ************************ check needs ************************ -->
 				<!-- Search for buyoffers/needs -->
