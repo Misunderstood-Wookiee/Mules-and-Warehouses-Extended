@@ -19,7 +19,7 @@
 				<do_for_each name="$offer" in="$offers">
 					<do_if value="$offer.owner == $offer.seller">
 						<!-- sell offers -->
-						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%1 wants to sell %2 %3 to %4 for %5 (%6)'.[$offer.seller.knownname, $offer.amount, $offer.ware, $offer.buyer, $offer.unitprice, $offer.relativeprice]" />
+						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%s (%s) wants to sell %s %s for %s (%s)'.[$offer.seller.knownname, $offer.seller.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]" />
 					</do_if>
 					<do_else>
 						<!-- buy offers -->
@@ -30,7 +30,7 @@
 						<do_else>
 							<set_value name="$buyerName" exact="$offer.buyer.knownname"/>
 						</do_else>
-						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%1 wants to buy %2 %3 from %4 for %5 (%6)'.[$buyerName, $offer.amount, $offer.ware, $offer.buyer, $offer.unitprice, $offer.relativeprice]" />
+						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%s (%s) wants to buy %s %s for %s (%s)'.[$buyerName, $offer.buyer.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]" />
 					</do_else>
 				</do_for_each>
 			</do_if>
