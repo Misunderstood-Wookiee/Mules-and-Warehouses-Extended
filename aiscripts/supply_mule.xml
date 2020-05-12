@@ -400,7 +400,11 @@
 
 				<!-- ************************ search for suppliers ************************ -->
 				<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$supplyOffers" multiple="true">
-					<match_seller tradesknownto="this.owner">
+					<match_seller>
+						<!-- Ensure the owner actually knows the station/seller -->
+						<match tradesknownto="this.owner"/>
+						<!-- Repect faction trade restrictions set by the priority list -->
+						<match owner="$priority.$buyFromFaction"/>
 						<!-- this next bit of mess is just blacklist handling -->
 						<!-- for the object in the gate distance I need a way to start us near a human station -->
 						<!-- Gate distance calculation is a bit problematic here, since we could examine 2 stations in two different sectors at the same time. -->
