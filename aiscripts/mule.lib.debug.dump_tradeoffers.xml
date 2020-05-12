@@ -12,13 +12,11 @@
   </params>
   <attention min="unknown">
     <actions>
-		<do_if value="$debugchance">
-			<!-- print headerline & count -->
-			<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
-			<!-- loop over offers and print every single one-->
-			<do_if value="$offers.count">
-				<do_all exact="$offers.count" counter="$i">
-					<set_value name="$offer" exact="$offers.{$i}" />
+			<do_if value="$debugchance">
+				<!-- print headerline & count -->
+				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
+				<!-- loop over offers and print every single one-->
+				<do_for_each name="$offer" in="$offers">
 					<do_if value="$offer.owner == $offer.seller">
 						<!-- sell offers -->
 						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%1 wants to sell %2 %3 to %4 for %5 (%6)'.[$offer.seller.knownname, $offer.amount, $offer.ware, $offer.buyer, $offer.unitprice, $offer.relativeprice]" />
@@ -34,12 +32,8 @@
 						</do_else>
 						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%1 wants to buy %2 %3 from %4 for %5 (%6)'.[$buyerName, $offer.amount, $offer.ware, $offer.buyer, $offer.unitprice, $offer.relativeprice]" />
 					</do_else>
-				</do_all>
-				<remove_value name="$offer" /> <!-- TODO: not needed?! -->
-				<!-- TODO: include ID code & sector in debug message -->
-				<!-- TODO: use %s instead of %1 -->
+				</do_for_each>
 			</do_if>
-		</do_if>
     </actions>
   </attention>
 </aiscript>
