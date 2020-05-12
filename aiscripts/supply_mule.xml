@@ -506,7 +506,7 @@
 								<!-- prevent the mule from using any other trade stations on this run/priority, by removing all other buyoffers/needs from different stations -->
 								<create_list name="$filteredNeeds" />
 								<do_for_each name="$need" in="$needs">
-									<do_if value="$needs.buyer == $bestNeedTrade.buyer">
+									<do_if value="$need.buyer == $bestNeedTrade.buyer">
 										<append_to_list name="$filteredNeeds" exact="$need" />
 									</do_if>
 								</do_for_each>
