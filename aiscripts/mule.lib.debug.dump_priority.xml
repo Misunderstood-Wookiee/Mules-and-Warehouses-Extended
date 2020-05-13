@@ -11,18 +11,11 @@
   <attention min="unknown">
     <actions>
 			<do_if value="$debugchance">
-				<!-- populate variables -->
-				<get_factions_by_relation relation="dock" result="$allDockableFactions" object="this.ship"/>
 				<!-- format: buy from faction -->
-				<do_if value="$priority.$buyFromFaction == faction.player">
-					<set_value name="$buyFromFactionString" exact="'player'"/>
-				</do_if>
-				<do_elseif value="$priority.$buyFromFaction == $allDockableFactions">
-					<set_value name="$buyFromFactionString" exact="'all dockable factions'"/>
-				</do_elseif>
-				<do_else>
-					<set_value name="$buyFromFactionString" exact="$priority.$buyFromFaction"/>
-				</do_else>
+				<create_list name="$buyFromFactionsString"/>
+				<do_for_each name="$faction" in ="$priority.$buyFromFactions">
+					<append_to_list name="$buyFromFactionsString" exact="$faction.id"/>
+				</do_for_each>
 				<!-- format: supply -->
 				<do_if value="(typeof $priority.$serve == datatype.faction) and ($priority.$serve == faction.player)">
 					<set_value name="$serveString" exact="'player'"/>
@@ -38,7 +31,7 @@
 				</do_else>
 				
 				<!-- write debug message -->
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$serveString, $priority.$type, $buyFromFactionString]" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$serveString, $priority.$type, $buyFromFactionsString]" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
 			</do_if>
     </actions>
