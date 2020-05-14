@@ -180,17 +180,14 @@
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Station or Ship: %s'.[if $serveStationOrShip then $serveStationOrShip.knownname else '-',if $serveStationOrShip then $serveStationOrShip.idcode else '-']"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Sector: %s'.[$serveSector.knownname]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Factions: %s'.[$serveFactions]"/>
-			
+
 
 			<!--here we want to copy settings to subordinates-->
-			<set_value name="$subordinates" exact="this.ship.subordinates" />
-			<set_value name="$subNr" exact="$subordinates.count" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'found subordinates: '+$subNr"/>
-			<do_all exact="$subNr" counter="$nr">
-				<set_value name="$subordinate" exact="$subordinates.{$nr}" />
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  '+$nr+' '+$subordinate.knownname"/>
-				<do_if value="$subordinate.type != this.ship.type">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    not same shiptype: '+$subordinate.type+' and '+this.ship.type"/>
+			<set_value name="$subordinateShipCopyType" exact="[shiptype.courier, shiptype.transporter, shiptype.freighter, shiptype.miner, shiptype.largeminer, this.ship.type]"/>
+			<do_for_each name="$subordinate" in="this.ship.subordinates">
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Subordinates %s'.[$subordinate.knownname]"/>
+				<do_if value="not $subordinateShipCopyType.indexof.{$subordinate.type}">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    not copying settings, because of wrong shiptype: %s'.[$subordinate.type]"/>
 					<continue />
 				</do_if>
 				<do_if value="global.$v1024cf_mod_loaded?" comment="Checking that this value exists; true if Civilian Fleets is loaded.">
@@ -206,7 +203,7 @@
 				<remove_object_commander object="$subordinate" />
 				<create_order object="$subordinate" default="true" id="'SupplyMule'">
 					<!-- Note: we changed the default orders, therefore civilian fleets needs an update -->
-					<param name="home" value="home" />
+					<param name="home" value="$home" />
 					<param name="maxDist" value="[$subordinate.pilot.skill.piloting * 2, $maxDist].min" />
 					<param name="assignHome" value="$assignHome" />
 					<param name="dedicatedServe" value="$dedicatedServe" />
@@ -221,11 +218,7 @@
 					<param name="playerBuyMod" value="$playerBuyMod" />
 				</create_order>
 				<wait min="50ms" max="150ms" />
-			</do_all>
-
-			<remove_value name="$subordinates" />
-			<remove_value name="$subNr" />
-			<remove_value name="$subordinate" />
+			</do_for_each>
 
 			<!-- Sell leftover cargo before resuming regular Mule routine -->
 			<!-- this was pulled right out of the randomTrader mod -->
