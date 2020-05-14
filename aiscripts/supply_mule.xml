@@ -19,7 +19,7 @@
 			<!-- menu option: Serve Source Only (will only serve the source station if used)-->
 			<param name="dedicatedServe" type="bool" default="false" text="Serve Source Only" comment="Will only serve the configured source station" />
 			<!-- menu option: include player and/or ai stations as sources for supplies -->
-			<param name="allowPlayerSuppliers" type="bool" default="true" text="Allow Player Suppliers" comment="Allow buys from player stations" />
+			<param name="allowPlayerSuppliers" type="bool" default="true" text="Allow Player Suppliers" comment="Allow buys from player stations"/>
 			<param name="allowAiSuppliers"     type="bool" default="true" text="Allow Ai Suppliers"     comment="Allow buys from ai stations" />
 
 			<!-- menu option: include buildstorage, resources, intermediates, and tradewares as possible options to supply -->
@@ -135,10 +135,9 @@
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
 
 			<!-- Dump Mule Settings -->
-			<do_if value="$debugchance">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    Home: %s (%s)'.[$home.knownname,@$home.idcode]"/>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignHome: %s'.[$assignHome]"/>
@@ -154,7 +153,6 @@
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
-			</do_if>
 
 			<!-- Validate Input -->
 			<!-- Note: Maybe put this in init section, however we would lose this debug information after the first run -->
@@ -167,6 +165,22 @@
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: assignHome (No Station or Ship configured)'"/>
 				<set_value name="$assignHome" exact="false" />
 			</do_if>
+
+			<!-- Setup variables for later use-->
+			<!-- Create shotcuts for all ai and all player factions -->
+			<!-- TODO: Check how ventures work an remove visitor factions depending on the outcome. -->
+			<get_factions_by_relation relation="dock" result="$aiFactions" object="this.ship"/>
+			<remove_from_list name="$aiFactions" exact="faction.player"/>
+			<set_value name="$playerFactions" exact="[faction.player]"/>
+
+			<!-- Determine where we serve and whom -->
+			<set_value name="$serveStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
+			<set_value name="$serveSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
+			<set_value name="$serveFactions" exact="if ($serveStationOrShip and $home.owner != faction.player) then $aiFactions else $playerFactions"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Station or Ship: %s'.[if $serveStationOrShip then $serveStationOrShip.knownname else '-',if $serveStationOrShip then $serveStationOrShip.idcode else '-']"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Sector: %s'.[$serveSector.knownname]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Factions: %s'.[$serveFactions]"/>
+			
 
 			<!--here we want to copy settings to subordinates-->
 			<set_value name="$subordinates" exact="this.ship.subordinates" />
@@ -282,10 +296,6 @@
 				<resume label="start" />
 			</do_if>
 
-			<!-- Create shotcuts for all factions that could be docked/traded at -->
-			<!-- TODO: Check how ventures work an remove visitor factions depending on the outcome. -->
-			<get_factions_by_relation relation="dock" result="$allFactions" object="this.ship"/>
-
 			<!-- Create shotcuts for all wares that could be used in searches -->
 			<set_value           chance="100*$lockWares" name="$allowedWares" exact="$specialWareBasket"/>
 			<get_ware_definition chance="100*(not $lockWares)" result="$allowedWares" flags="economy" />
@@ -294,28 +304,42 @@
 			<!-- It's an ordered tasklist of what out mule should try to do first  -->
 			<create_list name="$prioritylist" />
 			<!-- ************************ supply mule logic ************************ -->
-			<!-- $buyFrom: list of factiuons -->
-			<!-- $serve: specific station, specific ship, sector (cannot be a list currently!) -->
-			<!-- $type: buildstorage, tradewares, resources, products -->
+			<!-- $buyFrom: list of factions -->
+			<!-- $serve: 'station', 'sector', 'area' -->
+			<!-- $type: 'buildstorage', 'tradewares', 'resources', 'products' -->
 			<!-- Cases: -->
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home, $type = 'buildstorage' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home, $type = 'buildstorage' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home, $type = 'resources' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home, $type = 'resources' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home, $type = 'intermediates' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home, $type = 'intermediates' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home, $type = 'tradewares' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home, $type = 'tradewares' ]" />
-			<do_if value="(not $home.isclass.sector) and (not $dedicatedServe)">
-				<!-- a station is set and dedicated serve is disabled  -->
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home.sector, $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home.sector, $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home.sector, $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home.sector, $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home.sector, $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home.sector, $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = [faction.player], $serve = $home.sector, $type = 'tradewares' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $buyFromFactions = $allFactions,     $serve = $home.sector, $type = 'tradewares' ]" />
+			<do_if value="$serveStationOrShip">
+				<!-- Serve Station -->
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'station', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'station', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'station', $type = 'tradewares' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'tradewares' ]" />
+			</do_if>
+			
+			<!-- Serve Sector -->
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'resources' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'intermediates' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'intermediates' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'tradewares' ]" />
+			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
+
+			<do_if value="($serveFactions == faction.player)">
+				<!-- Serve player area -->
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'tradewares' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'tradewares' ]" />
 			</do_if>
 
 			<!-- Apply filters selected by the user in the ui -->
@@ -327,15 +351,11 @@
 				<continue chance="100*((not $allowIntermediates) and ($priority.$type == 'intermediates'))"/>
 				<continue chance="100*((not $allowTradewares)    and ($priority.$type == 'tradewares'))"/>
 
-				<!-- Filter buy factions -->
-				<!-- First filter Ai factions, if we are not allowed to buy from them -->
-				<!-- In that case the allowed factions must be faction.player or none -->
-				<set_value chance="100*(not $allowAiSuppliers)" name="$priority.$buyFromFactions" exact="if ($priority.$buyFromFactions.indexof.{faction.player}) then [faction.player] else []"/>
-				<!-- Secondly filter the player faction, if we are not to buy from them -->
-				<remove_from_list chance="100*(not $allowPlayerSuppliers)" name="$priority.$buyFromFactions"  exact="faction.player"/>
-				<!-- If no factions are remaining, the entry must be filtered -->
-				<continue chance="100*($priority.$buyFromFactions.count == 0)"/>
-
+				<!-- Filter supplier factions -->
+				<remove_from_list chance="100*(not $allowPlayerSuppliers)" name="$priority.$supplierFactions" list="$playerFactions"/>
+				<remove_from_list chance="100*(not $allowAiSuppliers)" name="$priority.$supplierFactions" list="$aiFactions"/>
+				<continue chance="100*($priority.$supplierFactions.count == 0)"/>
+				
 				<!-- If the have passed all filters, add to filtered list -->
 				<append_to_list name="$filteredPrioritylist" exact="$priority"/>
 			</do_for_each>
@@ -349,42 +369,35 @@
 			<!-- Start looping over our prioritiylist to determine what to do-->
 			<do_for_each name="$priority" in="$filteredPrioritylist">
 				<!-- Print current priority to debuglog -->
-				<run_script chance="$debugchance" name="'mule.lib.debug.dump_priority'">
-					<param name="priority" value="$priority"/>
-					<param name="debugchance" value="$debugchance"/>
-					<param name="debugFileName" value="$debugFileName"/>
-					<param name="debugDirName" value="$debugDirName"/>
-				</run_script>
-
-				<!-- Once a station has been determined to be served by issuing the first orders, we will stick to this station -->
-				<!-- This can lead to dublicate searches at the moment -->
-				<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing else $priority.$serve"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Currently Serving: %s'.[$currentlyServing.knownname]" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($serveFactions == faction.player) then 'player' else 'ai']" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
 				
 				<!-- ************************ check needs ************************ -->
-				<do_if value="$currentlyServing.isclass.{[class.ship, class.station]}">
-					<!-- CASE: specific station/ship -->
+				<do_if value="$alreadyServing or $priority.$serve == 'station'">
+					<!-- CASE: station/ship -->
 					<!-- Note: by default the game treats buildstorage and the station as two seperate components. -->
 					<!-- Buyoffers from buildstorage will not show up at the station and vice versa -->
+					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing else $serveStationOrShip"/>
 					<set_value name="$buyer" exact="if (($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)) then $currentlyServing.buildstorage else $currentlyServing"/>
 					<!-- buyoffer search -->
-					<find_buy_offer space="player.galaxy" tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
+					<find_buy_offer tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
 				</do_if>
-				<do_else>
-					<!-- CASE: sector serve (searches all stations in range) -->
-					<!-- Serve player only if a player station is selected -->
-					<!-- Note: Maybe add option for this? -->
-					<do_if value="$priority.$serve.owner == faction.player">
-						<!-- For player owned station -->
-						<set_value name="$serveFactions" exact="faction.player"/>
-						<set_value name="$serveSpace" exact="player.galaxy"/>
-					</do_if>
-					<do_else>
-						<!-- For ai owned station -->
-						<set_value name="$serveFactions" exact="$allFactions"/>
-						<!-- Note: If performance allows, remove space restriction from ai serve range -->
-						<set_value name="$serveSpace" exact="$priority.$serve"/>
-					</do_else>
+				<do_elseif value="$priority.$serve == 'sector'">
+					<!-- CASE: sector-->
+					<!-- $classes (buildstorage) -->
+					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
+					<!-- buyoffer search -->
+					<find_buy_offer space="$serveSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
+						<match_buyer>
+							<match tradesknownto="this.owner"/>
+							<match class="$serveClass"/>
+							<match owner="$serveFactions"/>
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+						</match_buyer>
+					</find_buy_offer>
+				</do_elseif>
+				<do_elseif value="$priority.$serve == 'area'">
+					<!-- CASE: area -->
 					<!-- $classes (buildstorage) -->
 					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
 					<!-- buyoffer search -->
@@ -392,12 +405,20 @@
 						<match_buyer>
 							<match class="$serveClass"/>
 							<match owner="$serveFactions"/>
-							<match_gate_distance object="$priority.$serve" min="0" max="$maxDist">
+							<match_gate_distance object="$serveSector" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
+							<!-- this next bit of mess is just blacklist handling -->
+							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+							<match_parent>
+								<match_parent>
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+								</match_parent>
+							</match_parent>
 						</match_buyer>
 					</find_buy_offer>
-				</do_else>
+				</do_elseif>
 
 				<!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
 				<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
@@ -409,7 +430,7 @@
 					<!-- X4 treats products and resources always as tradewares... -->
 					<set_value name="$isWare" exact="$need.owner.resources.{$need.ware}.exists"/>
 					<do_if value="
-								 ($priority.$type == 'resources'     and $isResource) or
+								 ($priority.$type == 'resources'     and $isResource and (not $isProduct)) or
 								 ($priority.$type == 'intermediates' and $isResource and $isProduct) or
 								 ($priority.$type == 'tradewares'    and $isWare and (not $isResource) and (not $isProduct))" >
 						<append_to_list name="$filteredNeeds" exact="$need" />
@@ -453,12 +474,9 @@
 				<!-- ************************ search for suppliers ************************ -->
 				<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$supplyOffers" multiple="true">
 					<match_seller>
-						<!-- Ensure the owner actually knows the station/seller -->
 						<match tradesknownto="this.owner"/>
-						<!-- Repect faction trade restrictions set by the priority list -->
-						<match owner="$priority.$buyFromFactions"/>
-						<!-- Make sure the seller is not more then $maxDist away from the service region (this must not be the position of the buyer!)-->
-						<match_gate_distance object="$priority.$serve" min="0" max="$maxDist">
+						<match owner="$priority.$supplierFactions"/>
+						<match_gate_distance object="$serveSector" min="0" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
 						<!-- this next bit of mess is just blacklist handling -->
