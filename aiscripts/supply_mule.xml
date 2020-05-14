@@ -27,7 +27,7 @@
 			<param name="allowResources"     type="bool" default="true" text="Allow Resources"     comment="Allow buys for resources" />
 			<param name="allowIntermediates" type="bool" default="true" text="Allow Intermediates" comment="Allow buys for intermediates" />
 			<param name="allowTradewares"    type="bool" default="true" text="Allow Tradewares"    comment="Allow buys for tradewares" />
-			 
+
 			<!-- lock wares to player selection -->
 			<param name="lockWares"            type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
 
@@ -320,7 +320,7 @@
 
 				<!-- Filter buy factions -->
 				<!-- First filter Ai factions, if we are not allowed to buy from them -->
-				<!-- In that case the allowed factions must be none or faction.player -->
+				<!-- In that case the allowed factions must be faction.player or none -->
 				<set_value chance="100*(not $allowAiSuppliers)" name="$priority.$buyFromFactions" exact="if ($priority.$buyFromFactions.indexof.{faction.player}) then [faction.player] else []"/>
 				<!-- Secondly filter the player faction, if we are not to buy from them -->
 				<remove_from_list chance="100*(not $allowPlayerSuppliers)" name="$priority.$buyFromFactions"  exact="faction.player"/>
@@ -460,7 +460,6 @@
 								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
 							</match_parent>
 						</match_parent>
-						<!-- TODO: Ignore Blacklists for your own faction. or is it better to create a different blacklist for the ship? -->
 					</match_seller>
 				</find_sell_offer>
 
@@ -511,6 +510,7 @@
 						</do_if>
 
 						<!-- Compare tradeoffers by profit and return the most profitable one -->
+						<!-- We might want to offer to fill critical resources with highest priority -->
 						<run_script name="'mule.lib.evaluate_tradeoffers'">
 							<!-- use clone for a shallow copy of objects (pass by reference) -->
 							<param name="buyoffers" value="$needs.clone"/>
