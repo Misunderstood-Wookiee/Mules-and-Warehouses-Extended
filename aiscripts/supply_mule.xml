@@ -311,13 +311,13 @@
 			<do_if value="$serveStationOrShip">
 				<!-- Serve Station -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'station', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'station', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'station', $type = 'tradewares' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'station', $type = 'tradewares' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'tradewares' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'tradewares' ]" />
 			</do_if>
 			
 			<!-- Serve Sector -->
@@ -368,16 +368,22 @@
 			<!-- ************************ main loop ************************-->
 			<!-- Start looping over our prioritiylist to determine what to do-->
 			<do_for_each name="$priority" in="$filteredPrioritylist">
+				<!-- If we were already serving a station, but would require to serve a different station to fill our cargo, abort -->
+				<do_if value="($alreadyServing and $alreadyServing.$serve != $priority.$serve)">
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Search finished. No more trade at station found.'" />
+					<break/>
+				</do_if>
+				
 				<!-- Print current priority to debuglog -->
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($serveFactions == faction.player) then 'player' else 'ai']" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($serveFactions == $playerFactions) then 'player' else 'ai']" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
 				
 				<!-- ************************ check needs ************************ -->
-				<do_if value="$alreadyServing or $priority.$serve == 'station'">
+				<do_if value="$alreadyServing or $priority.$serve == 'stationOrShip'">
 					<!-- CASE: station/ship -->
 					<!-- Note: by default the game treats buildstorage and the station as two seperate components. -->
 					<!-- Buyoffers from buildstorage will not show up at the station and vice versa -->
-					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing else $serveStationOrShip"/>
+					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $serveStationOrShip"/>
 					<set_value name="$buyer" exact="if (($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)) then $currentlyServing.buildstorage else $currentlyServing"/>
 					<!-- buyoffer search -->
 					<find_buy_offer tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
@@ -419,12 +425,12 @@
 						</match_buyer>
 					</find_buy_offer>
 				</do_elseif>
-
+				
 				<!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
 				<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
 				<create_list name="$filteredNeeds" />
 				<!-- Check for every need if it fullfills the requirement and add -->
-				<do_for_each name="$need" in="$needs">
+				<do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
 					<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists"/>
 					<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
 					<!-- X4 treats products and resources always as tradewares... -->
@@ -449,11 +455,8 @@
 				</run_script>
 
 				<!-- If there are no needs, just continue with the next on the priority list-->
-				<do_if value="$needs.count == 0">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'No offers found'" />
-					<continue/>
-				</do_if>
-
+				<continue chance="100*($needs.count == 0)"/>
+				
 				<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 				<!-- but only if the player didn't set them manually -->
 				<do_if value="(not $lockWares)">
@@ -578,14 +581,12 @@
 								<!-- prevent the mule from using any other trade stations on this run/priority, by removing all other buyoffers/needs from different stations -->
 								<create_list name="$filteredNeeds" />
 								<do_for_each name="$need" in="$needs">
-									<do_if value="$need.buyer == $bestNeedTrade.buyer">
-										<append_to_list name="$filteredNeeds" exact="$need" />
-									</do_if>
+										<append_to_list chance="100*($need.buyer == $bestNeedTrade.buyer)" name="$filteredNeeds" exact="$need" />
 								</do_for_each>
 								<set_value name="$needs" exact="$filteredNeeds"/>
 								<remove_value name="$filteredNeeds"/>
 								<!-- prevent searching for buyoffers from other stations in the next run/priority -->
-								<set_value name="$alreadyServing" exact="$bestNeedTrade.buyer"/>
+								<set_value name="$alreadyServing" exact="table[$serve = $priority.$serve ,$stationOrShip = $bestNeedTrade.buyer]"/>
 							</do_if>
 							<!-- remove used supply offers from evaluation -->
 							<remove_from_list name="$supplyOffers" exact="$bestSupplyTrade"/>
