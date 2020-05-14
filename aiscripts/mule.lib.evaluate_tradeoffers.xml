@@ -48,6 +48,50 @@
 						<continue />
 					</do_if>
 
+					<!-- trade rule handling -->
+					<!-- the buyoffer faction needs to be allowed by the selloffer faction, and vice-versa -->
+					<set_value name="$someNeedRestrictionFactions" exact="$someNeed.restriction.factions" />
+					<set_value name="$someNeedRestrictionInverted" exact="$someNeed.restriction.inverted" />
+					<set_value name="$someSupplyRestrictionFactions" exact="$someSupply.restriction.factions" />
+					<set_value name="$someSupplyRestrictionInverted" exact="$someSupply.restriction.inverted" />
+
+					<!-- this debug block is useful for trade rule debugging and I want to leave it in the script for a while -->
+					<!-- <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*******************************'" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someNeedRestrictionFactions" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someNeedRestrictionInverted" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someSupplyRestrictionFactions" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someSupplyRestrictionInverted" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someSupply.seller.owner" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +typeof $someSupply.seller.owner" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +(not $someNeedRestrictionFactions.indexof.{$someSupply.seller.owner})" /> -->
+
+					<!-- trade rules are a bit wonky -->
+					<!-- if tradeoffer.restriction.inverted == 1, then the list returned by tradeoffer.restriction.factions is a blacklist. -->
+					<!-- This corresponds to leaving "restrict all factions" blank in the trade rule UI -->
+					<!-- if tradeoffer.restriction.inverted == 0, then the list returned by tradeoffer.restriction.factions is a whitelist. -->
+					<!-- This corresponds to checking the box for "restrict all factions" in the trade rule UI -->
+					<!-- so we have a buyer and a seller. We need to determine if either one is disallowed from the other -->
+					<!-- buyer whitelist case -->
+					<!-- inverted == 0 and supply owner not in the whitelist -->
+					<do_if value="($someNeedRestrictionInverted == 0) and (not $someNeedRestrictionFactions.indexof.{$someSupply.seller.owner})">
+						<continue />
+					</do_if>
+					<!-- buyer blacklist case -->
+					<!-- inverted == 1 and supply owner in blacklist -->
+					<do_elseif value="($someNeedRestrictionInverted == 1) and ( $someNeedRestrictionFactions.indexof.{$someSupply.seller.owner})">
+						<continue />
+					</do_elseif>
+					<!-- seller whitelist case -->
+					<!-- inverted == 0 and need owner not in whitelist -->
+					<do_elseif value="($someSupplyRestrictionInverted == 0) and (not $someSupplyRestrictionFactions.indexof.{$someNeed.buyer.owner})">
+						<continue />
+					</do_elseif>
+					<!-- seller blacklist case -->
+					<!-- inverted == 1 and supply owner in blacklist -->
+					<do_elseif value="($someSupplyRestrictionInverted == 1) and ( $someSupplyRestrictionFactions.indexof.{$someNeed.buyer.owner})">
+						<continue />
+					</do_elseif>
+
 					<!-- how much does the need want? -->
 					<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
 					<set_value name="$targetOfferedAmount" exact="$someNeed.desiredamount" />
