@@ -330,7 +330,7 @@
 			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'tradewares' ]" />
 			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
 
-			<do_if value="($serveFactions == faction.player)">
+			<do_if value="($serveFactions == $playerFactions)">
 				<!-- Serve player area -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
