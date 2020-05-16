@@ -419,7 +419,7 @@
 					</find_buy_offer>
 				</do_elseif>
 
-				<do_if exact="$priority.$type != 'buildstorage'">
+				<do_if value="$priority.$type != 'buildstorage'">
 					<!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
 					<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
 					<create_list name="$filteredNeeds" />
