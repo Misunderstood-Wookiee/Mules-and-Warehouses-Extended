@@ -138,21 +138,21 @@
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
 
 			<!-- Dump Mule Settings -->
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    Home: %s (%s)'.[$home.knownname,@$home.idcode]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignHome: %s'.[$assignHome]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxDist: %s'.[$maxDist]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    dedicatedServe: %s'.[$dedicatedServe]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowPlayerSuppliers: %s'.[$allowPlayerSuppliers]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowAiSuppliers: %s'.[$allowAiSuppliers]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowBuildstorage: %s'.[$allowBuildstorage]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowResources: %s'.[$allowResources]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowIntermediates: %s'.[$allowIntermediates]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowTradewares: %s'.[$allowTradewares]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %s'.[$lockWares]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    Home: %s (%s)'.[$home.knownname,@$home.idcode]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignHome: %s'.[$assignHome]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxDist: %s'.[$maxDist]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    dedicatedServe: %s'.[$dedicatedServe]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowPlayerSuppliers: %s'.[$allowPlayerSuppliers]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowAiSuppliers: %s'.[$allowAiSuppliers]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowBuildstorage: %s'.[$allowBuildstorage]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowResources: %s'.[$allowResources]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowIntermediates: %s'.[$allowIntermediates]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowTradewares: %s'.[$allowTradewares]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %s'.[$lockWares]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
 
 			<!-- Validate Input -->
 			<!-- Note: Maybe put this in init section, however we would lose this debug information after the first run -->
@@ -312,7 +312,7 @@
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'tradewares' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'tradewares' ]" />
 			</do_if>
-			
+
 			<!-- Serve Sector -->
 			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
 			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
@@ -348,7 +348,7 @@
 				<remove_from_list chance="100*(not $allowPlayerSuppliers)" name="$priority.$supplierFactions" list="$playerFactions"/>
 				<remove_from_list chance="100*(not $allowAiSuppliers)" name="$priority.$supplierFactions" list="$aiFactions"/>
 				<continue chance="100*($priority.$supplierFactions.count == 0)"/>
-				
+
 				<!-- If the have passed all filters, add to filtered list -->
 				<append_to_list name="$filteredPrioritylist" exact="$priority"/>
 			</do_for_each>
@@ -366,11 +366,11 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Search finished. No more trade at station found.'" />
 					<break/>
 				</do_if>
-				
+
 				<!-- Print current priority to debuglog -->
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($serveFactions == $playerFactions) then 'player' else 'ai']" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
-				
+
 				<!-- ************************ check needs ************************ -->
 				<do_if value="$alreadyServing or $priority.$serve == 'stationOrShip'">
 					<!-- CASE: station/ship -->
@@ -418,25 +418,27 @@
 						</match_buyer>
 					</find_buy_offer>
 				</do_elseif>
-				
-				<!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
-				<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
-				<create_list name="$filteredNeeds" />
-				<!-- Check for every need if it fullfills the requirement and add -->
-				<do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
-					<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists"/>
-					<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
-					<!-- X4 treats products and resources always as tradewares... -->
-					<set_value name="$isWare" exact="$need.owner.resources.{$need.ware}.exists"/>
-					<do_if value="
+
+				<do_if exact="$priority.$type != 'buildstorage'">
+					<!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
+					<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
+					<create_list name="$filteredNeeds" />
+					<!-- Check for every need if it fullfills the requirement and add -->
+					<do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
+						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists"/>
+						<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
+						<!-- X4 treats products and resources always as tradewares... -->
+						<set_value name="$isWare" exact="$need.owner.resources.{$need.ware}.exists"/>
+						<do_if value="
 								 ($priority.$type == 'resources'     and $isResource and (not $isProduct)) or
 								 ($priority.$type == 'intermediates' and $isResource and $isProduct) or
 								 ($priority.$type == 'tradewares'    and $isWare and (not $isResource) and (not $isProduct))" >
-						<append_to_list name="$filteredNeeds" exact="$need" />
-					</do_if>
-				</do_for_each>
-				<set_value name="$needs" exact="$filteredNeeds"/>
-				<remove_value name="$filteredNeeds"/>
+							<append_to_list name="$filteredNeeds" exact="$need" />
+						</do_if>
+					</do_for_each>
+					<set_value name="$needs" exact="$filteredNeeds"/>
+					<remove_value name="$filteredNeeds"/>
+				</do_if>
 
 				<!-- dump all tradeoffers to debug log -->
 				<run_script chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
@@ -449,7 +451,7 @@
 
 				<!-- If there are no needs, just continue with the next on the priority list-->
 				<continue chance="100*($needs.count == 0)"/>
-				
+
 				<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
 				<!-- but only if the player didn't set them manually -->
 				<do_if value="(not $lockWares)">
@@ -574,7 +576,7 @@
 								<!-- prevent the mule from using any other trade stations on this run/priority, by removing all other buyoffers/needs from different stations -->
 								<create_list name="$filteredNeeds" />
 								<do_for_each name="$need" in="$needs">
-										<append_to_list chance="100*($need.buyer == $bestNeedTrade.buyer)" name="$filteredNeeds" exact="$need" />
+									<append_to_list chance="100*($need.buyer == $bestNeedTrade.buyer)" name="$filteredNeeds" exact="$need" />
 								</do_for_each>
 								<set_value name="$needs" exact="$filteredNeeds"/>
 								<remove_value name="$filteredNeeds"/>
