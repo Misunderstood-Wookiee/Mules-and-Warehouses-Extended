@@ -37,7 +37,7 @@ Now possible to assign Mules to station with assignment="assignment.trade" while
     <!-- It is known that the ship is assigned to a certain station; game is now deciding what orders to give. -->
     <!-- Inserting as the first do_elseif in decision making so to exempt the Mules; -->
     <!-- Mules will enter the following custom block of code instead of the vanilla AutoTrade code further down below. -->
-    <add sel="/aiscript[@name='lib.request.orders']/attention/actions/do_else/do_elseif/do_elseif[0]" pos="before">
+    <add sel="/aiscript[@name='lib.request.orders']/attention/actions/do_else/do_elseif/do_elseif[1]" pos="before">
         <!--
             {$value}? checks if any variable with this name exists;
             here, if we detected the ship running a Mules command, this variable will be here, and so the expression will be TRUE.
