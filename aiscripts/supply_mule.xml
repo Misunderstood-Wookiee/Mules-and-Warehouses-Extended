@@ -6,9 +6,12 @@
 			<!-- menu option: Home (Define Home)-->
 			<param name="home" type="object" default="this.ship.sector" text="Home Station/Sector" comment="Home">
 				<input_param name="class" value="[class.ship, class.station, class.sector]" />
+				<patch sinceversion="2" value="if $sourceStation then $sourceStation else this.ship.sector"/>
 			</param>
 			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.)-->
-			<param name="assignHome" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the home station if it's the players." />
+			<param name="assignHome" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the home station if it's the players.">
+				<patch sinceversion="2" value="$assignSrc"/>
+			</param>
 			<!-- menu option: Max Distance (Maximum Jumpes to buy/sell, in case of ai service only buy)-->
 			<param name="maxDist" required="false" default="this.ship.pilot.skill.piloting * 2" type="number" text="Max Jumps From Home" comment="Max gate distance to buy.">
 				<input_param name="startvalue" value="this.ship.pilot.skill.piloting * 2" />
@@ -19,14 +22,26 @@
 			<!-- menu option: Serve Source Only (will only serve the source station if used)-->
 			<param name="dedicatedServe" type="bool" default="false" text="Serve Source Only" comment="Will only serve the configured source station" />
 			<!-- menu option: include player and/or ai stations as sources for supplies -->
-			<param name="allowPlayerSuppliers" type="bool" default="true" text="Allow Player Suppliers" comment="Allow buys from player stations"/>
-			<param name="allowAiSuppliers"     type="bool" default="true" text="Allow Ai Suppliers"     comment="Allow buys from ai stations" />
+			<param name="allowPlayerSuppliers" type="bool" default="true" text="Allow Player Suppliers" comment="Allow buys from player stations">
+				<patch sinceversion="2" value="true"/>
+			</param>
+			<param name="allowAiSuppliers"     type="bool" default="true" text="Allow Ai Suppliers"     comment="Allow buys from ai stations">
+				<patch sinceversion="2" value="not $tradeWithOwn"/>
+			</param>
 
 			<!-- menu option: include buildstorage, resources, intermediates, and tradewares as possible options to supply -->
-			<param name="allowBuildstorage"  type="bool" default="true" text="Allow Buildstorage"  comment="Allow buys for buildstorage" />
-			<param name="allowResources"     type="bool" default="true" text="Allow Resources"     comment="Allow buys for resources" />
-			<param name="allowIntermediates" type="bool" default="true" text="Allow Intermediates" comment="Allow buys for intermediates" />
-			<param name="allowTradewares"    type="bool" default="true" text="Allow Tradewares"    comment="Allow buys for tradewares" />
+			<param name="allowBuildstorage"  type="bool" default="true" text="Allow Buildstorage"  comment="Allow buys for buildstorage">
+				<patch sinceversion="2" value="not $producer"/>
+			</param>
+			<param name="allowResources"     type="bool" default="true" text="Allow Resources"     comment="Allow buys for resources">
+				<patch sinceversion="2" value="not $builder"/>
+			</param>
+			<param name="allowIntermediates" type="bool" default="true" text="Allow Intermediates" comment="Allow buys for intermediates">
+				<patch sinceversion="2" value="not $builder"/>
+			</param>
+			<param name="allowTradewares"    type="bool" default="true" text="Allow Tradewares"    comment="Allow buys for tradewares">
+				<patch sinceversion="2" value="not $builder"/>
+			</param>
 
 			<!-- lock wares to player selection -->
 			<param name="lockWares"            type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
@@ -43,6 +58,7 @@
 				<input_param name="min" value="1" />
 				<input_param name="max" value="10" />
 				<input_param name="step" value="1" />
+				<patch sinceversion="2" value="$maxtrades"/>
 			</param>
 
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
@@ -99,33 +115,6 @@
 	</init>
 
 	<patch sinceversion="2">
-		<!-- Patch the old parameters for a new set -->
-		<debug_text text="'PATCH: Patching order parameters for mule %s'.[this.ship.idcode]" filter="savegame"/>
-
-		<edit_order_param order="this.assignedcontrolled.order" param="'allowAiSuppliers'" value="not $tradeWithOwn"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'allowPlayerSuppliers'" value="true"/>
-
-		<edit_order_param order="this.assignedcontrolled.order" param="'allowBuildstorage'" value="not $producer"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'allowResources'" value="not $builder"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'allowIntermediates'" value="not $builder"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'allowTradewares'" value="not $builder"/>
-
-		<edit_order_param order="this.assignedcontrolled.order" param="'assignHome'" value="$assignSrc"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'maxTrades'" value="$maxtrades"/>
-
-		<!-- Update Home parameter -->
-		<!-- If a homestation is set, keep it -->
-		<!-- Otherwise, try to find argon prime, and use it -->
-		<!-- Otherwise, pick a random known sector -->
-		<do_if value="$sourceStation">
-			<edit_order_param order="this.assignedcontrolled.order" param="'home'" value="$sourceStation"/>
-		</do_if>
-		<do_else>
-			<find_sector known="true" macro="macro.Cluster_14_Sector001_macro" name="$argonPrime"/>
-			<find_sector known="true" name="$randomSector" multiple="false"/>
-			<edit_order_param order="this.assignedcontrolled.order" param="'home'" value="if $argonPrime then $argonPrime else $randomSector"/>
-		</do_else>
-
 		<!-- This will reissue any standing supply mule orders -->
 		<!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
 		<debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %s'.[this.ship.idcode]" filter="savegame"/>
