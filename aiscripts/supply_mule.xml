@@ -314,16 +314,18 @@
 			</do_if>
 
 			<!-- Serve Sector -->
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'resources' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'intermediates' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'intermediates' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'tradewares' ]" />
-			<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
+			<do_if value="(not $dedicatedServe)">
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'resources' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'intermediates' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'tradewares' ]" />
+				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
+			</do_if>
 
-			<do_if value="($serveFactions == $playerFactions)">
+			<do_if value="($serveFactions == $playerFactions) and (not $dedicatedServe)">
 				<!-- Serve player area -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
