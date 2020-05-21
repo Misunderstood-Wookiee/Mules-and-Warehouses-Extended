@@ -303,7 +303,7 @@
 			</do_if>
 
 			<!-- Serve Sector -->
-			<do_if value="(not $dedicatedServe)">
+			<do_if value="$serveSector or (not $dedicatedServe)">
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
