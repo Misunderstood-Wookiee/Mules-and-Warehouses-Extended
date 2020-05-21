@@ -1,7 +1,7 @@
 ---
 name: Suggested Change
 about: You have some changes you would like made.
-title: ''
+title: "[SUGGESTION]: I would like to suggest changes!"
 labels: Suggestion
 assignees: ''
 

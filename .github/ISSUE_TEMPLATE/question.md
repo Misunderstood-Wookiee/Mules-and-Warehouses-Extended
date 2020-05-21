@@ -1,7 +1,7 @@
 ---
 name: Question
 about: Do you have a question about how to do a thing?
-title: ''
+title: "[QUESTION]: I something to ask!"
 labels: Question
 assignees: bhayden53, Misunderstood-Wookiee
 

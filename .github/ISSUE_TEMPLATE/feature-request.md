@@ -1,7 +1,7 @@
 ---
 name: Feature Request
 about: Have you got a cool idea? Let us know.
-title: ''
+title: "[FEATURE]: I have a new concept!"
 labels: Feature
 assignees: ''
 

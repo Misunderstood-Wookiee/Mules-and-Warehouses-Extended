@@ -1,13 +1,13 @@
 ---
 name: Bug Report
 about: Create a report if you discover a bug.
-title: New Issue
+title: "[Potential Bug]: I think I found a bug!"
 labels: Bug
 assignees: bhayden53, Misunderstood-Wookiee
 
 ---
 
->Please check for an existing issue before making a new report and comment in that report if one exist.
+>Please check for an existing issue before making a new report and comment in that report if one exists.
 
 **Describe the Bug**
 A clear and concise description of what the bug is.
