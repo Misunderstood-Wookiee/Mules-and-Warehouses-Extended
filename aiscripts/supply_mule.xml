@@ -276,7 +276,7 @@
 				<!-- if we got to this point without finding a buyer, we're just going to dump the ware -->
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  had to drop %1 of %2'.[$amount,$currentWare]" />
 				<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" text="'had to drop %1 of %2 due to no buyers'.[$amount,$currentWare]" />
-				<drop_cargo object="this.ship" ware="$currentWare"  exact="$amount"/>
+				<drop_cargo object="this.ship" ware="$currentWare" exact="$amount" />
 			</do_all>
 
 			<remove_value name="$searchStep" />
