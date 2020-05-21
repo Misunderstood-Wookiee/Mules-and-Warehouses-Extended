@@ -29,11 +29,7 @@
 
     <cue name="MWEX_update_notif" version="1">
       <conditions>
-        <check_any>
-          <event_cue_signalled cue="md.Setup.GameStart" />
-          <event_player_created/>
-          <event_cue_signalled/>
-        </check_any>
+        <event_cue_signalled cue="md.Setup.Start" />
       </conditions>
       <actions>
          <show_help duration="7s" custom="'Mules and Warehouses Extended has been updated to version BLAH'"/>
