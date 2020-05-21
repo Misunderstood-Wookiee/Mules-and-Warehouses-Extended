@@ -26,5 +26,30 @@
         <!-- Setup complete. -->
       </actions>
     </cue>
+
+    <cue name="MWEX_update_notif" version="1">
+      <conditions>
+        <check_any>
+          <event_cue_signalled cue="md.Setup.GameStart" />
+          <event_player_created/>
+          <event_cue_signalled/>
+        </check_any>
+      </conditions>
+      <actions>
+         <show_help duration="7s" custom="'Mules and Warehouses Extended has been updated to version BLAH'"/>
+         <!-- <show_help duration="7s" custom="'Supply Mule and Travel Mule have support for Trade Rules'"/> -->
+         <!-- <show_help duration="7s" custom="'Supply Mule has been refactored. It now obeys Max Distance for all trades.'"/> -->
+         <show_help duration="7s" custom="'The Home setting for supply mule is now mandatory.'"/>
+         <show_help duration="7s" custom="'We tried to patch your homeless mules to something reasonable, but please check on their orders'"/>
+
+      </actions>
+      <!-- if a cue is running that has a version like sinceversion or older then the patch will be applied -->
+      <patch sinceversion="1">
+        <!-- simple reset so the sub cue is called again. -->
+        <reset_cue cue="this"/>
+      </patch>
+
+    </cue>
+
   </cues>
 </mdscript>
