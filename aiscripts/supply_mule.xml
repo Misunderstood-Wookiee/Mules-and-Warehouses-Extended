@@ -143,13 +143,6 @@
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
 
-			<!-- Validate Input -->
-			<!-- Note: Maybe put this in init section, however we would lose this debug information after the first run -->
-			<do_if value="$dedicatedServe and $home.isclass.sector">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: dedicatedServe (No Station or Ship configured)'"/>
-				<set_value name="$dedicatedServe" exact="false" />
-			</do_if>
-
 			<do_if value="$assignHome and $home.isclass.sector">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: assignHome (No Station or Ship configured)'"/>
 				<set_value name="$assignHome" exact="false" />
