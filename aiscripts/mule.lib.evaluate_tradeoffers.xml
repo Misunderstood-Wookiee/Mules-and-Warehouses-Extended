@@ -16,9 +16,6 @@
 		<param name="occupiedCargo"/>
 		<!-- minimum cargo size for allowed transport -->
 		<param name="minCargoSize"/>
-		<!-- Enable trading for build storage -->
-		<!-- if the trade will finish off the build storage for that good it will be allowed for low volumes -->
-		<param name="tradeForBuildStorage" default="false"/>
 		<!-- enable/disable debug messages -->
 		<param name="debugchance"/>
 		<param name="debugFileName"/>
@@ -110,8 +107,8 @@
 
 					<!-- if the trade is too small, move on -->
 					<!-- however, if the trade will finish off the build storage for that good, let it through -->
-					<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and not (($tradeForBuildStorage) and ($tradeAmount != $targetOfferedAmount))">
-							<continue />
+					<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and not ($someNeed.buyer.isclass.buildstorage and ($tradeAmount == $targetOfferedAmount))">
+						<continue />
 					</do_if>
 
 					<!-- how much profit for this trade? -->

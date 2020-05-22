@@ -359,7 +359,7 @@
 				</do_if>
 
 				<!-- Print current priority to debuglog -->
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($serveFactions == $playerFactions) then 'player' else 'ai']" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($priority.$supplierFactions == $playerFactions) then 'player' else 'ai']" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
 
 				<!-- ************************ check needs ************************ -->
@@ -533,7 +533,6 @@
 							<param name="selloffers" value="$supplyOffers.clone"/>
 							<param name="shipEntity" value="this"/>
 							<param name="occupiedCargo" value="$occupiedCargo"/>
-							<param name="tradeForBuildStorage" value="false"/>
 							<param name="minCargoSize" value="$minCargoSize"/>
 							<param name="sameFactionBuyMod" value="$playerBuyMod"/>
 							<param name="debugchance" value="$debugchance"/>
