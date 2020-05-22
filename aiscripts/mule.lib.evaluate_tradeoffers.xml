@@ -113,7 +113,7 @@
 
 					<!-- how much profit for this trade? -->
 					<!-- If we use our own stations, we adjust the supply price by the sameFactionBuyMod to allow preferential treatment of player/owned supply chains -->
-					<do_if value="$someSupply.owner == $shipEntity.owner">
+					<do_if value="$someSupply.seller.owner == $shipEntity.owner">
 						<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$sameFactionBuyMod/100)" />
 					</do_if>
 					<do_else>
