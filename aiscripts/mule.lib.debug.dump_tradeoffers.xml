@@ -12,7 +12,7 @@
   </params>
   <attention min="unknown">
     <actions>
-			<do_if value="$debugchance">
+			<do_if value="$debugchance and $offers != null and $offers.count gt 0">
 				<!-- print headerline & count -->
 				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
 				<!-- loop over offers and print every single one-->
