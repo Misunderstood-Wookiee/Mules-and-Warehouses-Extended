@@ -406,7 +406,7 @@
 								<do_if value="($currentProfit gt $bestProfit) and ($cargoHauled/(this.ship.cargo.{$someInner.ware}.max)) gt $minCargoUsed/100">
 									<set_value name="$supplyTarget" exact="$someInner" />
 									<set_value name="$bestCargo" exact="$cargoHauled" />
-									<!-- It looks like travel mule stops looking after it finds the first trade above 0 profit?!? -->
+									<set_value name="$bestProfit" exact="$currentProfit" />
 									<do_if value="not $needFound">
 										<set_value name="$needFound" exact="true" />
 										<set_value name="$supplySource" exact="$someOuter" />
