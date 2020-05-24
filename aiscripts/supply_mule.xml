@@ -101,7 +101,7 @@
 	<init>
 		<!-- debug settings -->
 		<set_value name="$debugchance" exact="100" />
-		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode + ' - ' + this.ship"/>
+		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode"/>
 		<set_value name="$debugDirName" exact="'MulesExtended'"/>
 
 		<!-- init section for mule script -->
@@ -125,6 +125,8 @@
 		<actions>
 			<label name="start" />
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Entity (this): %s'.[this]"/>
 
 			<!-- Dump Mule Settings -->
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
