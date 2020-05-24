@@ -72,7 +72,7 @@
 		<do_if value="($sourceStation.owner == this.ship.owner)">
 			<set_object_commander object="this.ship" commander="$sourceStation" assignment="assignment.trade" />
 		</do_if>
-		<set_value name="$debugFileName" exact="'travelmule- ' + this.ship.knownname + ' ' + this.ship.idcode" />
+		<set_value name="$debugFileName" exact="'travelmule - ' + this.ship.idcode + ' - ' + this.ship" />
 	</init>
 
 	<attention min="unknown">
@@ -415,7 +415,6 @@
 							</do_if> <!-- need found -->
 						</do_all>
 						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'need found: ' +$needFound" output="false" append="true" />
-
 
 						<do_if value="$needFound">
 							<do_if value="$supplySource.owner.owner == this.ship.owner">

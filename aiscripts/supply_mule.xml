@@ -101,7 +101,7 @@
 	<init>
 		<!-- debug settings -->
 		<set_value name="$debugchance" exact="100" />
-		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode"/>
+		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode + ' - ' + this.ship"/>
 		<set_value name="$debugDirName" exact="'MulesExtended'"/>
 
 		<!-- init section for mule script -->
