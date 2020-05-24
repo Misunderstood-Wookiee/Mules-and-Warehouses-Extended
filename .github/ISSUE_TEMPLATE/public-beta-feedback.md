@@ -7,7 +7,7 @@ assignees: bhayden53, Misunderstood-Wookiee, Galaxy-Spam
 
 ---
 
->Make sure you are indeed using Public Beta game patch prior to posting feedback & the public beta branch of this project's download!
+>Make sure you are indeed using Public Beta game patch prior to posting feedback & the public beta branch of this project's correctly installed and enabled!
 
 ### I have been testing the public beta patch and have this to say:**
 A clear and concise description here.
