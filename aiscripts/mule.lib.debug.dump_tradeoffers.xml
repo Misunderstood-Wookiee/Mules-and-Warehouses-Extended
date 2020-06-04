@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="mule.lib.debug.dump_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="p:\X4\Database\libraries\aiscripts.xsd" version="8">
+	<params>
+		<!-- describtive header to be included before dump of offers -->
+		<param name="headerline" default="offers"/>
+		<!-- list of possible offers -->
+		<param name="offers"/>
+		<!-- enable/disable debug messages -->
+		<param name="debugchance"/>
+		<param name="debugFileName"/>
+		<param name="debugDirName"/>
+  </params>
+  <attention min="unknown">
+    <actions>
+			<do_if value="$debugchance and $offers != null and $offers.count gt 0">
+				<!-- print headerline & count -->
+				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
+				<!-- loop over offers and print every single one-->
+				<do_for_each name="$offer" in="$offers">
+					<do_if value="$offer.owner == $offer.seller">
+						<!-- sell offers -->
+						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%s (%s) wants to sell %s %s for %s (%s)'.[$offer.seller.knownname, $offer.seller.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]" />
+					</do_if>
+					<do_else>
+						<!-- buy offers -->
+						<!-- If we buy for build storage, add this information to the name -->
+						<do_if value="$offer.buyer.isclass.buildstorage">
+							<set_value name="$buyerName" exact="$offer.buyer.base.knownname + '(build storage)'"/>
+						</do_if>
+						<do_else>
+							<set_value name="$buyerName" exact="$offer.buyer.knownname"/>
+						</do_else>
+						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%s (%s) wants to buy %s %s for %s (%s)'.[$buyerName, $offer.buyer.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]" />
+					</do_else>
+				</do_for_each>
+			</do_if>
+    </actions>
+  </attention>
+</aiscript>
