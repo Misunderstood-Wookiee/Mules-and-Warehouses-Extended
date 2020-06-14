@@ -31,6 +31,26 @@
 
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 
+			<!-- Filter tradeoffers for capital ships if there are no cargo drones available -->
+			<!-- This could be optimized by filtering station instead of offers, but has not been done for simplicity -->
+			<do_if value="this.ship.iscapitalship and not this.ship.units.{unitcategory.transport}.count">
+				<create_list name="$filteredSelloffers" />
+				<do_for_each name="$selloffer" in="$selloffers">
+					<append_to_list chance="100*($selloffer.seller.units.{unitcategory.transport}.count > 0)" name="$filteredSelloffers" exact="$selloffer"/>
+				</do_for_each>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s selloffers due to missing cargo drones.'.[$selloffers.count - $filteredSelloffers.count]" />
+				<set_value name="$selloffers" exact="$filteredSelloffers"/>
+				<remove_value name="$filteredSelloffers"/>
+				
+				<create_list name="$filteredBuyoffers" />
+				<do_for_each name="$buyoffer" in="$buyoffers">
+					<append_to_list chance="100*($buyoffer.buyer.units.{unitcategory.transport}.count > 0)" name="$filteredBuyoffers" exact="$buyoffer"/>
+				</do_for_each>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s buyoffers due to missing cargo drones.'.[$buyoffers.count - $filteredBuyoffers.count]" />
+				<set_value name="$buyoffers" exact="$filteredBuyoffers"/>
+				<remove_value name="$filteredBuyoffers"/>
+			</do_if>
+
 			<!-- nested loop(s) over the trade offers -->
 			<do_for_each name="$buyoffer" in="$buyoffers">
 				<do_for_each name="$selloffer" in="$selloffers">
