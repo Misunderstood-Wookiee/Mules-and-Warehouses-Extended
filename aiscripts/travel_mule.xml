@@ -346,6 +346,26 @@
 				<param name="debugDirName" value="$debugDirName"/>
 			</run_script>
 
+			<!-- Filter tradeoffers for capital ships if there are no cargo drones available -->
+			<!-- This could be optimized by filtering station instead of offers, but has not been done for simplicity -->
+			<do_if value="this.ship.iscapitalship and not this.ship.units.{unitcategory.transport}.count">
+				<create_list name="$filteredSupplies" />
+				<do_for_each name="$supply" in="$supplies">
+					<append_to_list chance="100*($supply.seller.units.{unitcategory.transport}.count > 0)" name="$filteredSupplies" exact="$supply"/>
+				</do_for_each>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s selloffers due to missing cargo drones.'.[$supplies.count - $filteredSupplies.count]" />
+				<set_value name="$supplies" exact="$filteredSupplies"/>
+				<remove_value name="$filteredSupplies"/>
+
+				<create_list name="$filteredNeeds" />
+				<do_for_each name="$need" in="$needs">
+					<append_to_list chance="100*($need.buyer.units.{unitcategory.transport}.count > 0)" name="$filteredNeeds" exact="$need"/>
+				</do_for_each>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s buyoffers due to missing cargo drones.'.[$needs.count - $filteredNeeds.count]" />
+				<set_value name="$needs" exact="$filteredNeeds"/>
+				<remove_value name="$filteredNeeds"/>
+			</do_if>
+
 			<!-- Regular Travelling Mule Routine -->
 			<do_if value="$needs.count gt 0 and $supplies.count gt 0">
 				<set_value name="$innerList" exact="$needs" />
@@ -471,6 +491,7 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Nothing found, check back in a couple of minuites....'" />
 			<wait min="3min" max="5min" />
 			<label name="end" />
 			<return/>

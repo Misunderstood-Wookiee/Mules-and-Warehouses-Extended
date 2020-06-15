@@ -20,9 +20,9 @@
 		<param name="debugchance"/>
 		<param name="debugFileName"/>
 		<param name="debugDirName"/>
-  </params>
-  <attention min="unknown">
-    <actions>
+	</params>
+	<attention min="unknown">
+		<actions>
 			<!-- Default values for best trade -->
 			<set_value name="$bestProfit" exact="0Cr" />
 			<set_value name="$bestAmount" exact="0" />
@@ -30,37 +30,56 @@
 			<set_value name="$bestSupplyTrade" exact="null" />
 
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
+
+			<!-- Filter tradeoffers for capital ships if there are no cargo drones available -->
+			<!-- This could be optimized by filtering station instead of offers, but has not been done for simplicity -->
+			<do_if value="this.ship.iscapitalship and not this.ship.units.{unitcategory.transport}.count">
+				<create_list name="$filteredSelloffers" />
+				<do_for_each name="$selloffer" in="$selloffers">
+					<append_to_list chance="100*($selloffer.seller.units.{unitcategory.transport}.count > 0)" name="$filteredSelloffers" exact="$selloffer"/>
+				</do_for_each>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s selloffers due to missing cargo drones.'.[$selloffers.count - $filteredSelloffers.count]" />
+				<set_value name="$selloffers" exact="$filteredSelloffers"/>
+				<remove_value name="$filteredSelloffers"/>
+				
+				<create_list name="$filteredBuyoffers" />
+				<do_for_each name="$buyoffer" in="$buyoffers">
+					<append_to_list chance="100*($buyoffer.buyer.units.{unitcategory.transport}.count > 0)" name="$filteredBuyoffers" exact="$buyoffer"/>
+				</do_for_each>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s buyoffers due to missing cargo drones.'.[$buyoffers.count - $filteredBuyoffers.count]" />
+				<set_value name="$buyoffers" exact="$filteredBuyoffers"/>
+				<remove_value name="$filteredBuyoffers"/>
+			</do_if>
+
 			<!-- nested loop(s) over the trade offers -->
-			<do_all exact="$buyoffers.count" counter="$i">
-				<set_value name="$someNeed" exact="$buyoffers.{$i}" />
-				<do_all exact="$selloffers.count" counter="$j">
-					<set_value name="$someSupply" exact="$selloffers.{$j}" />
-					
+			<do_for_each name="$buyoffer" in="$buyoffers">
+				<do_for_each name="$selloffer" in="$selloffers">
+
 					<!-- only do any work if the offers are for the same ware -->
-					<do_if value="$someNeed.ware.id != $someSupply.ware.id">
+					<do_if value="$buyoffer.ware.id != $selloffer.ware.id">
 						<continue />
 					</do_if>
 					<!-- don't allow trades between the same station -->
-					<do_if value="$someNeed.buyer == $someSupply.seller ">
+					<do_if value="$buyoffer.buyer == $selloffer.seller ">
 						<continue />
 					</do_if>
 
 					<!-- trade rule handling -->
 					<!-- the buyoffer faction needs to be allowed by the selloffer faction, and vice-versa -->
-					<set_value name="$someNeedRestrictionFactions" exact="$someNeed.restriction.factions" />
-					<set_value name="$someNeedRestrictionInverted" exact="$someNeed.restriction.inverted" />
-					<set_value name="$someSupplyRestrictionFactions" exact="$someSupply.restriction.factions" />
-					<set_value name="$someSupplyRestrictionInverted" exact="$someSupply.restriction.inverted" />
+					<set_value name="$buyofferRestrictionFactions" exact="$buyoffer.restriction.factions" />
+					<set_value name="$buyofferRestrictionInverted" exact="$buyoffer.restriction.inverted" />
+					<set_value name="$sellofferRestrictionFactions" exact="$selloffer.restriction.factions" />
+					<set_value name="$sellofferRestrictionInverted" exact="$selloffer.restriction.inverted" />
 
 					<!-- this debug block is useful for trade rule debugging and I want to leave it in the script for a while -->
 					<!-- <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*******************************'" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someNeedRestrictionFactions" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someNeedRestrictionInverted" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someSupplyRestrictionFactions" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someSupplyRestrictionInverted" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$someSupply.seller.owner" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +typeof $someSupply.seller.owner" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +(not $someNeedRestrictionFactions.indexof.{$someSupply.seller.owner})" /> -->
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$buyofferRestrictionFactions" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$buyofferRestrictionInverted" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$sellofferRestrictionFactions" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$sellofferRestrictionInverted" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +$selloffer.seller.owner" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +typeof $selloffer.seller.owner" />
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'*_*_*_ ' +(not $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})" /> -->
 
 					<!-- trade rules are a bit wonky -->
 					<!-- if tradeoffer.restriction.inverted == 1, then the list returned by tradeoffer.restriction.factions is a blacklist. -->
@@ -70,32 +89,32 @@
 					<!-- so we have a buyer and a seller. We need to determine if either one is disallowed from the other -->
 					<!-- buyer whitelist case -->
 					<!-- inverted == 0 and supply owner not in the whitelist -->
-					<do_if value="($someNeedRestrictionInverted == 0) and (not $someNeedRestrictionFactions.indexof.{$someSupply.seller.owner})">
+					<do_if value="($buyofferRestrictionInverted == 0) and (not $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
 						<continue />
 					</do_if>
 					<!-- buyer blacklist case -->
 					<!-- inverted == 1 and supply owner in blacklist -->
-					<do_elseif value="($someNeedRestrictionInverted == 1) and ( $someNeedRestrictionFactions.indexof.{$someSupply.seller.owner})">
+					<do_elseif value="($buyofferRestrictionInverted == 1) and ( $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
 						<continue />
 					</do_elseif>
 					<!-- seller whitelist case -->
 					<!-- inverted == 0 and need owner not in whitelist -->
-					<do_elseif value="($someSupplyRestrictionInverted == 0) and (not $someSupplyRestrictionFactions.indexof.{$someNeed.buyer.owner})">
+					<do_elseif value="($sellofferRestrictionInverted == 0) and (not $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
 						<continue />
 					</do_elseif>
 					<!-- seller blacklist case -->
 					<!-- inverted == 1 and supply owner in blacklist -->
-					<do_elseif value="($someSupplyRestrictionInverted == 1) and ( $someSupplyRestrictionFactions.indexof.{$someNeed.buyer.owner})">
+					<do_elseif value="($sellofferRestrictionInverted == 1) and ( $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
 						<continue />
 					</do_elseif>
 
 					<!-- how much does the need want? -->
-					<get_ware_reservation object="$someNeed.owner" type="buy" ware="$someNeed.ware" result="$needReservations" />
-					<set_value name="$targetOfferedAmount" exact="$someNeed.desiredamount" />
+					<get_ware_reservation object="$buyoffer.owner" type="buy" ware="$buyoffer.ware" result="$needReservations" />
+					<set_value name="$targetOfferedAmount" exact="$buyoffer.desiredamount" />
 					<!-- how much does the supply have to offer? -->
-					<clamp_trade_amount trade="$someSupply" amount="$someSupply.amount" buyer="$shipEntity.assignedcontrolled" seller="$someSupply.seller" result="$affordableAmount" />
+					<clamp_trade_amount trade="$selloffer" amount="$selloffer.amount" buyer="$shipEntity.assignedcontrolled" seller="$selloffer.seller" result="$affordableAmount" />
 					<!-- how much can we haul? -->
-					<set_value name="$cargoHauled" exact="[($shipEntity.ship.cargo.{$someSupply.ware}.max-($occupiedCargo)f/$someNeed.ware.volume)i, $shipEntity.ship.cargo.{$someNeed.ware}.free].min" />
+					<set_value name="$cargoHauled" exact="[($shipEntity.ship.cargo.{$selloffer.ware}.max-($occupiedCargo)f/$buyoffer.ware.volume)i, $shipEntity.ship.cargo.{$buyoffer.ware}.free].min" />
 
 					<!-- the amount for the trade is the minimum of the three amounts -->
 					<set_value name="$tradeAmount" exact="[$targetOfferedAmount,$affordableAmount,$cargoHauled].min" />
@@ -107,42 +126,43 @@
 
 					<!-- if the trade is too small, move on -->
 					<!-- however, if the trade will finish off the build storage for that good, let it through -->
-					<do_if value="($tradeAmount*$someNeed.ware.volume lt $minCargoSize) and not ($someNeed.buyer.isclass.buildstorage and ($tradeAmount == $targetOfferedAmount))">
+					<do_if value="($tradeAmount*$buyoffer.ware.volume lt $minCargoSize) and not ($buyoffer.buyer.isclass.buildstorage and ($tradeAmount == $targetOfferedAmount))">
 						<continue />
 					</do_if>
 
 					<!-- how much profit for this trade? -->
 					<!-- If we use our own stations, we adjust the supply price by the sameFactionBuyMod to allow preferential treatment of player/owned supply chains -->
-					<do_if value="$someSupply.seller.owner == $shipEntity.owner">
-						<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice*$sameFactionBuyMod/100)" />
+					<do_if value="$selloffer.seller.owner == $shipEntity.owner">
+						<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice*$sameFactionBuyMod/100)" />
 					</do_if>
 					<do_else>
-						<set_value name="$currentProfit" exact="$cargoHauled * ($someNeed.unitprice - $someSupply.unitprice)" />
+						<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice)" />
 					</do_else>
 
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$someNeed.ware
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$buyoffer.ware
 											+ ' target desired amount ' + $targetOfferedAmount
 											+ ' supply amount: ' + $affordableAmount
 											+ ' ship can hold: ' + $cargoHauled
 											+ ' amount will be: ' + $tradeAmount
-											+ ' need unitprice: ' + $someNeed.unitprice
-											+ ' supp unitprice: ' + $someSupply.unitprice
+											+ ' need unitprice: ' + $buyoffer.unitprice
+											+ ' supp unitprice: ' + $selloffer.unitprice
 											+ ' faction buy modifier: ' + $sameFactionBuyMod
-											+ ' profit: ' + $currentProfit.formatted.{'%.s %Cr'}" /> <!-- TODO: better debug message to show owners of tradepartners -->
+											+ ' profit: ' + $currentProfit.formatted.{'%.s %Cr'}" />
+						<!-- TODO: better debug message to show owners of tradepartners -->
 					</do_if>
 
 					<!-- if we found a new best trade, set it! -->
 					<do_if value="$currentProfit > $bestProfit">
 						<set_value name="$bestProfit" exact="$currentProfit" />
-						<set_value name="$bestNeedTrade" exact="$someNeed" />
-						<set_value name="$bestSupplyTrade" exact="$someSupply" />
+						<set_value name="$bestNeedTrade" exact="$buyoffer" />
+						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_if>
-				</do_all>
-			</do_all>
+				</do_for_each>
+			</do_for_each>
 			<do_if value="$bestProfit > 0">
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Suggested Trade is: Buy %s %s from %s (%s) and sell to %s (%s) with %s of profit.'.[
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Suggested Trade is: Buy %s %s from %s (%s) and sell to %s (%s) with %s of profit.'.[
 										 $bestAmount,
 										 $bestSupplyTrade.ware,
 										 $bestSupplyTrade.seller.knownname,
@@ -150,7 +170,7 @@
 										 $bestNeedTrade.buyer.knownname,
 										 $bestNeedTrade.buyer.idcode,
 										 $bestProfit.formatted.{'%.s %Cr'}]" />
-			
+
 			</do_if>
 			<do_else>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'no valid trade found'" />
@@ -162,6 +182,6 @@
 				<retval name="bestNeedTrade" value="$bestNeedTrade"/>
 				<retval name="bestSupplyTrade" value="$bestSupplyTrade"/>
 			</return>
-    </actions>
-  </attention>
+		</actions>
+	</attention>
 </aiscript>
