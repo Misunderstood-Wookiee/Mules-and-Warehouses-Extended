@@ -200,7 +200,7 @@
 
 			<run_script sinceversion="2" chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
 				<param name="headerline" value="'supplies'"/>
-				<param name="offers" value="$supplies"/>
+				<param name="offers" value="$supplies.clone"/>
 				<param name="debugchance" value="$debugchance"/>
 				<param name="debugFileName" value="$debugFileName"/>
 				<param name="debugDirName" value="$debugDirName"/>
@@ -340,7 +340,7 @@
 
 			<run_script sinceversion="2" chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
 				<param name="headerline" value="'needs'"/>
-				<param name="offers" value="$needs"/>
+				<param name="offers" value="$needs.clone"/>
 				<param name="debugchance" value="$debugchance"/>
 				<param name="debugFileName" value="$debugFileName"/>
 				<param name="debugDirName" value="$debugDirName"/>
@@ -381,6 +381,7 @@
 				<do_all exact="$outerList.count" counter="$idx">
 					<do_if value="not $needFound">
 						<set_value name="$someOuter" exact="$outerList.{$idx}" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Comparing %s'.[$someOuter.ware.name]" output="false" append="true" />
 						<do_all exact="$innerList.count" counter="$ctr">
 							<set_value name="$someInner" exact="$innerList.{$ctr}" />
 							<do_if value="$someOuter.ware.id" exact="$someInner.ware.id">
