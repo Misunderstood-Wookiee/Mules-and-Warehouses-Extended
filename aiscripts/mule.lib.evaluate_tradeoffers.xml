@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="mule.lib.evaluate_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="1">
+<aiscript name="mule.lib.evaluate_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="2">
 	<!-- Compare tradeoffers by profit and return the most profitable one -->
 	<params>
 		<!-- list of possible buyoffers -->
@@ -159,6 +159,7 @@
 						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_if>
+					<wait sinceversion="2" exact="1ms"/>
 				</do_for_each>
 			</do_for_each>
 			<do_if value="$bestProfit > 0">

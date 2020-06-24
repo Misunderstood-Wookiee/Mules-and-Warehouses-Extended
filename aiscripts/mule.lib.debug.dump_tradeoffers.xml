@@ -14,12 +14,13 @@
     <actions>
 			<do_if value="$debugchance and $offers != null and $offers.count gt 0">
 				<!-- print headerline & count -->
+				<set_value name="$debugText" exact="''"/>
 				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
 				<!-- loop over offers and print every single one-->
 				<do_for_each name="$offer" in="$offers">
 					<do_if value="$offer.owner == $offer.seller">
 						<!-- sell offers -->
-						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%s (%s) wants to sell %s %s for %s (%s)'.[$offer.seller.knownname, $offer.seller.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]" />
+						<set_value name="$debugText" exact="'%s%s (%s) wants to sell %s %s for %s (%s)\n'.[$debugText,$offer.seller.knownname, $offer.seller.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]"/>
 					</do_if>
 					<do_else>
 						<!-- buy offers -->
@@ -30,9 +31,10 @@
 						<do_else>
 							<set_value name="$buyerName" exact="$offer.buyer.knownname"/>
 						</do_else>
-						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'%s (%s) wants to buy %s %s for %s (%s)'.[$buyerName, $offer.buyer.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]" />
+						<set_value name="$debugText" exact="'%s%s (%s) wants to buy %s %s for %s (%s)'.[$debugText,$buyerName, $offer.buyer.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]"/>
 					</do_else>
 				</do_for_each>
+				<debug_to_file name="$debugFileName" directory="$debugDirName" text="$debugText" />
 			</do_if>
     </actions>
   </attention>
