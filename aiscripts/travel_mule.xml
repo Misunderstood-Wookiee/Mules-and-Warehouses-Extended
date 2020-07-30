@@ -69,7 +69,7 @@
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
-		<do_if value="($sourceStation.owner == this.ship.owner)">
+		<do_if value="($sourceStation.owner == this.ship.owner) and (not (@this.ship.commander.isclass.ship and this.ship.assignment != assignment.trade))">
 			<set_object_commander object="this.ship" commander="$sourceStation" assignment="assignment.trade" />
 		</do_if>
 		<set_value name="$debugFileName" exact="'travelmule - ' + this.ship.idcode" />
