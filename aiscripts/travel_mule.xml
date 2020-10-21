@@ -142,7 +142,7 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100.0" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
 						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'  trade created'" />
 						<resume label="end" />
@@ -156,7 +156,7 @@
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
 
-			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
+			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'TravelMule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
@@ -439,16 +439,18 @@
 								</do_elseif>
 
 								<set_value name="$cargoHauled" exact="[this.ship.cargo.{$someInner.ware}.free,$targetAmount,$someOuter.amount].min" />
-								<set_value name="$currentProfit" exact="$cargoHauled * ($someInner.unitprice - $someOuter.unitprice*$profitMargin/100)" />
+								<set_value name="$currentProfit" exact="$cargoHauled * ($someInner.unitprice - $someOuter.unitprice*$profitMargin/100.0)" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----' + player.age" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'cargoHauled: ' +$cargoHauled" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buyer.unitprice: ' +$someInner.unitprice" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'seller.unitprice: ' +$someOuter.unitprice" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'currentProfit: ' +$currentProfit" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'bestProfit: ' +$bestProfit" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'minCargoUsed/100.0: ' +($minCargoUsed)f/100.0" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'minCargoUsed: ' +$minCargoUsed" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'this.ship.cargo.ware.max div 1.25: ' +this.ship.cargo.{$someInner.ware}.max / 1.25" output="false" append="true" />
 
-								<do_if value="($currentProfit gt $bestProfit) and ($cargoHauled/(this.ship.cargo.{$someInner.ware}.max)) gt $minCargoUsed/100">
+								<do_if value="($currentProfit gt $bestProfit) and (($cargoHauled)f/(this.ship.cargo.{$someInner.ware}.max)) gt $minCargoUsed/100.0">
 									<set_value name="$supplyTarget" exact="$someInner" />
 									<set_value name="$bestCargo" exact="$cargoHauled" />
 									<set_value name="$bestProfit" exact="$currentProfit" />
@@ -464,18 +466,18 @@
 						<do_if value="$needFound">
 							<do_if value="$supplySource.owner.owner == this.ship.owner">
 								<set_value name="$currentProfit" exact="$bestCargo * $supplyTarget.unitprice" />
-								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100" />
 
 								<!-- Debug: Print profit stats to logfile -->
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100.0" />
 
 							</do_if>
 							<do_else>
 								<set_value name="$currentProfit" exact="$bestCargo * ($supplyTarget.unitprice - $supplySource.unitprice)" />
-								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100.0 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100.0" />
 
 								<!-- Debug: Print profit stats to logfile -->
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100.0 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100.0" />
 
 							</do_else>
 
