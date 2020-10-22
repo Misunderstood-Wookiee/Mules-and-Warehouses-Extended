@@ -414,7 +414,7 @@
 						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists"/>
 						<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
 						<!-- X4 treats products and resources always as tradewares... -->
-						<set_value name="$isWare" exact="$need.owner.resources.{$need.ware}.exists"/>
+						<set_value name="$isWare" exact="$need.owner.tradewares.{$need.ware}.exists"/>
 						<do_if value="
 								 ($priority.$type == 'resources'     and $isResource and (not $isProduct)) or
 								 ($priority.$type == 'intermediates' and $isResource and $isProduct) or
