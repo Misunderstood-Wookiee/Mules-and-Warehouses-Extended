@@ -28,7 +28,7 @@
 			<set_value name="$bestAmount" exact="0" />
 			<set_value name="$bestNeedTrade" exact="null" />
 			<set_value name="$bestSupplyTrade" exact="null" />
-
+			
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----- trade offer comparisons'" />
 
 			<!-- Filter tradeoffers for capital ships if there are no cargo drones available -->
