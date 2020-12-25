@@ -31,7 +31,7 @@
 						<do_else>
 							<set_value name="$buyerName" exact="$offer.buyer.knownname"/>
 						</do_else>
-						<set_value name="$debugText" exact="'%s%s (%s) wants to buy %s %s for %s (%s)\n'.[$debugText,$buyerName, $offer.buyer.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]"/>
+						<set_value name="$debugText" exact="'%s%s (%s) wants to buy %s (desired %s, offer %s, stocklevel %s) %s for %s (%s)\n'.[$debugText,$buyerName, $offer.buyer.idcode, $offer.amount, $offer.desiredamount, $offer.offeramount, $offer.stocklevel, $offer.ware, $offer.unitprice, $offer.relativeprice]"/>
 					</do_else>
 				</do_for_each>
 				<debug_to_file name="$debugFileName" directory="$debugDirName" text="$debugText" />

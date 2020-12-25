@@ -125,8 +125,9 @@
 		<actions>
 			<label name="start" />
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Entity (this): %s'.[this]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'AssignedControlled: %s (%s) - %s'.[this.assignedcontrolled.knownname, this.assignedcontrolled.idcode, this.assignedcontrolled]" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Entity (this): %s'.[this]"/>
 
 			<!-- Dump Mule Settings -->
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
@@ -182,7 +183,7 @@
 					</do_if>
 				</do_if>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    copying default behavior'"/>
-				<remove_object_commander object="$subordinate" />
+<!--				<remove_object_commander object="$subordinate" />-->
 				<create_order object="$subordinate" default="true" id="'SupplyMule'">
 					<!-- Note: we changed the default orders, therefore civilian fleets needs an update -->
 					<param name="home" value="$home" />
@@ -291,7 +292,7 @@
    					serve player sector
    					serve player area
    			-->
-			<!-- Dedicated serve: only serve assigned home, weather its a station or sector -->
+			<!-- Dedicated serve: only serve assigned home, whether its a station or sector -->
 			<!-- Serve order: buildstorage -> resources -> intermediates -> tradewares -->
 
 			<!-- $supplierFactions: list of factions -->
@@ -301,11 +302,13 @@
 
 			<set_value name="$isServingStationOrShip" exact="if ($homeStationOrShip != null) then true else false"/>
 			<set_value name="$isServingSector" exact="if (($home.isclass.sector and $dedicatedServe) or ($home.isclass.{[class.ship, class.station]} and not $dedicatedServe)) then true else false"/>
-			<set_value name="$serveFactions" exact="if ($isServingStationOrShip and $homeStationOrShip.owner != faction.player) then $aiFactions else $playerFactions"/>
-			<set_value name="$isServingArea" exact="($serveFactions == $playerFactions) and (not $dedicatedServe)"/>	
+			<set_value name="$isServingPlayer" exact="(not $isServingStationOrShip) or ($homeStationOrShip.owner == faction.player)" />
+			<set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions else $aiFactions" />
+			<set_value name="$isServingArea" exact="$isServingPlayer and (not $dedicatedServe)" />
 
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingStationOrShip: %s'.[$isServingStationOrShip]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingSector: %s'.[$isServingSector]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingPlayer: %s'.[$isServingPlayer]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    serveFactions: %s'.[$serveFactions]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingArea: %s'.[$isServingArea]"/>
 
@@ -435,7 +438,7 @@
 					<create_list name="$filteredNeeds" />
 					<!-- Check for every need if it fullfills the requirement and add -->
 					<do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
-						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists"/>
+						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists or $need.owner.supplyresources.{$need.ware}.exists"/>
 						<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
 						<!-- X4 treats products and resources always as tradewares... -->
 						<set_value name="$isWare" exact="$need.owner.tradewares.{$need.ware}.exists"/>
@@ -572,7 +575,7 @@
 						</do_if>
 
 						<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-							<set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
+							<set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of %s.'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$tradeText" />
 							<write_to_logbook category="upkeep"  object="this.ship" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="$tradeText" />
 

@@ -109,7 +109,7 @@
 					</do_elseif>
 
 					<!-- how much does the need want? -->
-					<get_ware_reservation object="$buyoffer.owner" type="buy" ware="$buyoffer.ware" result="$needReservations" />
+					<!--<get_ware_reservation object="$buyoffer.owner" type="buy" ware="$buyoffer.ware" result="$needReservations" />-->
 					<set_value name="$targetOfferedAmount" exact="$buyoffer.desiredamount" />
 					<!-- how much does the supply have to offer? -->
 					<clamp_trade_amount trade="$selloffer" amount="$selloffer.amount" buyer="$shipEntity.assignedcontrolled" seller="$selloffer.seller" result="$affordableAmount" />
