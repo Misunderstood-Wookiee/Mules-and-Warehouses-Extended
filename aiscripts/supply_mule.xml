@@ -294,6 +294,7 @@
    			-->
 			<!-- Dedicated serve: only serve assigned home, whether its a station or sector -->
 			<!-- Serve order: buildstorage -> resources -> intermediates -> tradewares -->
+			<!-- Dedicated player's builder mode. Activated by: * selected allow build storage only; * selected station or sector as home. When active - an evaluation of trade offers is perfomed by a fill level algorithm instead of a best profit. -->
 
 			<!-- $supplierFactions: list of factions -->
 			<!-- $serve: 'station', 'sector', 'area' -->
@@ -305,12 +306,14 @@
 			<set_value name="$isServingPlayer" exact="(not $isServingStationOrShip) or ($homeStationOrShip.owner == faction.player)" />
 			<set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions else $aiFactions" />
 			<set_value name="$isServingArea" exact="$isServingPlayer and (not $dedicatedServe)" />
+			<set_value name="$isDedicatedPlayerBuilder" exact="$isServingPlayer and $allowBuildstorage and (not $allowResources) and (not $allowIntermediates) and (not $allowTradewares)" />
 
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingStationOrShip: %s'.[$isServingStationOrShip]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingSector: %s'.[$isServingSector]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingPlayer: %s'.[$isServingPlayer]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    serveFactions: %s'.[$serveFactions]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingArea: %s'.[$isServingArea]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isDedicatedPlayerBuilder: %s'.[$isDedicatedPlayerBuilder]"/>
 
 			<do_if value="$isServingStationOrShip">
 				<!-- Serve Station -->
@@ -561,6 +564,7 @@
 							<param name="debugchance" value="$debugchance"/>
 							<param name="debugFileName" value="$debugFileName"/>
 							<param name="debugDirName" value="$debugDirName"/>
+							<param name="dedicatedPlayerBuilder" value="$isDedicatedPlayerBuilder" />
 							<save_retval name="bestProfit" variable="$bestProfit"/>
 							<save_retval name="bestAmount" variable="$bestAmount"/>
 							<save_retval name="bestNeedTrade" variable="$bestNeedTrade"/>

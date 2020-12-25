@@ -16,6 +16,8 @@
 		<param name="occupiedCargo"/>
 		<!-- minimum cargo size for allowed transport -->
 		<param name="minCargoSize"/>
+		<!-- use fill level for profit calculation instead of buy/sell price difference -->
+		<param name="dedicatedPlayerBuilder" />
 		<!-- enable/disable debug messages -->
 		<param name="debugchance"/>
 		<param name="debugFileName"/>
@@ -51,6 +53,10 @@
 				<remove_value name="$filteredBuyoffers"/>
 			</do_if>
 
+			<do_if value="$dedicatedPlayerBuilder" >
+				<!--randomize construction materials inside the same fill level region-->
+				<shuffle_list list="$buyoffers" />
+			</do_if>
 			<!-- nested loop(s) over the trade offers -->
 			<do_for_each name="$buyoffer" in="$buyoffers">
 				<do_for_each name="$selloffer" in="$selloffers">
@@ -130,13 +136,24 @@
 						<continue />
 					</do_if>
 
-					<!-- how much profit for this trade? -->
-					<!-- If we use our own stations, we adjust the supply price by the sameFactionBuyMod to allow preferential treatment of player/owned supply chains -->
-					<do_if value="$selloffer.seller.owner == $shipEntity.owner">
-						<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice*$sameFactionBuyMod/100.0)" />
+					<do_if value="$dedicatedPlayerBuilder" >
+						<set_value name="$targetAmount" exact="$buyoffer.buyer.cargo.{$buyoffer.ware}.target" />
+						<!--calculate fill level region: 0%..33% = 3; 33%..67% = 2; 67%..100% = 1 -->
+						<!--REMIND (don't optimize) desired amount / target amount equals to the stock level when the construction is fully funded only-->
+						<set_value name="$fillLevelRegion" exact="((($buyoffer.desiredamount)f / ([$targetAmount,1].max)f - 0.0000001) * 3.0 + 1.0)i" />
+						<set_value name="$currentProfit" exact="$fillLevelRegion * 1Cr" />
+						<remove_value name="$targetAmount" />
+						<remove_value name="$fillLevelRegion" />
 					</do_if>
 					<do_else>
-						<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice)" />
+						<!-- how much profit for this trade? -->
+						<!-- If we use our own stations, we adjust the supply price by the sameFactionBuyMod to allow preferential treatment of player/owned supply chains -->
+						<do_if value="$selloffer.seller.owner == $shipEntity.owner">
+							<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice*$sameFactionBuyMod/100.0)" />
+						</do_if>
+						<do_else>
+							<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice)" />
+						</do_else>
 					</do_else>
 
 					<do_if value="$debugchance">
@@ -159,6 +176,11 @@
 						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_if>
+					<!--search for the best trade amount in the same fill level region between supply offers of the same ware-->
+					<do_elseif value="$dedicatedPlayerBuilder and ($currentProfit == $bestProfit) and ($tradeAmount > $bestAmount) and ($bestNeedTrade.ware.id == $buyoffer.ware.id)" >
+						<set_value name="$bestSupplyTrade" exact="$selloffer" />
+						<set_value name="$bestAmount" exact="$tradeAmount" />
+					</do_elseif>
 					<wait sinceversion="2" exact="1ms"/>
 				</do_for_each>
 			</do_for_each>
