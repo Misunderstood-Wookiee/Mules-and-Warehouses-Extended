@@ -1,26 +1,54 @@
-## Mules-and-Warehouses-Extended: A mod for X4 Foundations
-An continuation of Mules and Warehouses v4 & Mules Extentsion. That has been optimised and improved for current versions of X4 Foundation.
+# Mules-and-Warehouses-Extended: A mod for X4 Foundations
+A continuation and extension of Mules and Warehouses v4.
+That has been optimised and improved for current versions of X4 Foundation.
 
-### For general releases of this project please see the following
+Based on [Mules and Warehouses v4.0](https://forum.egosoft.com/viewtopic.php?t=417350) by LegionOfOne, which in turn is based on [Station Mule - Multiple ware station supply](https://forum.egosoft.com/viewtopic.php?f=181&t=411837) by leecarter.
+
+## Table of Contents
+
+- [Install](#install)
+- [Usage](#usage)
+    - [Station Mule](#station-mule)
+    - [Distribution Mule](#distribution-mule)
+    - [Travel Mule](#travel-mule)
+    - [Supply Mule](#supply-mule)
+- [Some General Mule Advice](#some-general-mule-advice)
+
+## Install
+For general releases of this project please see the following
+
 * Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2013772865
 * Nexus Mods: https://www.nexusmods.com/x4foundations/mods/416
 
-### Station Mule Tips
-I strongly suggest reading the original author's thread, station mule is described well:
+## Usage
+
+We **strongly suggest** reading the original author's thread, where the *station mule*, *distribution mule*, and *travel mule* are described well:
 https://forum.egosoft.com/viewtopic.php?t=417350
 
-The way I've been using station mules is that every factory has one pointed to a big warehouse with "make target warehouse" checked. They also have two-way trade checked so they'll bring back needs for their factory. Then from the big warehouse, there are station mules out to each trade station warehouse with "make target checked". This ensures that every warehouse has their tradewares set, and off course the station mules will work at distributing your goods to those stations.
+### Station Mule
+**TLDR**: Station mules provide way to setup static traderoutes in your empire.
 
-### Distribution Mule Tips
-The new supply mule and the Distribution Mule have a little bit of overlap. The distribution mule can be a little bit confusing on what the three sliders do, but here's how it works.
+Each mule can be set up to bring wares from a factory (**Source Station**) to a warehouse (**Target Station**) and return with the goods needed for production (if **Two-way trade** is checked).
+A second set of station mules can be enlisted at your warehouses to bring excess wares to your trade stations (with **Make Target Warehouse** checked).
+
+### Distribution Mule
+**TLDR**: The distribution mules are meant to distribute wares between your warehouses, so that every warehouse has at least some of each ware in stock.
+
+It will try to take the **Wares** from your **Source Warehouse** to your **Target Warehouses** depending on their respektiv stocklevels.
+
 - **Min Storage** - the desired percentage of storage for each ware on each target station in the list
 - **Static storage** - the desired stock level on the source station
 - **Max Storage** - an amount on the source station that will force a distribution even if the target is above min storage.
 
-Most of the time distribution mule bumps up against either min storage or static storage. To be less restrictive, you generally need to INCREASE min storage and DECREASE static storage to get wares moving. 
+Most of the time distribution mule bumps up against either min storage or static storage. To be less restrictive, you generally need to *increase* min storage and *decrease* static storage to get wares moving.
 
-### Travel Mule Tips
-- The Travel mule now has sliders that allow you to be less restrictive on what trades to take out from your stations. These options should allow you to open up your trade space to make sure goods are moving:
+### Travel Mule
+**TLDR**: The travel mules are meant to sell your wares to the AI to make money.
+
+They will take **Wares**, based on highest volume, from the **Source Warehouse** and sell it to AI stations in range of **Max Jumps** if a profit can be made.
+You can overwrite the target AI station selection by setting a **Custom Stop List**.
+
+The Travel mule now has sliders that allow you to be less restrictive on what trades to take out from your stations. These options should allow you to open up your trade space to make sure goods are moving:
 
 - **Player Buy Mod** A percentage multiplier applied to the player price in profit calculations. If it is 100, we use the station managers price. If it's 0, we ignore the price altogether. 50 means cut the manager's price in half, etc. In my experience this is usually the biggest problem; if your stock is somewhat low for any reason, the price will be too high for your travel mule to find a trade.
 - **Fill Cargo Hold %** The Mule will require the trade to fill up their hold past this percentage for it to be considered valid.
@@ -28,55 +56,61 @@ Most of the time distribution mule bumps up against either min storage or static
 You generally want a few travel mules on all of your warehouses so that your goods are going out to make you money. If you notice Travel Mules idling, either tinker with their sliders to encourage more trades, or re-assign them to a different task. It could be that you're just not producing or distributing fast enough to keep up with the amount of travel mules you have set.
 
 
-### New Supply Mule Instructions
-TLDR; just set some haulers to the Supply Mule without changing the defaults and they will supply your empires buy offers. You should never really need to touch them.
+### Supply Mule
+**TLDR**; The supply mules are meant to buy supplies for your station to keep production going or buy cheap wares for your tradehubs.
 
-What is the point of the Supply Mule? The supply mule attempts to fulfill all of the buy orders in your empire at the cheapest price possible. While this may not directly produce profit, it reduces theoretical losses. For instance, lets say you have a factory that wants to sell graphene at 130 Cr/unit, and a tradestation that wants to buy it at 150 Cr/unit. The AI could theoretically come along and buy from your factory, then sell to your trade station, and you would realize a loss. The supply mule will see this trade and attempt to fill it. It reduces price inefficiencies in your empire. 
+The supply mule attempts to fulfill all of the players buy orders in the selected area at the cheapest price possible. While this may not directly produce profit, it reduces theoretical losses. For instance, lets say you have a factory that wants to sell graphene at 130 Cr/unit, and a tradestation that wants to buy it at 150 Cr/unit. The AI could theoretically come along and buy from your factory, then sell to your trade station, and you would realize a loss. The supply mule will see this trade and attempt to fill it. It reduces price inefficiencies in your empire.
+The supply mule can also be asssigned to AI stations to boost thier production while earning you a bit of cash. This can be especailly usefull to supply shipyards or contested regions of space.
 
-In general, the mule prioritizes build storage, then production needs, then tradewares. It prefers to source from player owned resources and will take any trade that reduces inefficiency before going out to AI stations. It has the ability to queue up multiple trades until it's cargo is full before coming to sell everything (this particular routine isn't optimal in terms of pathing).
+In general, the mule prioritizes build storage, then production needs, then intermediates, then tradewares. It prefers to source from player owned resources and will take any trade that reduces inefficiency before going out to AI stations. It has the ability to queue up multiple trades until it's cargo is full before coming to sell everything (this particular routine isn't optimal in terms of pathing). The supply mule obeys your global blacklists.
 
-There are branches of priorities depending on whether a station is set in the UI and whether that station is owned by the player or the AI. The priorities will be described after we go over the options.
+#### Options
 
-**note**-the supply mule should obey your global blacklists.
-- **Source Station** - Can be any station. Behavior in different scenarios is described below
-- **Assign Ship To Station** - assigns the ship as a subordinate with the trader role. Serves no functional purpose except convenience
-- **Serve Source Only** - will only supply the station that is set
-- **Player Suppliers Only** - Will only source from player owned stations
-- **Max Trades** - the max number of stops that can be made in an attempt to fill up the cargo hold. Each trade will have a minimum size of (100/MaxTrades)% of the cargo hold full. i.e. a setting of 2 means each trade must be at least 50% of the hold. You can use this to avoid supply mules running low volume trades.
-- **Max Jumps** - in general when considering player to player trades there is no maximum jump distance. However, when sourcing from the AI or serving AI stations, this distance is obeyed. This is based on pilot skill.
-- **Lock Wares to User** - If you choose specific wares, you need to check this option for your choices to stick across trade runs. Otherwise the script populates the list on the UI with the needs that it found when searching for things to do.
-- **Build Storage ONLY** - will wait for build storage needs
-- **Factory Supply ONLY** - will only supply wares needed for production on your factories.
+- **Home Station/Sector** - Can be any station or sector. Behavior in different scenarios is described below.
+- **Assign Ship To Station** - assigns the ship as a subordinate with the trader role. Serves no functional purpose except convenience.
+- **Max Jumps From Home** - Maximum distance from home to serve stations as supplier and to source supplies. This is based on pilot skill.
+- **Serve Source Only** - will only supply the station / sector that is set.
+- **Allow Player / AI Suppliers** - allow mule to buy wares from player / AI stations.
+- **Allow Buildstorage / Resources / Intermediates / Tradewares** - allow mule to supply the stations build storage / resources / intermediates / tradewares
+- **Lock Wares to User Selection** - If you choose specific wares, you need to check this option for your choices to stick across trade runs. Otherwise the script populates the list on the UI with the needs that it found when searching for things to do.
+- **Warebasket** - Wares the mule trades with (if not locked, will be autopopulated and updated by the script with all wares of the station to supply)
+- **Max Trades** - the max number of stops that can be made in an attempt to fill up the cargo hold. Each trade will have a minimum size of (100 / MaxTrades)% of the cargo hold full. i.e. a setting of 2 means each trade must be at least 50% of the hold. You can use this to avoid supply mules running low volume trades.
 - **Player Buy Mod** - can be used to fake the sell prices on player owned stations for profit calculations. As an extreme example, you can set it to 0 and the sell plrices from player stations will be ignored.
 
-**Mule Priorities**
-#### When No Station is Set
-1. Buy from player, sell to player build storage
-2. Buy from anyone, sell to player build storage
-3. Buy from player, sell to player factories for production
-4. Buy from anyone, sell to player factories for production
-5. Buy from player, sell to player tradewares
-6. Buy from anyone, sell to player tradewares
+There are branches of priorities depending on whether a station is set in the UI and whether that station is owned by the player or the AI.
 
-#### When the set station is player owned
-1. Buy from player, sell to station build storage
-2. Buy from anyone, sell to station build storage
-3. Buy from player, sell to station production needs
-4. Buy from anyone, sell to station production needs
-5. Buy from player, sell to station tradewares
-6. Buy from anyone, sell to station tradewares
-continue with *no station set* logic.
+#### Mule Priorities
+##### When a sector is set as home
+1. Supply all player stations in **home sector**.
+2. Supply all player stations in **Max Jumps** range (unless **Serve Source Only** is set).
 
-#### When the set station is an AI station.
-1. Buy from Player, sell to station
-2. Buy from anyone, sell to station
-3. Buy from player, sell anywhere in same sector
-4. Buy from anyone, sell anywhere in same sector
+##### When a player owned station is set as home
+1. Supply **home station**.
+2. Supply all player stations in **home sector** (unless **Serve Source Only** is set).
+3. Supply all player stations in **Max Jumps** range (unless **Serve Source Only** is set).
+
+##### When a AI owned station is set as home
+1. Supply assigned AI station.
+2. Supply all AI stations in **sector** (unless **Serve Source Only** is set).
+
+##### Supply priorities based on ware type
+
+1. **build storage** (if checked),
+2. **resources** for production (if checked),
+3. **intermediates** (if checked),
+2.  and lastly **tradewares** (if checked).
+
+##### Supplier priorities (from whom to buy the needed ware)
+
+1. **Player** faction (if checked)
+2. any friendly **AI** faction (if checked).
+
+If there are multiple possible trades, the supply mule will choose **based on potential profit**.
 
 ### Some General Mule Advice
 - Make small changes at one time. Don't add storage to every warehouse and factories all at once. Don't add 10 travel mules or supply mules all at once. Your goal is to have just enough traders to move your goods without your factories or your traders idling. 
 - the only mule that can add tradewares is the station mule with the "make target wwarehouse" option checked.
 - the new supply mule can actually work as a profit-seeking trader, when assigned to an AI station. He will prioritize player owned goods so a good way to move something you have a lot of stock of, is to assign a couple of supply mules to an AI station with a high volume of demand. 
 - My preference is to chain together warehouses from one big warehouse that most factories feed into. This is the most efficient way to set up station mules such that all of your wares are added to your trade stations.
-- if the mules are idle, it means they're not finding trades. 99% of the time this is not due to a bug, but simply because no trades pass their cuts. Usually this means you have too many mules and not enough production to keep them busy. What I like to do is repurpose idle mules either to other mule jobs, or some type of auto trading (Tater Trader is my preference) until there is more work for them. 
-
+- if the mules are idle, it means they're not finding trades. 99% of the time this is not due to a bug, but simply because no trades pass their cuts. Usually this means you have too many mules and not enough production to keep them busy. What I like to do is repurpose idle mules either to other mule jobs, or some type of auto trading (Tater Trader is my preference) until there is more work for them.
+- **For a minimal performance impact**, reduce the maximum number of tradeoffers the mule evaluates! **Reduce** the number of **Max Jumps** for travel and supply mules as much as possible, since every buy offer will be compared to every sell offer!

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <mdscript name="MulesAndWarehousesExtended_Setup" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net/libraries/md.xsd">
   <cues>
-    <cue name="MWEX_SettingUp" instantiate="true" version="2">
+    <cue name="MWEX_SettingUp" instantiate="true" version="3">
       <conditions>
         <event_cue_signalled cue="md.Setup.Start" />
       </conditions>
@@ -22,7 +22,6 @@
         <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'TravelMule'" />
         <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'StationMule'" />
         <append_to_list name="global.$mwex_AllMulesCommandTags" exact="'DistriMule'" />
-
         <!-- Setup complete. -->
       </actions>
     </cue>

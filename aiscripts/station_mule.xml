@@ -132,7 +132,7 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100.0" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
 						<debug_to_file name="$debugFileName" directory="'MulesExtended'" text="'  trade created'" />
 						<resume label="end" />
@@ -146,7 +146,7 @@
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
 
-			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
+			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'stationmule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
@@ -281,7 +281,7 @@
 							<set_value name="$someTrade" exact="$needs.{$nSort}" />
 							<set_value name="$isMadeAndUsed" exact="$someTrade.owner.products.{$someTrade.ware}.exists" />
 							<set_value name="$isTradeWare" exact="$someTrade.owner.tradewares.{$someTrade.ware}.exists" />
-							<set_value name="$cargoRatio" exact="($someTrade.owner.cargo.{$someTrade.ware}.count * 100 / [$someTrade.owner.cargo.{$someTrade.ware}.target, 1].max)" />
+							<set_value name="$cargoRatio" exact="($someTrade.owner.cargo.{$someTrade.ware}.count * 100.0 / [$someTrade.owner.cargo.{$someTrade.ware}.target, 1].max)" />
 							<do_if value="(not $isMadeAndUsed) and (not $isTradeWare) and $cargoRatio lt 10">
 								<append_to_list name="$outerList" exact="$someTrade" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' +$someTrade.ware + ' not isMadeAndUsed and not isTradeWare and cargoRatio lt 10. appended to outerList'" />

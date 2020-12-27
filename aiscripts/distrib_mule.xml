@@ -125,7 +125,7 @@
 					<debug_to_file chance="$debugchance" name="'distribmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100.0" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
 						<debug_to_file chance="$debugchance" name="'distribmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  trade created'" />
 						<resume label="end" />
@@ -139,7 +139,7 @@
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
 
-			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
+			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
 				<debug_to_file chance="$debugchance" name="'distribmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'TravelMule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
@@ -220,14 +220,14 @@
 					<debug_to_file chance="$debugchance" name="'distribmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  ' +$staticStorage" output="false" append="true" />
 
 					<do_all exact="$outerList.count" counter="$idx">
-						<set_value name="$sourceCargoRatio" exact="($outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.count * 100 / [$outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.target, 1].max)" />
+						<set_value name="$sourceCargoRatio" exact="($outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.count * 100.0 / [$outerList.{$idx}.owner.cargo.{$outerList.{$idx}.ware}.target, 1].max)" />
 						<debug_to_file chance="$debugchance" name="'distribmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  source cargo ratio for ' +$outerList.{$idx}.ware + ': ' +$sourceCargoRatio" output="false" append="true" />
 
 						<do_if value="(not $needFound) and ($sourceCargoRatio gt $staticStorage)">
 							<set_value name="$someOuter" exact="$outerList.{$idx}" />
 
 							<do_all exact="$innerList.count" counter="$ctr">
-								<set_value name="$targetCargoRatio" exact="($innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.count * 100 / [$innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.target, 1].max)" />
+								<set_value name="$targetCargoRatio" exact="($innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.count * 100.0 / [$innerList.{$ctr}.owner.cargo.{$innerList.{$ctr}.ware}.target, 1].max)" />
 								<debug_to_file chance="$debugchance" name="'distribmule- ' + this.ship.knownname + ' ' + this.ship.idcode" directory="'MulesExtended'" text="'  target cargo ratio for ' +$innerList.{$ctr}.ware + ': ' +$targetCargoRatio" output="false" append="true" />
 								<do_if value="(not $needFound) and ($targetCargoRatio lt $minStorage or ($sourceCargoRatio gt $maxStorage and $sourceCargoRatio gt ($targetCargoRatio + 10)))">
 									<set_value name="$someInner" exact="$innerList.{$ctr}" />
@@ -242,7 +242,7 @@
 										</do_else>
 
 										<set_value name="$cargoHauled" exact="[this.ship.cargo.{$someInner.ware}.free,$targetAmount,$someOuter.amount].min" />
-										<do_if value="($cargoHauled gt (this.ship.cargo.{$someInner.ware}.max / 1.25)) or ($needFound2 and ($cargoHauled gt (this.ship.cargo.{$someInner.ware}.max / 2))) ">
+										<do_if value="($cargoHauled gt (this.ship.cargo.{$someInner.ware}.max / 1.25)) or ($needFound2 and ($cargoHauled gt (this.ship.cargo.{$someInner.ware}.max / 2.0))) ">
 											<set_value name="$supplyTarget" exact="$someInner" />
 											<set_value name="$supplySource" exact="$someOuter" />
 											<set_value name="$needFound" exact="true" />
