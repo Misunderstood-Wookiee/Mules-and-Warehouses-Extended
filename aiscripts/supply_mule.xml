@@ -157,13 +157,11 @@
 			<remove_from_list name="$aiFactions" exact="faction.player"/>
 			<set_value name="$playerFactions" exact="[faction.player]"/>
 
-			<!-- Determine where we serve and whom -->
-			<set_value name="$serveStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
-			<set_value name="$serveSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
-			<set_value name="$serveFactions" exact="if ($serveStationOrShip and $home.owner != faction.player) then $aiFactions else $playerFactions"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Station or Ship: %s'.[if $serveStationOrShip then $serveStationOrShip.knownname else '-',if $serveStationOrShip then $serveStationOrShip.idcode else '-']"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Sector: %s'.[$serveSector.knownname]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Factions: %s'.[$serveFactions]"/>
+			<!-- Determine where we assigned to -->
+			<set_value name="$homeStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
+			<set_value name="$homeSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Station or Ship: %s'.[if $homeStationOrShip then $homeStationOrShip.knownname else '-',if $homeStationOrShip then $homeStationOrShip.idcode else '-']"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Sector: %s'.[$homeSector.knownname]"/>
 
 
 			<!--here we want to copy settings to subordinates-->
@@ -281,11 +279,37 @@
 			<!-- It's an ordered tasklist of what out mule should try to do first  -->
 			<create_list name="$prioritylist" />
 			<!-- ************************ supply mule logic ************************ -->
-			<!-- $buyFrom: list of factions -->
+			<!-- Serve order
+				if player station
+   					serve player station
+   					serve player sector
+					serve player area
+				if ai station
+   					serve ai station
+   					serve ai sector
+				if sector
+   					serve player sector
+   					serve player area
+   			-->
+			<!-- Dedicated serve: only serve assigned home, weather its a station or sector -->
+			<!-- Serve order: buildstorage -> resources -> intermediates -> tradewares -->
+
+			<!-- $supplierFactions: list of factions -->
 			<!-- $serve: 'station', 'sector', 'area' -->
 			<!-- $type: 'buildstorage', 'tradewares', 'resources', 'products' -->
 			<!-- Cases: -->
-			<do_if value="$serveStationOrShip">
+
+			<set_value name="$isServingStationOrShip" exact="if ($homeStationOrShip != null) then true else false"/>
+			<set_value name="$isServingSector" exact="if (($home.isclass.sector and $dedicatedServe) or ($home.isclass.{[class.ship, class.station]} and not $dedicatedServe)) then true else false"/>
+			<set_value name="$serveFactions" exact="if ($isServingStationOrShip and $homeStationOrShip.owner != faction.player) then $aiFactions else $playerFactions"/>
+			<set_value name="$isServingArea" exact="($serveFactions == $playerFactions) and (not $dedicatedServe)"/>	
+
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingStationOrShip: %s'.[$isServingStationOrShip]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingSector: %s'.[$isServingSector]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    serveFactions: %s'.[$serveFactions]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingArea: %s'.[$isServingArea]"/>
+
+			<do_if value="$isServingStationOrShip">
 				<!-- Serve Station -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'buildstorage' ]" />
@@ -298,7 +322,7 @@
 			</do_if>
 
 			<!-- Serve Sector -->
-			<do_if value="$serveSector or (not $dedicatedServe)">
+			<do_if value="$isServingSector">
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
@@ -309,7 +333,7 @@
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
 			</do_if>
 
-			<do_if value="($serveFactions == $playerFactions) and (not $dedicatedServe)">
+			<do_if value="$isServingArea">
 				<!-- Serve player area -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
@@ -362,7 +386,7 @@
 					<!-- CASE: station/ship -->
 					<!-- Note: by default the game treats buildstorage and the station as two seperate components. -->
 					<!-- Buyoffers from buildstorage will not show up at the station and vice versa -->
-					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $serveStationOrShip"/>
+					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $homeStationOrShip"/>
 					<set_value name="$buyer" exact="if (($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)) then $currentlyServing.buildstorage else $currentlyServing"/>
 					<!-- buyoffer search -->
 					<find_buy_offer tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
@@ -372,7 +396,7 @@
 					<!-- $classes (buildstorage) -->
 					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
 					<!-- buyoffer search -->
-					<find_buy_offer space="$serveSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
+					<find_buy_offer space="$homeSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
 						<match_buyer>
 							<match tradesknownto="this.owner"/>
 							<match class="$serveClass"/>
@@ -390,7 +414,7 @@
 						<match_buyer>
 							<match class="$serveClass"/>
 							<match owner="$serveFactions"/>
-							<match_gate_distance object="$serveSector" min="0" max="$maxDist">
+							<match_gate_distance object="$homeSector" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<!-- this next bit of mess is just blacklist handling -->
@@ -454,13 +478,14 @@
 						<append_to_list name="$specialWareBasket" exact="$ware" />
 					</do_for_each>
 				</do_if>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'specialWareBasket: ' + $specialWareBasket" />
 
 				<!-- ************************ search for suppliers ************************ -->
 				<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$supplyOffers" multiple="true">
 					<match_seller>
 						<match tradesknownto="this.owner"/>
 						<match owner="$priority.$supplierFactions"/>
-						<match_gate_distance object="$serveSector" min="0" max="$maxDist">
+						<match_gate_distance object="$homeSector" min="0" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
 						<!-- this next bit of mess is just blacklist handling -->
