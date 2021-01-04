@@ -3,7 +3,7 @@ name: Bug Report
 about: Create a report if you discover a bug.
 title: "[Potential Bug]: I think I found a bug!"
 labels: Bug
-assignees: bhayden53, Misunderstood-Wookiee
+assignees: bhayden53, Misunderstood-Wookiee, Galaxy-Spam
 
 ---
 
