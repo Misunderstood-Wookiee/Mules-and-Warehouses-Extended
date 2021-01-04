@@ -12,10 +12,10 @@
   </params>
   <attention min="unknown">
     <actions>
+			<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
 			<do_if value="$debugchance and $offers != null and $offers.count gt 0">
 				<!-- print headerline & count -->
 				<set_value name="$debugText" exact="''"/>
-				<debug_to_file name="$debugFileName" directory="$debugDirName" text="'----- %s (%s):'.[$headerline, $offers.count]" />
 				<!-- loop over offers and print every single one-->
 				<do_for_each name="$offer" in="$offers">
 					<do_if value="$offer.owner == $offer.seller">
@@ -31,7 +31,7 @@
 						<do_else>
 							<set_value name="$buyerName" exact="$offer.buyer.knownname"/>
 						</do_else>
-						<set_value name="$debugText" exact="'%s%s (%s) wants to buy %s %s for %s (%s)\n'.[$debugText,$buyerName, $offer.buyer.idcode, $offer.amount, $offer.ware, $offer.unitprice, $offer.relativeprice]"/>
+						<set_value name="$debugText" exact="'%s%s (%s) wants to buy %s (desired %s, offer %s, stocklevel %s) %s for %s (%s)\n'.[$debugText,$buyerName, $offer.buyer.idcode, $offer.amount, $offer.desiredamount, $offer.offeramount, $offer.stocklevel, $offer.ware, $offer.unitprice, $offer.relativeprice]"/>
 					</do_else>
 				</do_for_each>
 				<debug_to_file name="$debugFileName" directory="$debugDirName" text="$debugText" />
