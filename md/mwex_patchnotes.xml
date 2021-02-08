@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<mdscript name="MulesAndWarehousesExtended_Patchnotes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net/libraries/md.xsd">
+<mdscript name="MulesAndWarehousesExtended_Patchnotes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly/libraries/md.xsd">
   <cues>
     <cue name="MWEX_Patchnotes" instantiate="false" version="2">
       <!-- not instantiated, so triggers only once -->
