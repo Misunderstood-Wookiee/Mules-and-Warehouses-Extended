@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="2">
+<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="3">
 	<!-- Setup context menu order-->
 	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
 		<params>
@@ -53,10 +53,10 @@
 			</param>
 
 			<!-- menu option: Max Trades (Maximum trades per buy run)-->
-			<param name="maxTrades" required="false" default="5" type="number" text="Max Trades" comment="Max Trades per buy run.">
-				<input_param name="startvalue" value="5" />
+			<param name="maxTrades" required="false" default="1" type="number" text="Max Trades" comment="Max Trades per buy run.">
+				<input_param name="startvalue" value="1" />
 				<input_param name="min" value="1" />
-				<input_param name="max" value="10" />
+				<input_param name="max" value="1" />
 				<input_param name="step" value="1" />
 				<patch sinceversion="2" value="$maxtrades"/>
 			</param>
@@ -119,6 +119,11 @@
 		<!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
 		<debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %s'.[this.ship.idcode]" filter="savegame"/>
 		<edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
+	</patch>
+	<patch sinceversion="3">
+		<!-- force maxTrades to 1 since it doesn't work, and will reduce efficiency at non-1 values -->
+		<debug_text text="'PATCH: Setting maxTrades=1 for supply mule %s'.[this.ship.idcode]" filter="savegame"/>
+		<edit_order_param order="this.assignedcontrolled.order" param="'maxTrades'" value="1"/>
 	</patch>
 
 	<attention min="unknown">
