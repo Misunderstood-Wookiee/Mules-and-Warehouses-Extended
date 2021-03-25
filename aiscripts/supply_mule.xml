@@ -524,7 +524,9 @@
 				<do_if value="$supplyOffers.count">
 					<!-- some setup, repeats in every block for readability -->
 					<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
-					<set_value name="$minCargoSize" exact="($ShipCapacity)f / $maxTrades" />
+					<!-- by hacking the maxTrades to 1 we make the supply mule have some trouble finding trades, so we need to add some leniency 
+					until we can figure out a longer term solution.... which may be a cargo % slider? -->
+					<set_value name="$minCargoSize" exact="0.75*($ShipCapacity)f / $maxTrades" />
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' + $ShipCapacity" />
 
 					<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
