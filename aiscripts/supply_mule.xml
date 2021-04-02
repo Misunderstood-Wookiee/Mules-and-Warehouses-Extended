@@ -201,6 +201,7 @@
 					<param name="allowResources" value="$allowResources" />
 					<param name="allowIntermediates" value="$allowIntermediates" />
 					<param name="allowTradewares" value="$allowTradewares" />
+					<param name="lockWares" value="$lockWares" />
 					<param name="specialWareBasket" value="$specialWareBasket" />
 					<param name="maxTrades" value="$maxTrades" />
 					<param name="playerBuyMod" value="$playerBuyMod" />
