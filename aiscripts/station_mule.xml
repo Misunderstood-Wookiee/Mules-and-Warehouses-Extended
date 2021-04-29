@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="5">
+<aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="6">
 	<!-- Setup context menu order -->
 	<order id="StationMule" name="M2- Station Mule" description="Ferries supplies between stations" category="trade" infinite="true">
 		<params>
@@ -33,6 +33,8 @@
 			<param name="allowLowVol" type="bool" default="false" text="Allow Low Volumes" comment="Allow trades below 50% cargo, 80% for system trade" />
 			<!-- menu option: Make Target Warehouse (Mule turns target station into functional Trade Station like NPC, which can buy everything the source sells if used) -->
 			<param name="allowCreateTrade" type="bool" default="false" text="Make Target Warehouse" comment="Allow mules to force Target to buy all the Source sells." />
+			<!-- Internal parameter used to restart the script on version update if required -->
+			<param name="restartScript" type="internal" default="false"/>
 		</params>
 		<requires>
 			<!-- The requirements of ships in order to be eligible get this order (requirements can be skill-level requirements or ship-type requirements) -->
@@ -63,9 +65,13 @@
 		<set_value name="$debugFileName" exact="'stationmule- ' + this.ship.idcode" />
 	</init>
 
+	<patch sinceversion="6">
+		<edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
+	</patch>
+
 	<attention min="unknown">
 		<actions>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'starting log file'" append="true" output="false" />
 
 			<label name="start" />
 			<set_value name="$loops" exact="2" />
@@ -123,7 +129,7 @@
 					<wait min="50ms" max="150ms" />
 
 					<do_if value="$buyOffer == null">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+($maxSell+$reduction-1)" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  could not find buyer for min amount: '+$amount*(0.8^($reduction-1))+ ' min relative price: '+(-$maxBuyRelPrice-(($reduction)f-1.0)*$searchStep-0.001)+', max gates :'+(8+$reduction-1)" />
 						<continue />
 					</do_if>
 
@@ -141,6 +147,7 @@
 				</do_all>
 				<show_notification text="['stationmule: '+this.ship.knownname+' ('+this.ship.idcode+')', '', 'can\'t empty cargo', [$amount+' '+$currentWare, 255, 192, 126]]" sound="notification_warning" />
 				<write_to_logbook category="general" title="'stationmule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" text="'can\'t get rid of '+$amount+' '+$currentWare+' from cargo, what should I do?'" />
+				<resume label="endWait" />
 			</do_all>
 			<remove_value name="$searchStep" />
 			<remove_value name="$cargo" />
@@ -149,7 +156,7 @@
 			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'stationmule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
-				<resume label="start" />
+				<resume label="endWait" />
 			</do_if>
 
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'sourceStation: ' +$sourceStation.knownname" />
@@ -399,10 +406,13 @@
 											<!-- $cargoHauled == $targetAmount means it is the last few units needed to finish a station or drones -->
 											<set_value name="$cargoHauled" exact="[this.ship.cargo.{$supplyTarget.ware}.free,$targetAmount,$supplySource.amount].min" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'-----crazy insane logic block checking'" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  ware ' +$supplyTarget.ware" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  cargoHauled ' +$cargoHauled" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  allowLowVol ' +$allowLowVol" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  this.ship.cargo.{$supplyTarget.ware}.max / 1.25 ' +this.ship.cargo.{$supplyTarget.ware}.max / 1.25" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetAmount ' +$targetAmount" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  supplytargetDesiredAmount ' + $supplyTarget.desiredamount" />
+											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  supplytargetAmount ' + $supplyTarget.amount" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  supplyTarget owner class ' +$supplyTarget.owner.class" />
 											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  $supplyTarget.owner.cargo.{$supplyTarget.ware}.target ' +$supplyTarget.owner.cargo.{$supplyTarget.ware}.target" />
 											<do_if value="$cargoHauled gt 0 and ($allowLowVol or $cargoHauled gt (this.ship.cargo.{$supplyTarget.ware}.max / 1.25) or ($cargoHauled == $targetAmount and ($supplyTarget.owner.class == class.buildstorage or $supplyTarget.owner.cargo.{$supplyTarget.ware}.target == 0)))">
@@ -499,8 +509,10 @@
 			<remove_value name="$innerList" />
 			<remove_value name="$outerList" />
 
+			<label name="endWait" />
 			<wait min="3min" max="5min" />
 			<label name="end" />
+
 		</actions>
 	</attention>
 </aiscript>
