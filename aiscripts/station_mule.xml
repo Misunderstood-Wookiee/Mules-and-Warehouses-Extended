@@ -71,7 +71,7 @@
 
 	<attention min="unknown">
 		<actions>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'starting log file'" append="true" output="false" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'starting log file'" append="false" output="false" />
 
 			<label name="start" />
 			<set_value name="$loops" exact="2" />
@@ -335,12 +335,23 @@
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed an energy cells trade'" />
 							</do_if>
 
-							<!-- TODO: other food needs to be excluded too right? Nostrop oil, soja stuff? -->
 							<!-- exclude food & meds -->
 							<do_if value="not $incFood">
 								<do_if value="$someOuter.ware.id" exact="'foodrations'">
 									<set_value name="$wareName" exact="'NOPE'" />
 									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a food rations trade.'" />
+								</do_if>
+								<do_if value="$someOuter.ware.id" exact="'nostropoil'">
+									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a nostrop oil trade.'" />
+								</do_if>
+								<do_if value="$someOuter.ware.id" exact="'sojahusk'">
+									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a soja husk trade.'" />
+								</do_if>
+								<do_if value="$someOuter.ware.id" exact="'terranmre'">
+									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a terran mre trade.'" />
 								</do_if>
 								<do_if value="$someOuter.ware.id" exact="'medicalsupplies'">
 									<set_value name="$wareName" exact="'NOPE'" />
@@ -362,6 +373,10 @@
 									<set_value name="$wareName" exact="'NOPE'" />
 									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a majadust trade'" />
 								</do_if>
+								<do_if value="$someOuter.ware.id" exact="'stimulants'">
+									<set_value name="$wareName" exact="'NOPE'" />
+									<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed a stimulants trade'" />
+								</do_if>
 							</do_if>
 
 							<!-- Only allow illegal wares (Infected Mushroom...) -->
@@ -369,8 +384,10 @@
 								<do_if value="$someOuter.ware.id" exact="not 'spacefuel'">
 									<do_if value="$someOuter.ware.id" exact="not 'spaceweed'">
 										<do_if value="$someOuter.ware.id" exact="not 'majadust'">
-											<set_value name="$wareName" exact="'NOPE'" />
-											<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed ' +$someOuter.ware +' because its not illegal'" />
+											<do_if value="$someOuter.ware.id" exact="not 'stimulants'">
+												<set_value name="$wareName" exact="'NOPE'" />
+												<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  removed ' +$someOuter.ware +' because its not illegal'" />
+											</do_if>
 										</do_if>
 									</do_if>
 								</do_if>
