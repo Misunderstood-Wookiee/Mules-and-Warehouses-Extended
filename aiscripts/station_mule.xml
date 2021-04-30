@@ -264,6 +264,8 @@
 			</find_sell_offer>
 
 			<!-- Station Mule Routines -->
+			<!-- if interrupted during loop, will restart here -->
+			<label name="mainRoutine" />
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'----- main station mule routine'" />
 			<do_all exact="$loops" counter="$loop">
 				<do_if value="$needs.count gt 0 and $supplies.count gt 0">
