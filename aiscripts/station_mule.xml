@@ -273,9 +273,21 @@
 					<set_value name="$outerList" exact="[]" />
 					<!-- Sort Trades -->
 					<do_if value="$supplyFirstLocal">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceStation priority setting needs to innerList and supplies to outerList sorted by volume'" />
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceStation priority setting needs to innerList and supplies to outerList sorted by stocklevel descending'" />
 						<set_value name="$innerList" exact="$needs" />
-						<sort_trades name="$outerList" tradelist="$supplies" sorter="volume" />
+
+						<!-- shuffling due to advice in sort_trades docstring, and reversing list to sort descending -->
+						<shuffle_list list="$supplies" />
+						<sort_trades name="$dummyList" tradelist="$supplies" sorter="stocklevel" />
+
+						<set_value name="$outerList" exact="[]"/>
+						<do_all exact="$dummyList.count" counter="$dummy" reverse="true">
+							<append_to_list name="$outerList" exact="$dummyList.{$dummy}" />
+						</do_all>
+						<remove_value name="$dummyList" />
+						<do_all exact="$outerList.count" counter="$i">
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'    ' + $outerList.{$i}.ware + ' ' + $outerList.{$i}.volume + ' ' + $outerList.{$i}.stocklevel" />
+						</do_all>
 					</do_if>
 					<do_else>
 						<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceStation priority not set, evaluating our own priorities '" />
@@ -419,10 +431,10 @@
 										<!-- X4 treats products and resources always as tradewares... -->
 										<set_value name="$sourceIsWare" exact="$supplySource.owner.tradewares.{$supplySource.ware}.exists"/>
 
-										<set_value name="$targetIsResourceOnly" exact="$targetIsResource and (not $targetIsProduct))"/>
-										<set_value name="$targetIsProductOnly" exact="$(not targetIsResource) and ($targetIsProduct))"/>
+										<set_value name="$targetIsResourceOnly" exact="$targetIsResource and (not $targetIsProduct)"/>
+										<set_value name="$targetIsProductOnly" exact="(not $targetIsResource) and $targetIsProduct"/>
 										<set_value name="$targetIsIntermediate" exact="$targetIsResource and $targetIsProduct"/>
-										<set_value name="$targetIsWareOnly" exact="$targetIsWare and (not $targetIsResource) and (not $targetIsProduct))"/>
+										<set_value name="$targetIsWareOnly" exact="$targetIsWare and (not $targetIsResource) and (not $targetIsProduct)"/>
 
 										<!-- this value is the amount of the trade / target amount. So 1-stocklevel is effectively the current stock level of the target -->
 										<set_value name="$targetStockLevel" exact="$supplyTarget.stocklevel" />
