@@ -17,6 +17,7 @@
             <param name="lockWares" value="$order.$lockWares"/>
             <param name="specialWareBasket" value="$order.$specialWareBasket"/>
             <param name="maxTrades" value="$order.$maxTrades"/>
+            <param name="minCargoUsed" value="$order.$minCargoUsed"/>
             <param name="playerBuyMod" value="$order.$playerBuyMod"/>
             <param name="restartScript" value="$order.$restartScript"/>
             <!-- don't copy deprecated params -->
@@ -38,6 +39,7 @@
             <param name="forbidTradeAll" value="$order.$forbidTradeAll"/>
             <param name="allowLowVol" value="$order.$allowLowVol"/>
             <param name="allowCreateTrade" value="$order.$allowCreateTrade"/>
+            <param name="restartScript" value="$order.$restartScript"/>
 		</run_script>
     </do_elseif>
     <do_elseif value="$order.id == 'TravelMule'">

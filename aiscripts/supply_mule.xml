@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="3">
+<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="4">
 	<!-- Setup context menu order-->
 	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
 		<params>
@@ -59,6 +59,14 @@
 				<input_param name="max" value="1" />
 				<input_param name="step" value="1" />
 				<patch sinceversion="2" value="$maxtrades"/>
+			</param>
+
+			<param name="minCargoUsed" default="75" type="number" text="Fill Cargo Hold %" comment="The percentage of the ship's cargo hold that the trade will take up.">
+				<input_param name="startvalue" value="75" />
+				<input_param name="min" value="25" />
+				<input_param name="max" value="95" />
+				<input_param name="step" value="5" />
+				<patch sinceversion="4" value="75"/>
 			</param>
 
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
@@ -149,6 +157,7 @@
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %s'.[$lockWares]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    minCargoUsed: %s'.[$minCargoUsed]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
 
 			<do_if value="$assignHome and $home.isclass.sector">
@@ -527,7 +536,7 @@
 					<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
 					<!-- by hacking the maxTrades to 1 we make the supply mule have some trouble finding trades, so we need to add some leniency 
 					until we can figure out a longer term solution.... which may be a cargo % slider? -->
-					<set_value name="$minCargoSize" exact="0.75*($ShipCapacity)f / $maxTrades" />
+					<set_value name="$minCargoSize" exact="($minCargoUsed/100.0)*($ShipCapacity)f / $maxTrades" />
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' + $ShipCapacity" />
 
 					<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
