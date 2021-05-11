@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="stationmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="6">
 	<!-- Setup context menu order -->
-	<order id="StationMule" name="M2- Station Mule" description="Ferries supplies between stations" category="trade" infinite="true">
+	<order id="StationMule" name="{61552,2001}" description="{61552,2002}" category="trade" infinite="true">
 		<params>
 			<!-- menu option: Source Station (Define Source Station) -->
-			<param name="sourceStation" type="object" text="Source Station" comment="The source station">
+			<param name="sourceStation" type="object" text="{61552,2002}" comment="{61552,2102}">
 				<input_param name="class" value="[class.station]" />
 			</param>
 			<!-- menu option: Target Station (Defines destination target) -->
-			<param name="targetStation" type="object" text="Target Station" comment="The recipient station">
+			<param name="targetStation" type="object" text="{61552,2003}" comment="{61552,2103}">
 				<input_param name="class" value="[class.station]" />
 			</param>
 			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.) -->
-			<param name="assignSrc" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the source station if it's the players." />
+			<param name="assignSrc" type="bool" default="false" text="{61552,2004}" comment="{61552,2104}" />
 			<!-- menu option: Include Energry Wares (Inlcudes energry cells if used) -->
-			<param name="incEgry" type="bool" default="false" text="Include Energy Cells" comment="Includes energy cells in the supply" />
+			<param name="incEgry" type="bool" default="false" text="{61552,2005}" comment="{61552,2105}" />
 			<!-- menu option: Include Food & Medical Wares (Inlcudes food and medical wares if used) -->
-			<param name="incFood" type="bool" default="false" text="Include Food and Meds" comment="Includes food and meds in the supply" />
+			<param name="incFood" type="bool" default="false" text="{61552,2006}" comment="{61552,2106}" />
 			<!-- menu option: Supply First (Prioritize emptying sellers ware stocks if used) -->
-			<param name="supplyFirst" type="bool" default="false" text="Seller Priority" comment="Put the priority on emptying the seller's stocks" />
+			<param name="supplyFirst" type="bool" default="false" text="{61552,2007}" comment="{61552,2107}" />
 			<!-- menu option: Drug Free (Never trade illegal wares if used) -->
-			<param name="drugFree" type="bool" default="false" text="Never Illegal " comment="Never trades illegal wares" />
+			<param name="drugFree" type="bool" default="false" text="{61552,2008}" comment="{61552,2108}" />
 			<!-- menu option: Drugs Only (Only trade illegal wares if used) -->
-			<param name="drugsOnly" type="bool" default="false" text="Illegal Only" comment="Trade only illegal wares" />
+			<param name="drugsOnly" type="bool" default="false" text="{61552,2009}" comment="{61552,2109}" />
 			<!-- menu option: Two-way Trade (Forces trading back and forth between the stations if used) -->
-			<param name="twoWay" type="bool" default="false" text="Two-way trade" comment="Trades back and forth between stations" />
+			<param name="twoWay" type="bool" default="false" text="{61552,2010}" comment="{61552,2110}" />
 			<!-- menu option: Return Seller Priority (Forces seller priority on return if used) -->
-			<param name="twoWaySupplyFirst" type="bool" default="false" text="Return Seller Priority" comment="Seller priority on return trade" />
+			<param name="twoWaySupplyFirst" type="bool" default="false" text="{61552,2011}" comment="{61552,2111}" />
 			<!-- menu option: No player in-system trade (Forbids all trades between all player owned objects in sector when ilde if used) -->
-			<param name="forbidTradeAll" type="bool" default="false" text="No in-system trade" comment="Forbid trade between all player objects in system when idle" />
+			<param name="forbidTradeAll" type="bool" default="false" text="{61552,2012}" comment="{61552,2112}" />
 			<!-- menu option: Allow Low Volumes (Allow trades below 50% cargo capacity and below 80% cargo capacity for in-system trades if used) -->
-			<param name="allowLowVol" type="bool" default="false" text="Allow Low Volumes" comment="Allow trades below 50% cargo, 80% for system trade" />
+			<param name="allowLowVol" type="bool" default="false" text="{61552,2013}" comment="{61552,2113}" />
 			<!-- menu option: Make Target Warehouse (Mule turns target station into functional Trade Station like NPC, which can buy everything the source sells if used) -->
-			<param name="allowCreateTrade" type="bool" default="false" text="Make Target Warehouse" comment="Allow mules to force Target to buy all the Source sells." />
+			<param name="allowCreateTrade" type="bool" default="false" text="{61552,2014}" comment="{61552,2114}" />
 			<!-- Internal parameter used to restart the script on version update if required -->
 			<param name="restartScript" type="internal" default="false"/>
 		</params>
