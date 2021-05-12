@@ -61,7 +61,7 @@
 				<patch sinceversion="2" value="$maxtrades"/>
 			</param>
 
-			<param name="minCargoUsed" default="75" type="number" text="Fill Cargo Hold %" comment="The percentage of the ship's cargo hold that the trade will take up.">
+			<param name="minCargoUsed" default="75" type="number" text="{61552,4022}" comment="{61552,4122}">
 				<input_param name="startvalue" value="75" />
 				<input_param name="min" value="25" />
 				<input_param name="max" value="95" />
