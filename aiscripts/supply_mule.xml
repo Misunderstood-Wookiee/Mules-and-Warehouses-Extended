@@ -1,68 +1,76 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="2">
+<aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="4">
 	<!-- Setup context menu order-->
-	<order id="SupplyMule" name="M4- Supply Mule" description="Supplys own Stations Needs" category="trade" infinite="true">
+	<order id="SupplyMule" name="{61552,4001}" description="{61552,4101}" category="trade" infinite="true">
 		<params>
 			<!-- menu option: Home (Define Home)-->
-			<param name="home" type="object" default="this.ship.sector" text="Home Station/Sector" comment="Home">
+			<param name="home" type="object" default="this.ship.sector" text="{61552,4002}" comment="{61552,4102}">
 				<input_param name="class" value="[class.ship, class.station, class.sector]" />
 				<patch sinceversion="2" value="if $sourceStation then $sourceStation else this.ship.sector"/>
 			</param>
 			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.)-->
-			<param name="assignHome" type="bool" default="false" text="Assign Ship To Station" comment="Assign to the home station if it's the players.">
+			<param name="assignHome" type="bool" default="false" text="{61552,4003}" comment="{61552,4103}">
 				<patch sinceversion="2" value="$assignSrc"/>
 			</param>
 			<!-- menu option: Max Distance (Maximum Jumpes to buy/sell, in case of ai service only buy)-->
-			<param name="maxDist" required="false" default="this.ship.pilot.skill.piloting * 2" type="number" text="Max Jumps From Home" comment="Max gate distance to buy.">
+			<param name="maxDist" required="false" default="this.ship.pilot.skill.piloting * 2" type="number" text="{61552,4004}" comment="{61552,4104}">
 				<input_param name="startvalue" value="this.ship.pilot.skill.piloting * 2" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="this.ship.pilot.skill.piloting * 2" />
 				<input_param name="step" value="1" />
 			</param>
 			<!-- menu option: Serve Source Only (will only serve the source station if used)-->
-			<param name="dedicatedServe" type="bool" default="false" text="Serve Source Only" comment="Will only serve the configured source station" />
+			<param name="dedicatedServe" type="bool" default="false" text="{61552,4005}" comment="{61552,4105}" />
 			<!-- menu option: include player and/or ai stations as sources for supplies -->
-			<param name="allowPlayerSuppliers" type="bool" default="true" text="Allow Player Suppliers" comment="Allow buys from player stations">
+			<param name="allowPlayerSuppliers" type="bool" default="true" text="{61552,4006}" comment="{61552,4106}">
 				<patch sinceversion="2" value="true"/>
 			</param>
-			<param name="allowAiSuppliers"     type="bool" default="true" text="Allow Ai Suppliers"     comment="Allow buys from ai stations">
+			<param name="allowAiSuppliers"     type="bool" default="true" text="{61552,4007}"     comment="{61552,4107}">
 				<patch sinceversion="2" value="not $tradeWithOwn"/>
 			</param>
 
 			<!-- menu option: include buildstorage, resources, intermediates, and tradewares as possible options to supply -->
-			<param name="allowBuildstorage"  type="bool" default="true" text="Allow Buildstorage"  comment="Allow buys for buildstorage">
+			<param name="allowBuildstorage"  type="bool" default="true" text="{61552,4008}"  comment="{61552,4108}">
 				<patch sinceversion="2" value="not $producer"/>
 			</param>
-			<param name="allowResources"     type="bool" default="true" text="Allow Resources"     comment="Allow buys for resources">
+			<param name="allowResources"     type="bool" default="true" text="{61552,4009}"     comment="{61552,4109}">
 				<patch sinceversion="2" value="not $builder"/>
 			</param>
-			<param name="allowIntermediates" type="bool" default="true" text="Allow Intermediates" comment="Allow buys for intermediates">
+			<param name="allowIntermediates" type="bool" default="true" text="{61552,4010}" comment="{61552,4110}">
 				<patch sinceversion="2" value="not $builder"/>
 			</param>
-			<param name="allowTradewares"    type="bool" default="true" text="Allow Tradewares"    comment="Allow buys for tradewares">
+			<param name="allowTradewares"    type="bool" default="true" text="{61552,4011}"    comment="{61552,4111}">
 				<patch sinceversion="2" value="not $builder"/>
 			</param>
 
 			<!-- lock wares to player selection -->
-			<param name="lockWares"            type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
+			<param name="lockWares"            type="bool" default="false" text="{61552,4012}" comment="{61552,4112}" />
 
 			<!-- menu option: WareBasket List-->
-			<param name="specialWareBasket"    type="list" default="[]"    text="Wares (all by default)"       comment="Warebasket">
+			<param name="specialWareBasket"    type="list" default="[]"    text="{61552,4013}"       comment="{61552,4113}">
 				<input_param name="type"     value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
 
 			<!-- menu option: Max Trades (Maximum trades per buy run)-->
-			<param name="maxTrades" required="false" default="5" type="number" text="Max Trades" comment="Max Trades per buy run.">
-				<input_param name="startvalue" value="5" />
+			<param name="maxTrades" required="false" default="1" type="number" text="{61552,4014}" comment="{61552,4114}">
+				<input_param name="startvalue" value="1" />
 				<input_param name="min" value="1" />
-				<input_param name="max" value="10" />
+				<input_param name="max" value="1" />
 				<input_param name="step" value="1" />
 				<patch sinceversion="2" value="$maxtrades"/>
 			</param>
 
+			<param name="minCargoUsed" default="75" type="number" text="{61552,4022}" comment="{61552,4122}">
+				<input_param name="startvalue" value="75" />
+				<input_param name="min" value="25" />
+				<input_param name="max" value="95" />
+				<input_param name="step" value="5" />
+				<patch sinceversion="4" value="75"/>
+			</param>
+
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
-			<param name="playerBuyMod" default="100" type="number" text="Player Buy Mod" comment="Owned Station Buy price adjustment, 0=ignore manager price 100= Obey Station Manager's buy offer.">
+			<param name="playerBuyMod" default="100" type="number" text="{61552,4015}" comment="{61552,4115}">
 				<input_param name="startvalue" value="100" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="100" />
@@ -72,12 +80,12 @@
 			<!-- Internal parameter used to restart the script on version update if required -->
 			<param name="restartScript" type="internal" default="false"/>
 			<!-- Old deprecated parameters, see patch version 2 below -->
-			<param name="tradeWithOwn"  type="internal" default="null" text="Player Suppliers Only" comment="Buys from player stations only" />
-			<param name="builder"       type="internal" default="null" text="Build Storage ONLY"    comment="Will wait for build storage needs instead of finding something to do" />
-			<param name="producer"      type="internal" default="null" text="Factory Supply ONLY"   comment="Will look to supply only factories with products" />
-			<param name="sourceStation" type="internal" default="null" text="Home Station/Sector"   comment="The source station"/>
-			<param name="assignSrc"     type="internal" default="false" text="Assign Ship To Station" comment="Assign to the home station if it's the players." />
-			<param name="maxtrades"     type="internal" required="false" default="5" text="Max Trades" comment="Max Trades per buy run."/>
+			<param name="tradeWithOwn"  type="internal" default="null" text="{61552,4016}" comment="{61552,4116}" />
+			<param name="builder"       type="internal" default="null" text="{61552,4017}"    comment="{61552,4117}" />
+			<param name="producer"      type="internal" default="null" text="{61552,4018}"   comment="{61552,4118}" />
+			<param name="sourceStation" type="internal" default="null" text="{61552,4019}"   comment="{61552,4119}"/>
+			<param name="assignSrc"     type="internal" default="false" text="{61552,4020}" comment="{61552,4120}" />
+			<param name="maxtrades"     type="internal" required="false" default="5" text="{61552,4021}" comment="{61552,4121}"/>
 		</params>
 		<requires>
 			<match shiptype="shiptype.lasertower" negate="true" />
@@ -120,13 +128,19 @@
 		<debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %s'.[this.ship.idcode]" filter="savegame"/>
 		<edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
 	</patch>
+	<patch sinceversion="3">
+		<!-- force maxTrades to 1 since it doesn't work, and will reduce efficiency at non-1 values -->
+		<debug_text text="'PATCH: Setting maxTrades=1 for supply mule %s'.[this.ship.idcode]" filter="savegame"/>
+		<edit_order_param order="this.assignedcontrolled.order" param="'maxTrades'" value="1"/>
+	</patch>
 
 	<attention min="unknown">
 		<actions>
 			<label name="start" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="true"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'Entity (this): %s'.[this]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'AssignedControlled: %s (%s) - %s'.[this.assignedcontrolled.knownname, this.assignedcontrolled.idcode, this.assignedcontrolled]" />
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Entity (this): %s'.[this]"/>
 
 			<!-- Dump Mule Settings -->
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
@@ -143,6 +157,7 @@
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %s'.[$lockWares]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    minCargoUsed: %s'.[$minCargoUsed]"/>
 			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
 
 			<do_if value="$assignHome and $home.isclass.sector">
@@ -157,13 +172,11 @@
 			<remove_from_list name="$aiFactions" exact="faction.player"/>
 			<set_value name="$playerFactions" exact="[faction.player]"/>
 
-			<!-- Determine where we serve and whom -->
-			<set_value name="$serveStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
-			<set_value name="$serveSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
-			<set_value name="$serveFactions" exact="if ($serveStationOrShip and $home.owner != faction.player) then $aiFactions else $playerFactions"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Station or Ship: %s'.[if $serveStationOrShip then $serveStationOrShip.knownname else '-',if $serveStationOrShip then $serveStationOrShip.idcode else '-']"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Sector: %s'.[$serveSector.knownname]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Serving Factions: %s'.[$serveFactions]"/>
+			<!-- Determine where we assigned to -->
+			<set_value name="$homeStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
+			<set_value name="$homeSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Station or Ship: %s'.[if $homeStationOrShip then $homeStationOrShip.knownname else '-',if $homeStationOrShip then $homeStationOrShip.idcode else '-']"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Sector: %s'.[$homeSector.knownname]"/>
 
 
 			<!--here we want to copy settings to subordinates-->
@@ -184,7 +197,7 @@
 					</do_if>
 				</do_if>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    copying default behavior'"/>
-				<remove_object_commander object="$subordinate" />
+<!--				<remove_object_commander object="$subordinate" />-->
 				<create_order object="$subordinate" default="true" id="'SupplyMule'">
 					<!-- Note: we changed the default orders, therefore civilian fleets needs an update -->
 					<param name="home" value="$home" />
@@ -197,6 +210,7 @@
 					<param name="allowResources" value="$allowResources" />
 					<param name="allowIntermediates" value="$allowIntermediates" />
 					<param name="allowTradewares" value="$allowTradewares" />
+					<param name="lockWares" value="$lockWares" />
 					<param name="specialWareBasket" value="$specialWareBasket" />
 					<param name="maxTrades" value="$maxTrades" />
 					<param name="playerBuyMod" value="$playerBuyMod" />
@@ -250,7 +264,7 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="$logbookEntryTitle" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100.0" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
 						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'  trade created'" />
 						<resume label="end" />
@@ -267,7 +281,7 @@
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
 
-			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
+			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
@@ -281,11 +295,42 @@
 			<!-- It's an ordered tasklist of what out mule should try to do first  -->
 			<create_list name="$prioritylist" />
 			<!-- ************************ supply mule logic ************************ -->
-			<!-- $buyFrom: list of factions -->
+			<!-- Serve order
+				if player station
+   					serve player station
+   					serve player sector
+					serve player area
+				if ai station
+   					serve ai station
+   					serve ai sector
+				if sector
+   					serve player sector
+   					serve player area
+   			-->
+			<!-- Dedicated serve: only serve assigned home, whether its a station or sector -->
+			<!-- Serve order: buildstorage -> resources -> intermediates -> tradewares -->
+			<!-- Dedicated player's builder mode. Activated by: * selected allow build storage only; * selected station or sector as home. When active - an evaluation of trade offers is perfomed by a fill level algorithm instead of a best profit. -->
+
+			<!-- $supplierFactions: list of factions -->
 			<!-- $serve: 'station', 'sector', 'area' -->
 			<!-- $type: 'buildstorage', 'tradewares', 'resources', 'products' -->
 			<!-- Cases: -->
-			<do_if value="$serveStationOrShip">
+
+			<set_value name="$isServingStationOrShip" exact="if ($homeStationOrShip != null) then true else false"/>
+			<set_value name="$isServingSector" exact="if (($home.isclass.sector and $dedicatedServe) or ($home.isclass.{[class.ship, class.station]} and not $dedicatedServe)) then true else false"/>
+			<set_value name="$isServingPlayer" exact="(not $isServingStationOrShip) or ($homeStationOrShip.owner == faction.player)" />
+			<set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions else $aiFactions" />
+			<set_value name="$isServingArea" exact="$isServingPlayer and (not $dedicatedServe)" />
+			<set_value name="$isDedicatedPlayerBuilder" exact="$isServingPlayer and $allowBuildstorage and (not $allowResources) and (not $allowIntermediates) and (not $allowTradewares)" />
+
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingStationOrShip: %s'.[$isServingStationOrShip]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingSector: %s'.[$isServingSector]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingPlayer: %s'.[$isServingPlayer]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    serveFactions: %s'.[$serveFactions]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingArea: %s'.[$isServingArea]"/>
+			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isDedicatedPlayerBuilder: %s'.[$isDedicatedPlayerBuilder]"/>
+
+			<do_if value="$isServingStationOrShip">
 				<!-- Serve Station -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'buildstorage' ]" />
@@ -298,7 +343,7 @@
 			</do_if>
 
 			<!-- Serve Sector -->
-			<do_if value="$serveSector or (not $dedicatedServe)">
+			<do_if value="$isServingSector">
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
@@ -309,7 +354,7 @@
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
 			</do_if>
 
-			<do_if value="($serveFactions == $playerFactions) and (not $dedicatedServe)">
+			<do_if value="$isServingArea">
 				<!-- Serve player area -->
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
 				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
@@ -362,7 +407,7 @@
 					<!-- CASE: station/ship -->
 					<!-- Note: by default the game treats buildstorage and the station as two seperate components. -->
 					<!-- Buyoffers from buildstorage will not show up at the station and vice versa -->
-					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $serveStationOrShip"/>
+					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $homeStationOrShip"/>
 					<set_value name="$buyer" exact="if (($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)) then $currentlyServing.buildstorage else $currentlyServing"/>
 					<!-- buyoffer search -->
 					<find_buy_offer tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
@@ -372,7 +417,7 @@
 					<!-- $classes (buildstorage) -->
 					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
 					<!-- buyoffer search -->
-					<find_buy_offer space="$serveSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
+					<find_buy_offer space="$homeSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
 						<match_buyer>
 							<match tradesknownto="this.owner"/>
 							<match class="$serveClass"/>
@@ -390,7 +435,7 @@
 						<match_buyer>
 							<match class="$serveClass"/>
 							<match owner="$serveFactions"/>
-							<match_gate_distance object="$serveSector" min="0" max="$maxDist">
+							<match_gate_distance object="$homeSector" min="0" max="$maxDist">
 								<blacklist group="blacklistgroup.civilian" object="this.ship" />
 							</match_gate_distance>
 							<!-- this next bit of mess is just blacklist handling -->
@@ -411,10 +456,10 @@
 					<create_list name="$filteredNeeds" />
 					<!-- Check for every need if it fullfills the requirement and add -->
 					<do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
-						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists"/>
+						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists or $need.owner.supplyresources.{$need.ware}.exists"/>
 						<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
 						<!-- X4 treats products and resources always as tradewares... -->
-						<set_value name="$isWare" exact="$need.owner.resources.{$need.ware}.exists"/>
+						<set_value name="$isWare" exact="$need.owner.tradewares.{$need.ware}.exists"/>
 						<do_if value="
 								 ($priority.$type == 'resources'     and $isResource and (not $isProduct)) or
 								 ($priority.$type == 'intermediates' and $isResource and $isProduct) or
@@ -454,13 +499,14 @@
 						<append_to_list name="$specialWareBasket" exact="$ware" />
 					</do_for_each>
 				</do_if>
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'specialWareBasket: ' + $specialWareBasket" />
 
 				<!-- ************************ search for suppliers ************************ -->
 				<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$supplyOffers" multiple="true">
 					<match_seller>
 						<match tradesknownto="this.owner"/>
 						<match owner="$priority.$supplierFactions"/>
-						<match_gate_distance object="$serveSector" min="0" max="$maxDist">
+						<match_gate_distance object="$homeSector" min="0" max="$maxDist">
 							<blacklist group="blacklistgroup.civilian" object="this.ship" />
 						</match_gate_distance>
 						<!-- this next bit of mess is just blacklist handling -->
@@ -488,7 +534,9 @@
 				<do_if value="$supplyOffers.count">
 					<!-- some setup, repeats in every block for readability -->
 					<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
-					<set_value name="$minCargoSize" exact="$ShipCapacity / $maxTrades" />
+					<!-- by hacking the maxTrades to 1 we make the supply mule have some trouble finding trades, so we need to add some leniency 
+					until we can figure out a longer term solution.... which may be a cargo % slider? -->
+					<set_value name="$minCargoSize" exact="($minCargoUsed/100.0)*($ShipCapacity)f / $maxTrades" />
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' + $ShipCapacity" />
 
 					<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
@@ -509,7 +557,7 @@
 							<return/>
 						</do_if>
 
-						<do_if value="$occupiedCargo + $minCargoSize / 2 ge $ShipCapacity">
+						<do_if value="$occupiedCargo + $minCargoSize / 2.0 ge $ShipCapacity">
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, skip to end'" />
 							<!-- cargo full, skip to end -->
 							<resume label="end"/>
@@ -533,6 +581,7 @@
 							<param name="debugchance" value="$debugchance"/>
 							<param name="debugFileName" value="$debugFileName"/>
 							<param name="debugDirName" value="$debugDirName"/>
+							<param name="dedicatedPlayerBuilder" value="$isDedicatedPlayerBuilder" />
 							<save_retval name="bestProfit" variable="$bestProfit"/>
 							<save_retval name="bestAmount" variable="$bestAmount"/>
 							<save_retval name="bestNeedTrade" variable="$bestNeedTrade"/>
@@ -547,7 +596,7 @@
 						</do_if>
 
 						<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-							<set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
+							<set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of %s.'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
 							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$tradeText" />
 							<write_to_logbook category="upkeep"  object="this.ship" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="$tradeText" />
 

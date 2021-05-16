@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="travelmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4libonline.ddns.net\libraries\aiscripts.xsd" version="2">
+<aiscript name="travelmule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="2">
 	<!-- Setup context menu order -->
-	<order id="TravelMule" name="M1- Travel Mule" description="Ferries supplies between stations" category="trade" infinite="true">
+	<order id="TravelMule" name="{61552,1001}" description="{61552,1101}" category="trade" infinite="true">
 		<params>
 			<!-- menu option: Source Station (Define Source Station) -->
-			<param name="sourceStation" required="false" default="null" type="object" text="Source Station" comment="The source station">
+			<param name="sourceStation" required="false" default="null" type="object" text="{61552,1002}" comment="{61552,1102}">
 				<input_param name="class" value="[class.station]" />
 			</param>
 			<!-- menu option: Max Gate Distance -->
-			<param name="maxDist" required="false" default="8" type="number" text="Max Jumps" comment="Max Gate Distance to sell.">
+			<param name="maxDist" required="false" default="8" type="number" text="{61552,1003}" comment="{61552,1103}">
 				<input_param name="startvalue" value="15" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="15" />
 				<input_param name="step" value="1" />
 			</param>
 			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
-			<param name="profitMargin" default="90" type="number" text="Profit Override" comment="Owned Station Buy price adjustment, 0=Sell all wares regardless of trade offer price. 100= Obey Station Manager's buy offer.">
+			<param name="profitMargin" default="90" type="number" text="{61552,1004}" comment="{61552,1104}">
 				<input_param name="startvalue" value="90" />
 				<input_param name="min" value="0" />
 				<input_param name="max" value="100" />
 				<input_param name="step" value="5" />
 			</param>
 			<!-- lock wares to player selection -->
-			<param name="lockWares" type="bool" default="false" text="Lock Wares to User Selection" comment="Locks the Users ware selection, otherwise we need to wipe it each time we call the script" />
+			<param name="lockWares" type="bool" default="false" text="{61552,1005}" comment="{61552,1105}" />
 			<!-- menu option: WareBasket List -->
-			<param name="specialWareBasket" required="false" default="[]" type="list" text="Wares (all by default)" comment="Which Wares to consider in the trade.">
+			<param name="specialWareBasket" required="false" default="[]" type="list" text="{61552,1006}" comment="{61552,1106}">
 				<input_param name="type" value="'ware'" />
 				<input_param name="cancarry" value="this.ship" />
 			</param>
 			<!-- menu option: Cargo Percentage Used for Trade -->
-			<param name="minCargoUsed" default="80" type="number" text="Fill Cargo Hold %" comment="The percentage of the ship's cargo hold that the trade will take up.">
+			<param name="minCargoUsed" default="80" type="number" text="{61552,1007}" comment="{61552,1107}">
 				<input_param name="startvalue" value="80" />
 				<input_param name="min" value="25" />
 				<input_param name="max" value="95" />
@@ -37,12 +37,12 @@
 			</param>
 
 			<!-- menu option: Target NPC Shipyards, Whalfs, Equipment Docks -->
-			<param name="tradeWithBig" required="false" type="bool" default="false" text="Target NPC Shipyards" comment="Assign to trade with all NPC shipyards, wharfs, and equip docks." />
+			<param name="tradeWithBig" required="false" type="bool" default="false" text="{61552,1008}" comment="{61552,1108}" />
 			<!-- menu option: Target All NPC Stations (trade with any station toggle) -->
-			<param name="tradeWithAll" required="false" type="bool" default="true" text="Target All NPC Stations" comment="Assign to trade with all NPC stations." />
+			<param name="tradeWithAll" required="false" type="bool" default="true" text="{61552,1009}" comment="{61552,1109}" />
 
 			<!-- menu option: Destination Override (select stations manually to visit) -->
-			<param name="destList" required="false" default="[]" type="list" text="Custom Stop List (Replaces 'Target' Options)" comment="Manually choose Points to visit.">
+			<param name="destList" required="false" default="[]" type="list" text="{61552,1010}" comment="{61552,1110}">
 				<input_param name="type" value="'object'" />
 			</param>
 		</params>
@@ -142,7 +142,7 @@
 					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  found buyer: ownername: '+$buyOffer.owner.knownname+'('+$buyOffer.owner.owner.knownname+'), unitprice: '+$buyOffer.unitprice+', amount: '+$buyOffer.amount+', relative price: '+$buyOffer.relativeprice+', totalprice: '+$buyOffer.price+', sector: '+$buyOffer.owner.sector.knownname+', gates from this ship: '+$buyOffer.owner.gatedistance.{this.ship}+', gates from home (from ship if not homebound): '+$buyOffer.owner.gatedistance.{this.ship}+'. selling amount: '+$amount" />
 
 					<do_if value="$buyOffer.available">
-						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100" />
+						<write_to_logbook category="general" title="'TravelMule: '+this.ship.knownname+' ( '+this.ship.idcode+' )'" interaction="showonmap" object="this.ship" money="$buyOffer.unitprice*$amount" text="'Selling '+$amount+' '+$currentWare+', unitprice: '+$buyOffer.unitprice/100.0" />
 						<create_trade_order object="this.ship" amount="$amount" tradeoffer="$buyOffer" />
 						<debug_to_file name="$debugFileName" directory="$debugDirName" text="'  trade created'" />
 						<resume label="end" />
@@ -156,7 +156,7 @@
 			<remove_value name="$cargo" />
 			<remove_value name="$buyOffer" />
 
-			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10)">
+			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="'TravelMule'" text="'  cargo is full =('" />
 				<wait min="50ms" max="150ms" />
 				<resume label="start" />
@@ -439,16 +439,18 @@
 								</do_elseif>
 
 								<set_value name="$cargoHauled" exact="[this.ship.cargo.{$someInner.ware}.free,$targetAmount,$someOuter.amount].min" />
-								<set_value name="$currentProfit" exact="$cargoHauled * ($someInner.unitprice - $someOuter.unitprice*$profitMargin/100)" />
+								<set_value name="$currentProfit" exact="$cargoHauled * ($someInner.unitprice - $someOuter.unitprice*$profitMargin/100.0)" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'----' + player.age" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'cargoHauled: ' +$cargoHauled" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'buyer.unitprice: ' +$someInner.unitprice" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'seller.unitprice: ' +$someOuter.unitprice" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'currentProfit: ' +$currentProfit" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'bestProfit: ' +$bestProfit" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'minCargoUsed/100.0: ' +($minCargoUsed)f/100.0" output="false" append="true" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'minCargoUsed: ' +$minCargoUsed" output="false" append="true" />
 								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'this.ship.cargo.ware.max div 1.25: ' +this.ship.cargo.{$someInner.ware}.max / 1.25" output="false" append="true" />
 
-								<do_if value="($currentProfit gt $bestProfit) and ($cargoHauled/(this.ship.cargo.{$someInner.ware}.max)) gt $minCargoUsed/100">
+								<do_if value="($currentProfit gt $bestProfit) and (($cargoHauled)f/(this.ship.cargo.{$someInner.ware}.max)) gt $minCargoUsed/100.0">
 									<set_value name="$supplyTarget" exact="$someInner" />
 									<set_value name="$bestCargo" exact="$cargoHauled" />
 									<set_value name="$bestProfit" exact="$currentProfit" />
@@ -464,18 +466,18 @@
 						<do_if value="$needFound">
 							<do_if value="$supplySource.owner.owner == this.ship.owner">
 								<set_value name="$currentProfit" exact="$bestCargo * $supplyTarget.unitprice" />
-								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100" />
 
 								<!-- Debug: Print profit stats to logfile -->
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at -- (player owned) to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100.0" />
 
 							</do_if>
 							<do_else>
 								<set_value name="$currentProfit" exact="$bestCargo * ($supplyTarget.unitprice - $supplySource.unitprice)" />
-								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<write_to_logbook category="upkeep" title="'Travel Mule: '+this.ship.knownname" interaction="showonmap" object="this.ship" money="$currentProfit" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100.0 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100.0" />
 
 								<!-- Debug: Print profit stats to logfile -->
-								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100 + ' for a profit of ' +$currentProfit/100" />
+								<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Buying ' +$bestCargo + ' ' +$supplySource.ware + ' from ' +$supplySource.seller.knownname + ' at ' +$supplySource.unitprice/100.0 + ' to sell to ' + $supplyTarget.buyer.knownname + ' at ' +$supplyTarget.unitprice/100.0 + ' for a profit of ' +$currentProfit/100.0" />
 
 							</do_else>
 
