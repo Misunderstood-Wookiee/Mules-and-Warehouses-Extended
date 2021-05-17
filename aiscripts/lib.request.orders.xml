@@ -29,7 +29,7 @@ Now possible to assign Mules to station with assignment="assignment.trade" while
 
             Overall, this has the effect of checking if the ship is running our Mules command
         -->
-        <do_if value="global.$mwex_AllMulesCommandTags.indexof.{$object.defaultorder.id}">
+        <do_if value="global.$mwex_AllMulesCommandTags.indexof.{$object.defaultorder?.id}">
             <set_value name="$flag_mwex_shipismule" exact="false" comment="Actual value not important; we simply need this variable to be here" />
         </do_if>
     </add>
