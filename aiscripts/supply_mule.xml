@@ -214,6 +214,7 @@
 					<param name="specialWareBasket" value="$specialWareBasket" />
 					<param name="maxTrades" value="$maxTrades" />
 					<param name="playerBuyMod" value="$playerBuyMod" />
+					<param name="minCargoUsed" value="$minCargoUsed" />
 				</create_order>
 				<wait min="50ms" max="150ms" />
 			</do_for_each>
