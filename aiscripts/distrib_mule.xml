@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<aiscript name="distrimule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="1">
+<aiscript name="distrimule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="2">
 	<!-- Setup context menu order-->
 	<order id="DistriMule" name="{61552,3001}" description="{61552,3101}" category="trade" infinite="true">
 		<params>
 			<!-- menu option: Source Warehouse (Define Source Station)-->
 			<param name="sourceStation" required="false" default="null" type="object" text="{61552,3002}" comment="{61552,3102}">
 				<input_param name="class" value="[class.station]" />
+			</param>
+			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.) -->
+			<param name="assignSrc" type="bool" default="true" text="{61552,2004}" comment="{61552,2104}">
+				<patch sinceversion="1" value="true"/>
 			</param>
 			<!-- menu option: Min Storage-->
 			<param name="minStorage" required="false" default="20" type="number" text="{61552,3003}" comment="{61552,3103}">
@@ -61,7 +65,7 @@
 		<set_value name="$object" exact="this.assignedcontrolled" />
 		<set_order_syncpoint_reached order="this.ship.order" />
 		<set_command_action commandaction="commandaction.searchingtrades" />
-		<do_if value="($sourceStation.owner == this.ship.owner)">
+		<do_if value="($sourceStation.owner == this.ship.owner) and ($assignSrc)">
 			<set_object_commander object="this.ship" commander="$sourceStation" assignment="assignment.trade" />
 		</do_if>
 	</init>
