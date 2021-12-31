@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<content id="ws_2013772865" name="Mules, Supply and Warehouses Extended" description="Mules Extended, A derived work upon an original empire supply chain concept.. Credited too LegionOfOne, Ramokthan." author="MoistDreams, BHayden53, Galaxy Spam" version="636" date="2021-10-04" save="0" lastupdate="1633276077" sync="true">
+<content id="ws_2013772865" name="Mules, Supply and Warehouses Extended" description="Mules Extended, A derived work upon an original empire supply chain concept. Credited to LegionOfOne, Ramokthan." author="MoistDreams, BHayden53, Galaxy Spam" version="636" date="2021-10-04" save="0" lastupdate="1633276077" sync="true">
   <text language="7" name="Мул, снабжение и складские помещения расширены" description="Расширенные мулы, производная работа над оригинальной концепцией цепочки поставок империи." author="MoistDreams, BHayden53, Galaxy Spam"/>
   <text language="33" name="Extension des mules, des fournitures et des entrepôts" description="Mules Extended, un travail dérivé d'un concept original de chaîne d'approvisionnement de l'empire." author="MoistDreams, BHayden53, Galaxy Spam"/>
   <text language="34" name="Mulas, Abastecimiento y Almacenes Ampliados" description="Mules Extended, un trabajo derivado de un concepto de cadena de suministro del imperio original." author="MoistDreams, BHayden53, Galaxy Spam"/>
@@ -9,6 +9,6 @@
   <text language="55" name="Muli, supplementum et Warehouses Fundo" description="Muli lateque dispersum, quo trahitur originale opus copia catena imperio rationis." author="MoistDreams, BHayden53, Galaxy Spam"/>
   <text language="81" name="ラバ、供給および倉庫の拡張" description="Mules Extended、元の帝国のサプライチェーンの概念に基づいた派生物。" author="MoistDreams, BHayden53, Galaxy Spam"/>
   <text language="82" name="노새, 공급 및 창고 확장" description="Mules Extended, 원래 제국 공급망 개념을 기반으로 한 파생 작업." author="MoistDreams, BHayden53, Galaxy Spam"/>
-  <text language="86" name="子，补给和仓库扩展" description="穆勒扩展（Mules Extended），是基于原始帝国供应链概念的衍生作品." author="MoistDreams, BHayden53, Galaxy Spam"/>
-  <text language="88" name="প্রসারণ, সরবরাহ এবং গুদামগুলি প্রসারিত" description="মেলস প্রসারিত, একটি মূল সাম্রাজ্য সরবরাহ চেইন ধারণার উপর ভিত্তি করে তৈরি একটি কাজ।" author="MoistDreams, BHayden53, Galaxy Spam"/>
+  <text language="86" name="骡子，补给和仓库扩展" description="穆勒扩展（Mules Extended），是基于原始帝国供应链概念的衍生作品." author="MoistDreams, BHayden53, Galaxy Spam"/>
+  <text language="88" name="騾子、供應鍵和倉庫廷伸" description="騾子廷伸(Mules Extended)，是一個基於原創的帝國供應鍵概念的衍生作品。" author="MoistDreams, BHayden53, Galaxy Spam"/>
 </content>
