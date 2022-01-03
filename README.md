@@ -70,7 +70,7 @@ In general, the mule prioritizes build storage, then production needs, then inte
 - **Assign Ship To Station** - assigns the ship as a subordinate with the trader role. Serves no functional purpose except convenience.
 - **Max Jumps From Home** - Maximum distance from home to serve stations as supplier and to source supplies. This is based on pilot skill.
 - **Serve Source Only** - will only supply the station / sector that is set.
-- **Allow Player / AI Suppliers** - allow mule to buy wares from player / AI stations.
+- **Gather Player / AI Faction** - allow mule to buy wares from player / AI stations.
 - **Allow Buildstorage / Resources / Intermediates / Tradewares** - allow mule to supply the stations build storage / resources / intermediates / tradewares
 - **Lock Wares to User Selection** - If you choose specific wares, you need to check this option for your choices to stick across trade runs. Otherwise the script populates the list on the UI with the needs that it found when searching for things to do.
 - **Warebasket** - Wares the mule trades with (if not locked, will be autopopulated and updated by the script with all wares of the station to supply)
