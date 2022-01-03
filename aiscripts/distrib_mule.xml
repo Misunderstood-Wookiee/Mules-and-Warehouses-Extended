@@ -9,7 +9,7 @@
 			</param>
 			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.) -->
 			<param name="assignSrc" type="bool" default="true" text="{61552,2004}" comment="{61552,2104}">
-				<patch sinceversion="1" value="true"/>
+				<patch sinceversion="2" value="true"/>
 			</param>
 			<!-- menu option: Min Storage-->
 			<param name="minStorage" required="false" default="20" type="number" text="{61552,3003}" comment="{61552,3103}">
