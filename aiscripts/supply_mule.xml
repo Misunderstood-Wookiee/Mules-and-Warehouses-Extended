@@ -202,7 +202,7 @@
 					<!-- Note: we changed the default orders, therefore civilian fleets needs an update -->
 					<param name="home" value="$home" />
 					<param name="maxDist" value="[$subordinate.pilot.skill.piloting * 2, $maxDist].min" />
-					<param name="assignHome" value="$assignHome" />
+					<param name="assignHome" value="false" />
 					<param name="dedicatedServe" value="$dedicatedServe" />
 					<param name="allowPlayerSuppliers" value="$allowPlayerSuppliers" />
 					<param name="allowAiSuppliers" value="$allowAiSuppliers" />
