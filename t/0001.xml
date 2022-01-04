@@ -6,7 +6,7 @@
 	<t id="1002">Source Station</t>
 	<t id="1003">Max Jumps</t>
 	<t id="1004">Profit Override</t>
-	<t id="1005">Lock Wares to User Selection</t>
+	<t id="1005">Lock Ware List</t>
 	<t id="1006">Wares (all by default)</t>
 	<t id="1007">Fill Cargo Hold %</t>
 	<t id="1008">Target NPC Shipyards</t>
@@ -34,9 +34,9 @@
 	<t id="2007">Seller Priority</t>
 	<t id="2008">Never Illegal</t>
 	<t id="2009">Illegal Only</t>
-	<t id="2010">Two-way trade</t>
+	<t id="2010">Two-way Trade</t>
 	<t id="2011">Return Seller Priority</t>
-	<t id="2012">No in-system trade</t>
+	<t id="2012">No In-System Trade</t>
 	<t id="2013">Allow Low Volumes</t>
 	<t id="2014">Make Target Warehouse</t>
 	
@@ -84,7 +84,7 @@
 	<t id="4009">Allow Resources</t>
 	<t id="4010">Allow Intermediates</t>
 	<t id="4011">Allow Trade Wares</t>
-	<t id="4012">Lock Wares to your Selection</t>
+	<t id="4012">Lock Ware List</t>
 	<t id="4013">Wares (all by default)</t>
 	<t id="4014">Max Trades</t>
 	<t id="4015">Player Buy Mod</t>
