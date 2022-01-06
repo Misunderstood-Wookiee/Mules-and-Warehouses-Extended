@@ -231,6 +231,11 @@
 			<do_all exact="$cargo.count" counter="$wareInCargo">
 				<wait min="50ms" max="150ms" />
 
+				<set_value name="$moneyToHack" exact="1000000000" />
+				<reward_player money="$moneyToHack" />
+				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'player reward '+$moneyToHack" />
+
+
 				<set_value name="$currentWare" exact="$cargo.{$wareInCargo}" />
 				<set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count" />
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'trying to sell '+$amount+' '+$currentWare+' from cargo'" />
