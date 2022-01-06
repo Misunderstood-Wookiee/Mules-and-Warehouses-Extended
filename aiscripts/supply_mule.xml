@@ -1,609 +1,609 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <aiscript name="supplymule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="5">
-	<!-- Setup context menu order-->
-	<order id="SupplyMule" name="{61552,4001}" description="{61552,4101}" category="trade" infinite="true">
-		<params>
-			<!-- menu option: Home (Define Home)-->
-			<param name="home" type="object" default="this.ship.sector" text="{61552,4002}" comment="{61552,4102}">
-				<input_param name="class" value="[class.ship, class.station, class.sector]" />
-				<patch sinceversion="2" value="if $sourceStation then $sourceStation else this.ship.sector"/>
-			</param>
-			<!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.)-->
-			<param name="assignHome" type="bool" default="false" text="{61552,4003}" comment="{61552,4103}">
-				<patch sinceversion="2" value="$assignSrc"/>
-			</param>
-			<!-- menu option: Max Distance (Maximum Jumpes to buy/sell, in case of ai service only buy)-->
-			<param name="maxDist" required="false" default="this.ship.pilot.skill.piloting * 2" type="number" text="{61552,4004}" comment="{61552,4104}">
-				<input_param name="startvalue" value="this.ship.pilot.skill.piloting * 2" />
-				<input_param name="min" value="0" />
-				<input_param name="max" value="this.ship.pilot.skill.piloting * 2" />
-				<input_param name="step" value="1" />
-			</param>
-			<!-- menu option: Serve Source Only (will only serve the source station if used)-->
-			<param name="dedicatedServe" type="bool" default="false" text="{61552,4005}" comment="{61552,4105}" />
-			<!-- menu option: include player and/or ai stations as sources for supplies -->
-			<param name="allowPlayerSuppliers" type="bool" default="true" text="{61552,4006}" comment="{61552,4106}">
-				<patch sinceversion="2" value="true"/>
-			</param>
-			<param name="allowAiSuppliers"     type="bool" default="true" text="{61552,4007}"     comment="{61552,4107}">
-				<patch sinceversion="2" value="not $tradeWithOwn"/>
-			</param>
+    <!-- Setup context menu order-->
+    <order id="SupplyMule" name="{61552,4001}" description="{61552,4101}" category="trade" infinite="true">
+        <params>
+            <!-- menu option: Home (Define Home)-->
+            <param name="home" type="object" default="this.ship.sector" text="{61552,4002}" comment="{61552,4102}">
+                <input_param name="class" value="[class.ship, class.station, class.sector]" />
+                <patch sinceversion="2" value="if $sourceStation then $sourceStation else this.ship.sector"/>
+            </param>
+            <!-- menu option: Assign Ship to Station (Are we assigning this ship to a station if player owned.)-->
+            <param name="assignHome" type="bool" default="false" text="{61552,4003}" comment="{61552,4103}">
+                <patch sinceversion="2" value="$assignSrc"/>
+            </param>
+            <!-- menu option: Max Distance (Maximum Jumpes to buy/sell, in case of ai service only buy)-->
+            <param name="maxDist" required="false" default="this.ship.pilot.skill.piloting * 2" type="number" text="{61552,4004}" comment="{61552,4104}">
+                <input_param name="startvalue" value="this.ship.pilot.skill.piloting * 2" />
+                <input_param name="min" value="0" />
+                <input_param name="max" value="this.ship.pilot.skill.piloting * 2" />
+                <input_param name="step" value="1" />
+            </param>
+            <!-- menu option: Serve Source Only (will only serve the source station if used)-->
+            <param name="dedicatedServe" type="bool" default="false" text="{61552,4005}" comment="{61552,4105}" />
+            <!-- menu option: include player and/or ai stations as sources for supplies -->
+            <param name="allowPlayerSuppliers" type="bool" default="true" text="{61552,4006}" comment="{61552,4106}">
+                <patch sinceversion="2" value="true"/>
+            </param>
+            <param name="allowAiSuppliers"     type="bool" default="true" text="{61552,4007}"     comment="{61552,4107}">
+                <patch sinceversion="2" value="not $tradeWithOwn"/>
+            </param>
 
-			<!-- menu option: include buildstorage, resources, intermediates, and tradewares as possible options to supply -->
-			<param name="allowBuildstorage"  type="bool" default="true" text="{61552,4008}"  comment="{61552,4108}">
-				<patch sinceversion="2" value="not $producer"/>
-			</param>
-			<param name="allowResources"     type="bool" default="true" text="{61552,4009}"     comment="{61552,4109}">
-				<patch sinceversion="2" value="not $builder"/>
-			</param>
-			<param name="allowIntermediates" type="bool" default="true" text="{61552,4010}" comment="{61552,4110}">
-				<patch sinceversion="2" value="not $builder"/>
-			</param>
-			<param name="allowTradewares"    type="bool" default="true" text="{61552,4011}"    comment="{61552,4111}">
-				<patch sinceversion="2" value="not $builder"/>
-			</param>
+            <!-- menu option: include buildstorage, resources, intermediates, and tradewares as possible options to supply -->
+            <param name="allowBuildstorage"  type="bool" default="true" text="{61552,4008}"  comment="{61552,4108}">
+                <patch sinceversion="2" value="not $producer"/>
+            </param>
+            <param name="allowResources"     type="bool" default="true" text="{61552,4009}"     comment="{61552,4109}">
+                <patch sinceversion="2" value="not $builder"/>
+            </param>
+            <param name="allowIntermediates" type="bool" default="true" text="{61552,4010}" comment="{61552,4110}">
+                <patch sinceversion="2" value="not $builder"/>
+            </param>
+            <param name="allowTradewares"    type="bool" default="true" text="{61552,4011}"    comment="{61552,4111}">
+                <patch sinceversion="2" value="not $builder"/>
+            </param>
 
-			<!-- lock wares to player selection -->
-			<param name="lockWares"            type="bool" default="false" text="{61552,4012}" comment="{61552,4112}" />
+            <!-- lock wares to player selection -->
+            <param name="lockWares"            type="bool" default="false" text="{61552,4012}" comment="{61552,4112}" />
 
-			<!-- menu option: WareBasket List-->
-			<param name="specialWareBasket"    type="list" default="[]"    text="{61552,4013}"       comment="{61552,4113}">
-				<input_param name="type"     value="'ware'" />
-				<input_param name="cancarry" value="this.ship" />
-			</param>
+            <!-- menu option: WareBasket List-->
+            <param name="specialWareBasket"    type="list" default="[]"    text="{61552,4013}"       comment="{61552,4113}">
+                <input_param name="type"     value="'ware'" />
+                <input_param name="cancarry" value="this.ship" />
+            </param>
 
-			<!-- menu option: Max Trades (Maximum trades per buy run)-->
-			<param name="maxTrades" required="false" default="1" type="number" text="{61552,4014}" comment="{61552,4114}">
-				<input_param name="startvalue" value="1" />
-				<input_param name="min" value="1" />
-				<input_param name="max" value="1" />
-				<input_param name="step" value="1" />
-				<patch sinceversion="2" value="$maxtrades"/>
-			</param>
+            <!-- menu option: Max Trades (Maximum trades per buy run)-->
+            <param name="maxTrades" required="false" default="1" type="number" text="{61552,4014}" comment="{61552,4114}">
+                <input_param name="startvalue" value="1" />
+                <input_param name="min" value="1" />
+                <input_param name="max" value="1" />
+                <input_param name="step" value="1" />
+                <patch sinceversion="2" value="$maxtrades"/>
+            </param>
 
-			<param name="minCargoUsed" default="75" type="number" text="{61552,4022}" comment="{61552,4122}">
-				<input_param name="startvalue" value="75" />
-				<input_param name="min" value="25" />
-				<input_param name="max" value="95" />
-				<input_param name="step" value="5" />
-				<patch sinceversion="4" value="75"/>
-			</param>
+            <param name="minCargoUsed" default="75" type="number" text="{61552,4022}" comment="{61552,4122}">
+                <input_param name="startvalue" value="75" />
+                <input_param name="min" value="25" />
+                <input_param name="max" value="95" />
+                <input_param name="step" value="5" />
+                <patch sinceversion="4" value="75"/>
+            </param>
 
-			<!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
-			<param name="playerBuyMod" default="100" type="number" text="{61552,4015}" comment="{61552,4115}">
-				<input_param name="startvalue" value="100" />
-				<input_param name="min" value="0" />
-				<input_param name="max" value="100" />
-				<input_param name="step" value="5" />
-			</param>
+            <!-- menu option: Profit Override Percentage (Used when buying/selling at own warehouses mostly) -->
+            <param name="playerBuyMod" default="100" type="number" text="{61552,4015}" comment="{61552,4115}">
+                <input_param name="startvalue" value="100" />
+                <input_param name="min" value="0" />
+                <input_param name="max" value="100" />
+                <input_param name="step" value="5" />
+            </param>
 
-			<!-- Internal parameter used to restart the script on version update if required -->
-			<param name="restartScript" type="internal" default="false"/>
-			<!-- Old deprecated parameters, see patch version 2 below -->
-			<param name="tradeWithOwn"  type="internal" default="null" text="{61552,4016}" comment="{61552,4116}" />
-			<param name="builder"       type="internal" default="null" text="{61552,4017}"    comment="{61552,4117}" />
-			<param name="producer"      type="internal" default="null" text="{61552,4018}"   comment="{61552,4118}" />
-			<param name="sourceStation" type="internal" default="null" text="{61552,4019}"   comment="{61552,4119}"/>
-			<param name="assignSrc"     type="internal" default="false" text="{61552,4020}" comment="{61552,4120}" />
-			<param name="maxtrades"     type="internal" required="false" default="5" text="{61552,4021}" comment="{61552,4121}"/>
-		</params>
-		<requires>
-			<match shiptype="shiptype.lasertower" negate="true" />
-			<!-- no idea wtf this is for-->
-		</requires>
-	</order>
-
-
-	<interrupts>
-		<handler ref="SectorChangeHandler" />
-		<handler ref="AttackHandler" />
-		<handler ref="MissileLockHandler" />
-		<handler ref="ScannedHandler" />
-		<handler ref="InspectedHandler" />
-		<handler ref="FoundAbandonedHandler" />
-		<handler ref="ResupplyHandler" />
-		<handler ref="JobRemoveRequestHandler" />
-		<handler ref="TargetInvalidHandler" />
-	</interrupts>
-
-	<init>
-		<!-- debug settings -->
-		<set_value name="$debugchance" exact="100" />
-		<set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode"/>
-		<set_value name="$debugDirName" exact="'MulesExtended'"/>
-
-		<!-- init section for mule script -->
-		<set_value name="$logbookEntryTitle" exact="'SupplyMule: '+this.ship.knownname +' ( '+this.ship.idcode+' )'"/>
-		<set_order_syncpoint_reached order="this.ship.order" />
-		<set_command_action commandaction="commandaction.searchingtrades" />
-		<!-- Set commander -->
-		<do_if value="$home and ($home.owner == this.ship.owner) and $assignHome">
-			<set_object_commander object="this.ship" commander="$home" assignment="assignment.trade" />
-		</do_if>
-	</init>
-
-	<patch sinceversion="5">
-		<!-- This will reissue any standing supply mule orders -->
-		<!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
-		<debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %s'.[this.ship.idcode]" filter="savegame"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
-	</patch>
-	<patch sinceversion="3">
-		<!-- force maxTrades to 1 since it doesn't work, and will reduce efficiency at non-1 values -->
-		<debug_text text="'PATCH: Setting maxTrades=1 for supply mule %s'.[this.ship.idcode]" filter="savegame"/>
-		<edit_order_param order="this.assignedcontrolled.order" param="'maxTrades'" value="1"/>
-	</patch>
-
-	<attention min="unknown">
-		<actions>
-			<label name="start" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'AssignedControlled: %s (%s) - %s'.[this.assignedcontrolled.knownname, this.assignedcontrolled.idcode, this.assignedcontrolled]" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Entity (this): %s'.[this]"/>
-
-			<!-- Dump Mule Settings -->
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    Home: %s (%s)'.[$home.knownname,@$home.idcode]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignHome: %s'.[$assignHome]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxDist: %s'.[$maxDist]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    dedicatedServe: %s'.[$dedicatedServe]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowPlayerSuppliers: %s'.[$allowPlayerSuppliers]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowAiSuppliers: %s'.[$allowAiSuppliers]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowBuildstorage: %s'.[$allowBuildstorage]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowResources: %s'.[$allowResources]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowIntermediates: %s'.[$allowIntermediates]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowTradewares: %s'.[$allowTradewares]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %s'.[$lockWares]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    minCargoUsed: %s'.[$minCargoUsed]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
-
-			<do_if value="$assignHome and $home.isclass.sector">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: assignHome (No Station or Ship configured)'"/>
-				<set_value name="$assignHome" exact="false" />
-			</do_if>
-
-			<!-- Setup variables for later use-->
-			<!-- Create shotcuts for all ai and all player factions -->
-			<!-- TODO: Check how ventures work an remove visitor factions depending on the outcome. -->
-			<get_factions_by_relation relation="dock" result="$aiFactions" object="this.ship"/>
-			<remove_from_list name="$aiFactions" exact="faction.player"/>
-			<set_value name="$playerFactions" exact="[faction.player]"/>
-
-			<!-- Determine where we assigned to -->
-			<set_value name="$homeStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
-			<set_value name="$homeSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Station or Ship: %s'.[if $homeStationOrShip then $homeStationOrShip.knownname else '-',if $homeStationOrShip then $homeStationOrShip.idcode else '-']"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Sector: %s'.[$homeSector.knownname]"/>
+            <!-- Internal parameter used to restart the script on version update if required -->
+            <param name="restartScript" type="internal" default="false"/>
+            <!-- Old deprecated parameters, see patch version 2 below -->
+            <param name="tradeWithOwn"  type="internal" default="null" text="{61552,4016}" comment="{61552,4116}" />
+            <param name="builder"       type="internal" default="null" text="{61552,4017}"    comment="{61552,4117}" />
+            <param name="producer"      type="internal" default="null" text="{61552,4018}"   comment="{61552,4118}" />
+            <param name="sourceStation" type="internal" default="null" text="{61552,4019}"   comment="{61552,4119}"/>
+            <param name="assignSrc"     type="internal" default="false" text="{61552,4020}" comment="{61552,4120}" />
+            <param name="maxtrades"     type="internal" required="false" default="5" text="{61552,4021}" comment="{61552,4121}"/>
+        </params>
+        <requires>
+            <match shiptype="shiptype.lasertower" negate="true" />
+            <!-- no idea wtf this is for-->
+        </requires>
+    </order>
 
 
-			<!--here we want to copy settings to subordinates-->
-			<set_value name="$subordinateShipCopyType" exact="[shiptype.courier, shiptype.transporter, shiptype.freighter, shiptype.miner, shiptype.largeminer, this.ship.type]"/>
-			<do_for_each name="$subordinate" in="this.ship.subordinates">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Subordinates %s'.[$subordinate.knownname]"/>
-				<do_if value="not $subordinateShipCopyType.indexof.{$subordinate.type}">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    not copying settings, because of wrong shiptype: %s'.[$subordinate.type]"/>
-					<continue />
-				</do_if>
-				<do_if value="global.$v1024cf_mod_loaded?" comment="Checking that this value exists; true if Civilian Fleets is loaded.">
-					<!-- Civilian Fleets loaded. -->
-					<!-- Check also, where Civ-Fleet is loaded but the user is not using the Civ-Fleet Supply Mules fleet -->
-					<do_if value="$subordinate.assignment == assignment.trade" comment="Checking if the Mule is being handled by Civ-Fleets, that is the characteristic property.">
-						<!-- Skip the handling on this side, stay in the fleet, and let Civilian Fleets handle the order sync. -->
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    is handled by Civilian Fleets; skipping'" output="false" append="true" />
-						<continue />
-					</do_if>
-				</do_if>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    copying default behavior'"/>
+    <interrupts>
+        <handler ref="SectorChangeHandler" />
+        <handler ref="AttackHandler" />
+        <handler ref="MissileLockHandler" />
+        <handler ref="ScannedHandler" />
+        <handler ref="InspectedHandler" />
+        <handler ref="FoundAbandonedHandler" />
+        <handler ref="ResupplyHandler" />
+        <handler ref="JobRemoveRequestHandler" />
+        <handler ref="TargetInvalidHandler" />
+    </interrupts>
+
+    <init>
+        <!-- debug settings -->
+        <set_value name="$debugchance" exact="100" />
+        <set_value name="$debugFileName" exact="'SupplyMule - ' + this.ship.idcode"/>
+        <set_value name="$debugDirName" exact="'MulesExtended'"/>
+
+        <!-- init section for mule script -->
+        <set_value name="$logbookEntryTitle" exact="'SupplyMule: '+this.ship.knownname +' ( '+this.ship.idcode+' )'"/>
+        <set_order_syncpoint_reached order="this.ship.order" />
+        <set_command_action commandaction="commandaction.searchingtrades" />
+        <!-- Set commander -->
+        <do_if value="$home and ($home.owner == this.ship.owner) and $assignHome">
+            <set_object_commander object="this.ship" commander="$home" assignment="assignment.trade" />
+        </do_if>
+    </init>
+
+    <patch sinceversion="5">
+        <!-- This will reissue any standing supply mule orders -->
+        <!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
+        <debug_text text="'PATCH: Restarting supply mule script on load for version safety on mule %s'.[this.ship.idcode]" filter="savegame"/>
+        <edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
+    </patch>
+    <patch sinceversion="3">
+        <!-- force maxTrades to 1 since it doesn't work, and will reduce efficiency at non-1 values -->
+        <debug_text text="'PATCH: Setting maxTrades=1 for supply mule %s'.[this.ship.idcode]" filter="savegame"/>
+        <edit_order_param order="this.assignedcontrolled.order" param="'maxTrades'" value="1"/>
+    </patch>
+
+    <attention min="unknown">
+        <actions>
+            <label name="start" />
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ScriptStart'" append="false"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Ship: %s (%s) - %s'.[this.ship.knownname, this.ship.idcode, this.ship]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'AssignedControlled: %s (%s) - %s'.[this.assignedcontrolled.knownname, this.assignedcontrolled.idcode, this.assignedcontrolled]" />
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Entity (this): %s'.[this]"/>
+
+            <!-- Dump Mule Settings -->
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Supply Mule Settings:'"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    Home: %s (%s)'.[$home.knownname,@$home.idcode]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    assignHome: %s'.[$assignHome]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxDist: %s'.[$maxDist]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    dedicatedServe: %s'.[$dedicatedServe]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowPlayerSuppliers: %s'.[$allowPlayerSuppliers]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowAiSuppliers: %s'.[$allowAiSuppliers]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowBuildstorage: %s'.[$allowBuildstorage]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowResources: %s'.[$allowResources]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowIntermediates: %s'.[$allowIntermediates]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    allowTradewares: %s'.[$allowTradewares]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    lockWares: %s'.[$lockWares]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    specialWareBasket: %s'.[$specialWareBasket]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    maxTrades: %s'.[$maxTrades]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    minCargoUsed: %s'.[$minCargoUsed]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    playerBuyMod: %s'.[$playerBuyMod]"/>
+
+            <do_if value="$assignHome and $home.isclass.sector">
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Invalid Config: assignHome (No Station or Ship configured)'"/>
+                <set_value name="$assignHome" exact="false" />
+            </do_if>
+
+            <!-- Setup variables for later use-->
+            <!-- Create shotcuts for all ai and all player factions -->
+            <!-- TODO: Check how ventures work an remove visitor factions depending on the outcome. -->
+            <get_factions_by_relation relation="dock" result="$aiFactions" object="this.ship"/>
+            <remove_from_list name="$aiFactions" exact="faction.player"/>
+            <set_value name="$playerFactions" exact="[faction.player]"/>
+
+            <!-- Determine where we assigned to -->
+            <set_value name="$homeStationOrShip" exact="if ($home.isclass.{[class.ship, class.station]}) then $home else null"/>
+            <set_value name="$homeSector" exact="if ($home.isclass.sector) then $home else $home.sector"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Station or Ship: %s'.[if $homeStationOrShip then $homeStationOrShip.knownname else '-',if $homeStationOrShip then $homeStationOrShip.idcode else '-']"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Home Sector: %s'.[$homeSector.knownname]"/>
+
+
+            <!--here we want to copy settings to subordinates-->
+            <set_value name="$subordinateShipCopyType" exact="[shiptype.courier, shiptype.transporter, shiptype.freighter, shiptype.miner, shiptype.largeminer, this.ship.type]"/>
+            <do_for_each name="$subordinate" in="this.ship.subordinates">
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Subordinates %s'.[$subordinate.knownname]"/>
+                <do_if value="not $subordinateShipCopyType.indexof.{$subordinate.type}">
+                    <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    not copying settings, because of wrong shiptype: %s'.[$subordinate.type]"/>
+                    <continue />
+                </do_if>
+                <do_if value="global.$v1024cf_mod_loaded?" comment="Checking that this value exists; true if Civilian Fleets is loaded.">
+                    <!-- Civilian Fleets loaded. -->
+                    <!-- Check also, where Civ-Fleet is loaded but the user is not using the Civ-Fleet Supply Mules fleet -->
+                    <do_if value="$subordinate.assignment == assignment.trade" comment="Checking if the Mule is being handled by Civ-Fleets, that is the characteristic property.">
+                        <!-- Skip the handling on this side, stay in the fleet, and let Civilian Fleets handle the order sync. -->
+                        <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    is handled by Civilian Fleets; skipping'" output="false" append="true" />
+                        <continue />
+                    </do_if>
+                </do_if>
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    copying default behavior'"/>
 <!--				<remove_object_commander object="$subordinate" />-->
-				<create_order object="$subordinate" default="true" id="'SupplyMule'">
-					<!-- Note: we changed the default orders, therefore civilian fleets needs an update -->
-					<param name="home" value="$home" />
-					<param name="maxDist" value="[$subordinate.pilot.skill.piloting * 2, $maxDist].min" />
-					<param name="assignHome" value="false" />
-					<param name="dedicatedServe" value="$dedicatedServe" />
-					<param name="allowPlayerSuppliers" value="$allowPlayerSuppliers" />
-					<param name="allowAiSuppliers" value="$allowAiSuppliers" />
-					<param name="allowBuildstorage" value="$allowBuildstorage" />
-					<param name="allowResources" value="$allowResources" />
-					<param name="allowIntermediates" value="$allowIntermediates" />
-					<param name="allowTradewares" value="$allowTradewares" />
-					<param name="lockWares" value="$lockWares" />
-					<param name="specialWareBasket" value="$specialWareBasket" />
-					<param name="maxTrades" value="$maxTrades" />
-					<param name="playerBuyMod" value="$playerBuyMod" />
-					<param name="minCargoUsed" value="$minCargoUsed" />
-				</create_order>
-				<wait min="50ms" max="150ms" />
-			</do_for_each>
+                <create_order object="$subordinate" default="true" id="'SupplyMule'">
+                    <!-- Note: we changed the default orders, therefore civilian fleets needs an update -->
+                    <param name="home" value="$home" />
+                    <param name="maxDist" value="[$subordinate.pilot.skill.piloting * 2, $maxDist].min" />
+                    <param name="assignHome" value="false" />
+                    <param name="dedicatedServe" value="$dedicatedServe" />
+                    <param name="allowPlayerSuppliers" value="$allowPlayerSuppliers" />
+                    <param name="allowAiSuppliers" value="$allowAiSuppliers" />
+                    <param name="allowBuildstorage" value="$allowBuildstorage" />
+                    <param name="allowResources" value="$allowResources" />
+                    <param name="allowIntermediates" value="$allowIntermediates" />
+                    <param name="allowTradewares" value="$allowTradewares" />
+                    <param name="lockWares" value="$lockWares" />
+                    <param name="specialWareBasket" value="$specialWareBasket" />
+                    <param name="maxTrades" value="$maxTrades" />
+                    <param name="playerBuyMod" value="$playerBuyMod" />
+                    <param name="minCargoUsed" value="$minCargoUsed" />
+                </create_order>
+                <wait min="50ms" max="150ms" />
+            </do_for_each>
 
-			<!-- Sell leftover cargo at averageprice (to nobody) before resuming regular Mule routine -->
-			<set_value name="$cargo" exact="this.ship.cargo.list" />
+            <!-- Sell leftover cargo at averageprice (to nobody) before resuming regular Mule routine -->
+            <set_value name="$cargo" exact="this.ship.cargo.list" />
 
-			<do_if value="$cargo.count gt 0">
-				<run_script name="'mule.lib.empty_cargo'">
-					<param name="debugchance" value="$debugchance" />
-					<param name="debugFileName" value="$debugFileName" />
-					<param name="debugDirName" value="$debugDirName" />
-					<param name="logbookEntryTitle" value="$logbookEntryTitle" />
-					<param name="cargo" value="$cargo" />
-				</run_script>
-			</do_if>
+            <do_if value="$cargo.count gt 0">
+                <run_script name="'mule.lib.empty_cargo'">
+                    <param name="debugchance" value="$debugchance" />
+                    <param name="debugFileName" value="$debugFileName" />
+                    <param name="debugDirName" value="$debugDirName" />
+                    <param name="logbookEntryTitle" value="$logbookEntryTitle" />
+                    <param name="cargo" value="$cargo" />
+                </run_script>
+            </do_if>
 
-			<do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  cargo is full =('" />
-				<wait min="50ms" max="150ms" />
-				<resume label="start" />
-			</do_if>
+            <do_if value="this.ship.cargo.free.container lt (this.ship.cargo.capacity.container/10.0)">
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'  cargo is full =('" />
+                <wait min="50ms" max="150ms" />
+                <resume label="start" />
+            </do_if>
 
-			<!-- Create shotcuts for all wares that could be used in searches -->
-			<set_value           chance="100*$lockWares" name="$allowedWares" exact="$specialWareBasket"/>
-			<get_ware_definition chance="100*(not $lockWares)" result="$allowedWares" flags="economy" />
+            <!-- Create shotcuts for all wares that could be used in searches -->
+            <set_value           chance="100*$lockWares" name="$allowedWares" exact="$specialWareBasket"/>
+            <get_ware_definition chance="100*(not $lockWares)" result="$allowedWares" flags="economy" />
 
-			<!-- Create a list of prorities for our mule -->
-			<!-- It's an ordered tasklist of what out mule should try to do first  -->
-			<create_list name="$prioritylist" />
-			<!-- ************************ supply mule logic ************************ -->
-			<!-- Serve order
-				if player station
-   					serve player station
-   					serve player sector
-					serve player area
-				if ai station
-   					serve ai station
-   					serve ai sector
-				if sector
-   					serve player sector
-   					serve player area
-   			-->
-			<!-- Dedicated serve: only serve assigned home, whether its a station or sector -->
-			<!-- Serve order: buildstorage -> resources -> intermediates -> tradewares -->
-			<!-- Dedicated player's builder mode. Activated by: * selected allow build storage only; * selected station or sector as home. When active - an evaluation of trade offers is perfomed by a fill level algorithm instead of a best profit. -->
+            <!-- Create a list of prorities for our mule -->
+            <!-- It's an ordered tasklist of what out mule should try to do first  -->
+            <create_list name="$prioritylist" />
+            <!-- ************************ supply mule logic ************************ -->
+            <!-- Serve order
+                if player station
+                       serve player station
+                       serve player sector
+                    serve player area
+                if ai station
+                       serve ai station
+                       serve ai sector
+                if sector
+                       serve player sector
+                       serve player area
+               -->
+            <!-- Dedicated serve: only serve assigned home, whether its a station or sector -->
+            <!-- Serve order: buildstorage -> resources -> intermediates -> tradewares -->
+            <!-- Dedicated player's builder mode. Activated by: * selected allow build storage only; * selected station or sector as home. When active - an evaluation of trade offers is perfomed by a fill level algorithm instead of a best profit. -->
 
-			<!-- $supplierFactions: list of factions -->
-			<!-- $serve: 'station', 'sector', 'area' -->
-			<!-- $type: 'buildstorage', 'tradewares', 'resources', 'products' -->
-			<!-- Cases: -->
+            <!-- $supplierFactions: list of factions -->
+            <!-- $serve: 'station', 'sector', 'area' -->
+            <!-- $type: 'buildstorage', 'tradewares', 'resources', 'products' -->
+            <!-- Cases: -->
 
-			<set_value name="$isServingStationOrShip" exact="if ($homeStationOrShip != null) then true else false"/>
-			<set_value name="$isServingSector" exact="if (($home.isclass.sector and $dedicatedServe) or ($home.isclass.{[class.ship, class.station]} and not $dedicatedServe)) then true else false"/>
-			<set_value name="$isServingPlayer" exact="(not $isServingStationOrShip) or ($homeStationOrShip.owner == faction.player)" />
-			<set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions else $aiFactions" />
-			<set_value name="$isServingArea" exact="$isServingPlayer and (not $dedicatedServe)" />
-			<set_value name="$isDedicatedPlayerBuilder" exact="$isServingPlayer and $allowBuildstorage and (not $allowResources) and (not $allowIntermediates) and (not $allowTradewares)" />
+            <set_value name="$isServingStationOrShip" exact="if ($homeStationOrShip != null) then true else false"/>
+            <set_value name="$isServingSector" exact="if (($home.isclass.sector and $dedicatedServe) or ($home.isclass.{[class.ship, class.station]} and not $dedicatedServe)) then true else false"/>
+            <set_value name="$isServingPlayer" exact="(not $isServingStationOrShip) or ($homeStationOrShip.owner == faction.player)" />
+            <set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions else $aiFactions" />
+            <set_value name="$isServingArea" exact="$isServingPlayer and (not $dedicatedServe)" />
+            <set_value name="$isDedicatedPlayerBuilder" exact="$isServingPlayer and $allowBuildstorage and (not $allowResources) and (not $allowIntermediates) and (not $allowTradewares)" />
 
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingStationOrShip: %s'.[$isServingStationOrShip]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingSector: %s'.[$isServingSector]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingPlayer: %s'.[$isServingPlayer]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    serveFactions: %s'.[$serveFactions]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingArea: %s'.[$isServingArea]"/>
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isDedicatedPlayerBuilder: %s'.[$isDedicatedPlayerBuilder]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingStationOrShip: %s'.[$isServingStationOrShip]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingSector: %s'.[$isServingSector]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingPlayer: %s'.[$isServingPlayer]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    serveFactions: %s'.[$serveFactions]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isServingArea: %s'.[$isServingArea]"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'    isDedicatedPlayerBuilder: %s'.[$isDedicatedPlayerBuilder]"/>
 
-			<do_if value="$isServingStationOrShip">
-				<!-- Serve Station -->
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'tradewares' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'tradewares' ]" />
-			</do_if>
+            <do_if value="$isServingStationOrShip">
+                <!-- Serve Station -->
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'buildstorage' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'buildstorage' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'resources' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'resources' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'intermediates' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'intermediates' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'stationOrShip', $type = 'tradewares' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'stationOrShip', $type = 'tradewares' ]" />
+            </do_if>
 
-			<!-- Serve Sector -->
-			<do_if value="$isServingSector">
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'tradewares' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
-			</do_if>
+            <!-- Serve Sector -->
+            <do_if value="$isServingSector">
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'buildstorage' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'buildstorage' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'resources' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'resources' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'intermediates' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'intermediates' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'sector', $type = 'tradewares' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'sector', $type = 'tradewares' ]" />
+            </do_if>
 
-			<do_if value="$isServingArea">
-				<!-- Serve player area -->
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'resources' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'intermediates' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'tradewares' ]" />
-				<append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'tradewares' ]" />
-			</do_if>
+            <do_if value="$isServingArea">
+                <!-- Serve player area -->
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'buildstorage' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'buildstorage' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'resources' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'resources' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'intermediates' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'intermediates' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $playerFactions, $serve = 'area', $type = 'tradewares' ]" />
+                <append_to_list name="$prioritylist" exact="table[ $supplierFactions = $aiFactions,     $serve = 'area', $type = 'tradewares' ]" />
+            </do_if>
 
-			<!-- Apply filters selected by the user in the ui -->
-			<create_list name="$filteredPrioritylist" />
-			<do_for_each name="$priority" in="$prioritylist">
-				<!-- Basically, we prevent every prioirty that does not match our criteria from going onto the $filteredPrioritylist -->
-				<continue chance="100*((not $allowBuildstorage)  and ($priority.$type == 'buildstorage'))"/>
-				<continue chance="100*((not $allowResources)     and ($priority.$type == 'resources'))"/>
-				<continue chance="100*((not $allowIntermediates) and ($priority.$type == 'intermediates'))"/>
-				<continue chance="100*((not $allowTradewares)    and ($priority.$type == 'tradewares'))"/>
+            <!-- Apply filters selected by the user in the ui -->
+            <create_list name="$filteredPrioritylist" />
+            <do_for_each name="$priority" in="$prioritylist">
+                <!-- Basically, we prevent every prioirty that does not match our criteria from going onto the $filteredPrioritylist -->
+                <continue chance="100*((not $allowBuildstorage)  and ($priority.$type == 'buildstorage'))"/>
+                <continue chance="100*((not $allowResources)     and ($priority.$type == 'resources'))"/>
+                <continue chance="100*((not $allowIntermediates) and ($priority.$type == 'intermediates'))"/>
+                <continue chance="100*((not $allowTradewares)    and ($priority.$type == 'tradewares'))"/>
 
-				<!-- Filter supplier factions -->
-				<remove_from_list chance="100*(not $allowPlayerSuppliers)" name="$priority.$supplierFactions" list="$playerFactions"/>
-				<remove_from_list chance="100*(not $allowAiSuppliers)" name="$priority.$supplierFactions" list="$aiFactions"/>
-				<continue chance="100*($priority.$supplierFactions.count == 0)"/>
+                <!-- Filter supplier factions -->
+                <remove_from_list chance="100*(not $allowPlayerSuppliers)" name="$priority.$supplierFactions" list="$playerFactions"/>
+                <remove_from_list chance="100*(not $allowAiSuppliers)" name="$priority.$supplierFactions" list="$aiFactions"/>
+                <continue chance="100*($priority.$supplierFactions.count == 0)"/>
 
-				<!-- If the have passed all filters, add to filtered list -->
-				<append_to_list name="$filteredPrioritylist" exact="$priority"/>
-			</do_for_each>
+                <!-- If the have passed all filters, add to filtered list -->
+                <append_to_list name="$filteredPrioritylist" exact="$priority"/>
+            </do_for_each>
 
-			<!-- station that is currently served (determined by the first set of orders issued) -->
-			<set_value name="$alreadyServing" exact="null"/>
-			<!-- Current number of issued trades -->
-			<set_value name="$tradeCount" exact="0"/>
+            <!-- station that is currently served (determined by the first set of orders issued) -->
+            <set_value name="$alreadyServing" exact="null"/>
+            <!-- Current number of issued trades -->
+            <set_value name="$tradeCount" exact="0"/>
 
-			<!-- ************************ main loop ************************-->
-			<!-- Start looping over our prioritiylist to determine what to do-->
-			<do_for_each name="$priority" in="$filteredPrioritylist">
-				<!-- If we were already serving a station, but would require to serve a different station to fill our cargo, abort -->
-				<do_if value="($alreadyServing and $alreadyServing.$serve != $priority.$serve)">
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Search finished. No more trade at station found.'" />
-					<break/>
-				</do_if>
+            <!-- ************************ main loop ************************-->
+            <!-- Start looping over our prioritiylist to determine what to do-->
+            <do_for_each name="$priority" in="$filteredPrioritylist">
+                <!-- If we were already serving a station, but would require to serve a different station to fill our cargo, abort -->
+                <do_if value="($alreadyServing and $alreadyServing.$serve != $priority.$serve)">
+                    <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Search finished. No more trade at station found.'" />
+                    <break/>
+                </do_if>
 
-				<!-- Print current priority to debuglog -->
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($priority.$supplierFactions == $playerFactions) then 'player' else 'ai']" />
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
+                <!-- Print current priority to debuglog -->
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Current priority is to supply &quot;%s&quot; by buying &quot;%s&quot; from &quot;%s&quot;'.[$priority.$serve, $priority.$type, if ($priority.$supplierFactions == $playerFactions) then 'player' else 'ai']" />
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'------------------------------------------------------------------------------------------------------------------------------------'" />
 
-				<!-- ************************ check needs ************************ -->
-				<do_if value="$alreadyServing or $priority.$serve == 'stationOrShip'">
-					<!-- CASE: station/ship -->
-					<!-- Note: by default the game treats buildstorage and the station as two seperate components. -->
-					<!-- Buyoffers from buildstorage will not show up at the station and vice versa -->
-					<set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $homeStationOrShip"/>
-					<set_value name="$buyer" exact="if (($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)) then $currentlyServing.buildstorage else $currentlyServing"/>
-					<!-- buyoffer search -->
-					<find_buy_offer tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
-				</do_if>
-				<do_elseif value="$priority.$serve == 'sector'">
-					<!-- CASE: sector-->
-					<!-- $classes (buildstorage) -->
-					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
-					<!-- buyoffer search -->
-					<find_buy_offer space="$homeSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
-						<match_buyer>
-							<match tradesknownto="this.owner"/>
-							<match class="$serveClass"/>
-							<match owner="$serveFactions"/>
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-						</match_buyer>
-					</find_buy_offer>
-				</do_elseif>
-				<do_elseif value="$priority.$serve == 'area'">
-					<!-- CASE: area -->
-					<!-- $classes (buildstorage) -->
-					<set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
-					<!-- buyoffer search -->
-					<find_buy_offer space="player.galaxy" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
-						<match_buyer>
-							<match class="$serveClass"/>
-							<match owner="$serveFactions"/>
-							<match_gate_distance object="$homeSector" min="0" max="$maxDist">
-								<blacklist group="blacklistgroup.civilian" object="this.ship" />
-							</match_gate_distance>
-							<!-- this next bit of mess is just blacklist handling -->
-							<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-							<match_parent>
-								<match_parent>
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-									<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
-								</match_parent>
-							</match_parent>
-						</match_buyer>
-					</find_buy_offer>
-				</do_elseif>
+                <!-- ************************ check needs ************************ -->
+                <do_if value="$alreadyServing or $priority.$serve == 'stationOrShip'">
+                    <!-- CASE: station/ship -->
+                    <!-- Note: by default the game treats buildstorage and the station as two seperate components. -->
+                    <!-- Buyoffers from buildstorage will not show up at the station and vice versa -->
+                    <set_value name="$currentlyServing" exact="if $alreadyServing then $alreadyServing.$stationOrShip else $homeStationOrShip"/>
+                    <set_value name="$buyer" exact="if (($priority.$type == 'buildstorage') and ($currentlyServing.isclass.station)) then $currentlyServing.buildstorage else $currentlyServing"/>
+                    <!-- buyoffer search -->
+                    <find_buy_offer tradepartner="this.ship" wares="$allowedWares" buyer="$buyer" result="$needs" multiple="true"/>
+                </do_if>
+                <do_elseif value="$priority.$serve == 'sector'">
+                    <!-- CASE: sector-->
+                    <!-- $classes (buildstorage) -->
+                    <set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
+                    <!-- buyoffer search -->
+                    <find_buy_offer space="$homeSector" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
+                        <match_buyer>
+                            <match tradesknownto="this.owner"/>
+                            <match class="$serveClass"/>
+                            <match owner="$serveFactions"/>
+                            <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+                        </match_buyer>
+                    </find_buy_offer>
+                </do_elseif>
+                <do_elseif value="$priority.$serve == 'area'">
+                    <!-- CASE: area -->
+                    <!-- $classes (buildstorage) -->
+                    <set_value name="$serveClass" exact="if ($priority.$type == 'buildstorage') then class.buildstorage else [class.station, class.ship]"/>
+                    <!-- buyoffer search -->
+                    <find_buy_offer space="player.galaxy" tradepartner="this.ship" wares="$allowedWares" result="$needs" multiple="true">
+                        <match_buyer>
+                            <match class="$serveClass"/>
+                            <match owner="$serveFactions"/>
+                            <match_gate_distance object="$homeSector" min="0" max="$maxDist">
+                                <blacklist group="blacklistgroup.civilian" object="this.ship" />
+                            </match_gate_distance>
+                            <!-- this next bit of mess is just blacklist handling -->
+                            <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+                            <match_parent>
+                                <match_parent>
+                                    <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+                                    <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+                                </match_parent>
+                            </match_parent>
+                        </match_buyer>
+                    </find_buy_offer>
+                </do_elseif>
 
-				<do_if value="$priority.$type != 'buildstorage'">
-					<!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
-					<!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
-					<create_list name="$filteredNeeds" />
-					<!-- Check for every need if it fullfills the requirement and add -->
-					<do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
-						<set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists or $need.owner.supplyresources.{$need.ware}.exists"/>
-						<set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
-						<!-- X4 treats products and resources always as tradewares... -->
-						<set_value name="$isWare" exact="$need.owner.tradewares.{$need.ware}.exists"/>
-						<do_if value="
-								 ($priority.$type == 'resources'     and $isResource and (not $isProduct)) or
-								 ($priority.$type == 'intermediates' and $isResource and $isProduct) or
-								 ($priority.$type == 'tradewares'    and $isWare and (not $isResource) and (not $isProduct))" >
-							<append_to_list name="$filteredNeeds" exact="$need" />
-						</do_if>
-					</do_for_each>
-					<set_value name="$needs" exact="$filteredNeeds"/>
-					<remove_value name="$filteredNeeds"/>
-				</do_if>
+                <do_if value="$priority.$type != 'buildstorage'">
+                    <!-- Filter needs(buyoffers) depending on resources, intermediates, tradewares -->
+                    <!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
+                    <create_list name="$filteredNeeds" />
+                    <!-- Check for every need if it fullfills the requirement and add -->
+                    <do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
+                        <set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists or $need.owner.supplyresources.{$need.ware}.exists"/>
+                        <set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
+                        <!-- X4 treats products and resources always as tradewares... -->
+                        <set_value name="$isWare" exact="$need.owner.tradewares.{$need.ware}.exists"/>
+                        <do_if value="
+                                 ($priority.$type == 'resources'     and $isResource and (not $isProduct)) or
+                                 ($priority.$type == 'intermediates' and $isResource and $isProduct) or
+                                 ($priority.$type == 'tradewares'    and $isWare and (not $isResource) and (not $isProduct))" >
+                            <append_to_list name="$filteredNeeds" exact="$need" />
+                        </do_if>
+                    </do_for_each>
+                    <set_value name="$needs" exact="$filteredNeeds"/>
+                    <remove_value name="$filteredNeeds"/>
+                </do_if>
 
-				<!-- dump all tradeoffers to debug log -->
-				<run_script chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
-					<param name="headerline" value="'needs'"/>
-					<param name="offers" value="$needs.clone"/>
-					<param name="debugchance" value="$debugchance"/>
-					<param name="debugFileName" value="$debugFileName"/>
-					<param name="debugDirName" value="$debugDirName"/>
-				</run_script>
+                <!-- dump all tradeoffers to debug log -->
+                <run_script chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
+                    <param name="headerline" value="'needs'"/>
+                    <param name="offers" value="$needs.clone"/>
+                    <param name="debugchance" value="$debugchance"/>
+                    <param name="debugFileName" value="$debugFileName"/>
+                    <param name="debugDirName" value="$debugDirName"/>
+                </run_script>
 
-				<!-- If there are no needs, just continue with the next on the priority list-->
-				<continue chance="100*($needs.count == 0)"/>
+                <!-- If there are no needs, just continue with the next on the priority list-->
+                <continue chance="100*($needs.count == 0)"/>
 
-				<!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
-				<!-- but only if the player didn't set them manually -->
-				<do_if value="(not $lockWares)">
-					<!-- To eliminate dublicates, just create a table with the ware as index -->
-					<set_value name="$uniqueWareTable" exact="table[]"/>
-					<do_for_each name="$need" in="$needs">
-						<set_value name="$uniqueWareTable.{$need.ware}" exact="$need.ware"/>
-					</do_for_each>
+                <!-- if we found some needs, set them to the specialWareBasket so they show up for the player in the UI -->
+                <!-- but only if the player didn't set them manually -->
+                <do_if value="(not $lockWares)">
+                    <!-- To eliminate dublicates, just create a table with the ware as index -->
+                    <set_value name="$uniqueWareTable" exact="table[]"/>
+                    <do_for_each name="$need" in="$needs">
+                        <set_value name="$uniqueWareTable.{$need.ware}" exact="$need.ware"/>
+                    </do_for_each>
 
-					<!-- now flush the old warebasket -->
-					<remove_from_list name="$specialWareBasket" />
-					<!-- and add all unique wares -->
-					<do_for_each name="$ware" in="$uniqueWareTable">
-						<append_to_list name="$specialWareBasket" exact="$ware" />
-					</do_for_each>
-				</do_if>
-				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'specialWareBasket: ' + $specialWareBasket" />
+                    <!-- now flush the old warebasket -->
+                    <remove_from_list name="$specialWareBasket" />
+                    <!-- and add all unique wares -->
+                    <do_for_each name="$ware" in="$uniqueWareTable">
+                        <append_to_list name="$specialWareBasket" exact="$ware" />
+                    </do_for_each>
+                </do_if>
+                <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'specialWareBasket: ' + $specialWareBasket" />
 
-				<!-- ************************ search for suppliers ************************ -->
-				<find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$supplyOffers" multiple="true">
-					<match_seller>
-						<match tradesknownto="this.owner"/>
-						<match owner="$priority.$supplierFactions"/>
-						<match_gate_distance object="$homeSector" min="0" max="$maxDist">
-							<blacklist group="blacklistgroup.civilian" object="this.ship" />
-						</match_gate_distance>
-						<!-- this next bit of mess is just blacklist handling -->
-						<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
-						<match_parent>
-							<match_parent>
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
-								<match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
-							</match_parent>
-						</match_parent>
-					</match_seller>
-				</find_sell_offer>
+                <!-- ************************ search for suppliers ************************ -->
+                <find_sell_offer space="player.galaxy" tradepartner="this.ship" wares="$specialWareBasket" result="$supplyOffers" multiple="true">
+                    <match_seller>
+                        <match tradesknownto="this.owner"/>
+                        <match owner="$priority.$supplierFactions"/>
+                        <match_gate_distance object="$homeSector" min="0" max="$maxDist">
+                            <blacklist group="blacklistgroup.civilian" object="this.ship" />
+                        </match_gate_distance>
+                        <!-- this next bit of mess is just blacklist handling -->
+                        <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+                        <match_parent>
+                            <match_parent>
+                                <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+                                <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+                            </match_parent>
+                        </match_parent>
+                    </match_seller>
+                </find_sell_offer>
 
-				<!-- dump all tradeoffers to debug log -->
-				<run_script chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
-					<param name="headerline" value="'supply offers'"/>
-					<param name="offers" value="$supplyOffers.clone"/>
-					<param name="debugchance" value="$debugchance"/>
-					<param name="debugFileName" value="$debugFileName"/>
-					<param name="debugDirName" value="$debugDirName"/>
-				</run_script>
+                <!-- dump all tradeoffers to debug log -->
+                <run_script chance="$debugchance" name="'mule.lib.debug.dump_tradeoffers'">
+                    <param name="headerline" value="'supply offers'"/>
+                    <param name="offers" value="$supplyOffers.clone"/>
+                    <param name="debugchance" value="$debugchance"/>
+                    <param name="debugFileName" value="$debugFileName"/>
+                    <param name="debugDirName" value="$debugDirName"/>
+                </run_script>
 
-				<!-- ************************ evalute offers & issue orders ************************ -->
-				<!-- If we have found matching supply start profit calculation and issue orders -->
-				<do_if value="$supplyOffers.count">
-					<!-- some setup, repeats in every block for readability -->
-					<set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
-					<!-- by hacking the maxTrades to 1 we make the supply mule have some trouble finding trades, so we need to add some leniency 
-					until we can figure out a longer term solution.... which may be a cargo % slider? -->
-					<set_value name="$minCargoSize" exact="($minCargoUsed/100.0)*($ShipCapacity)f / $maxTrades" />
-					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' + $ShipCapacity" />
+                <!-- ************************ evalute offers & issue orders ************************ -->
+                <!-- If we have found matching supply start profit calculation and issue orders -->
+                <do_if value="$supplyOffers.count">
+                    <!-- some setup, repeats in every block for readability -->
+                    <set_value name="$ShipCapacity" exact="this.ship.cargo.capacity.all" />
+                    <!-- by hacking the maxTrades to 1 we make the supply mule have some trouble finding trades, so we need to add some leniency 
+                    until we can figure out a longer term solution.... which may be a cargo % slider? -->
+                    <set_value name="$minCargoSize" exact="($minCargoUsed/100.0)*($ShipCapacity)f / $maxTrades" />
+                    <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'ship capacity: ' + $ShipCapacity" />
 
-					<!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
-					<create_list name="$supplyTrades" />
-					<!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
-					<set_value name="$occupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
-					<set_value name="$emergencyBreak" exact="0"/>
-					<do_while value="true">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' + $occupiedCargo" />
+                    <!-- these lists will hold the trades we want to make. we'll check they're still available before creating the orders -->
+                    <create_list name="$supplyTrades" />
+                    <!-- looping over the max number of trade in the UI. if cargo is full already we'll break -->
+                    <set_value name="$occupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
+                    <set_value name="$emergencyBreak" exact="0"/>
+                    <do_while value="true">
+                        <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' + $occupiedCargo" />
 
-						<!-- emergency break to prevent mule from freezing the screen (in theory they should never crash) -->
-						<set_value name="$emergencyBreak" operation="add" exact="1"/>
-						<do_if value="$emergencyBreak > 100">
-							<set_value name="$emergencyText" exact="'Suppymule %s (%s) crashed. Check debug log for more infos and report this error to the mod developers (with a full debug log file).'.[this.ship.knownname, this.ship.idcode]"/>
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$emergencyText" />
-							<write_to_logbook category="alerts" object="this.ship" title="'Supplymule crashed!'" interaction="showonmap" text="$emergencyText" />
-							<create_order object="this.ship" id="Wait" default="true"/>
-							<return/>
-						</do_if>
+                        <!-- emergency break to prevent mule from freezing the screen (in theory they should never crash) -->
+                        <set_value name="$emergencyBreak" operation="add" exact="1"/>
+                        <do_if value="$emergencyBreak > 100">
+                            <set_value name="$emergencyText" exact="'Suppymule %s (%s) crashed. Check debug log for more infos and report this error to the mod developers (with a full debug log file).'.[this.ship.knownname, this.ship.idcode]"/>
+                            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$emergencyText" />
+                            <write_to_logbook category="alerts" object="this.ship" title="'Supplymule crashed!'" interaction="showonmap" text="$emergencyText" />
+                            <create_order object="this.ship" id="Wait" default="true"/>
+                            <return/>
+                        </do_if>
 
-						<do_if value="$occupiedCargo + $minCargoSize / 2.0 ge $ShipCapacity">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, skip to end'" />
-							<!-- cargo full, skip to end -->
-							<resume label="end"/>
-						</do_if>
-						<do_if value="$tradeCount == $maxTrades">
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'max trades, skip to end'" />
-							<!-- max trades, skip to end -->
-							<resume label="end"/>
-						</do_if>
+                        <do_if value="$occupiedCargo + $minCargoSize / 2.0 ge $ShipCapacity">
+                            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Cargo Full, skip to end'" />
+                            <!-- cargo full, skip to end -->
+                            <resume label="end"/>
+                        </do_if>
+                        <do_if value="$tradeCount == $maxTrades">
+                            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'max trades, skip to end'" />
+                            <!-- max trades, skip to end -->
+                            <resume label="end"/>
+                        </do_if>
 
-						<!-- Compare tradeoffers by profit and return the most profitable one -->
-						<!-- We might want to offer to fill critical resources with highest priority -->
-						<run_script name="'mule.lib.evaluate_tradeoffers'">
-							<!-- use clone for a shallow copy of objects (pass by reference) -->
-							<param name="buyoffers" value="$needs.clone"/>
-							<param name="selloffers" value="$supplyOffers.clone"/>
-							<param name="shipEntity" value="this"/>
-							<param name="occupiedCargo" value="$occupiedCargo"/>
-							<param name="minCargoSize" value="$minCargoSize"/>
-							<param name="sameFactionBuyMod" value="$playerBuyMod"/>
-							<param name="debugchance" value="$debugchance"/>
-							<param name="debugFileName" value="$debugFileName"/>
-							<param name="debugDirName" value="$debugDirName"/>
-							<param name="dedicatedPlayerBuilder" value="$isDedicatedPlayerBuilder" />
-							<save_retval name="bestProfit" variable="$bestProfit"/>
-							<save_retval name="bestAmount" variable="$bestAmount"/>
-							<save_retval name="bestNeedTrade" variable="$bestNeedTrade"/>
-							<save_retval name="bestSupplyTrade" variable="$bestSupplyTrade"/>
-						</run_script>
+                        <!-- Compare tradeoffers by profit and return the most profitable one -->
+                        <!-- We might want to offer to fill critical resources with highest priority -->
+                        <run_script name="'mule.lib.evaluate_tradeoffers'">
+                            <!-- use clone for a shallow copy of objects (pass by reference) -->
+                            <param name="buyoffers" value="$needs.clone"/>
+                            <param name="selloffers" value="$supplyOffers.clone"/>
+                            <param name="shipEntity" value="this"/>
+                            <param name="occupiedCargo" value="$occupiedCargo"/>
+                            <param name="minCargoSize" value="$minCargoSize"/>
+                            <param name="sameFactionBuyMod" value="$playerBuyMod"/>
+                            <param name="debugchance" value="$debugchance"/>
+                            <param name="debugFileName" value="$debugFileName"/>
+                            <param name="debugDirName" value="$debugDirName"/>
+                            <param name="dedicatedPlayerBuilder" value="$isDedicatedPlayerBuilder" />
+                            <save_retval name="bestProfit" variable="$bestProfit"/>
+                            <save_retval name="bestAmount" variable="$bestAmount"/>
+                            <save_retval name="bestNeedTrade" variable="$bestNeedTrade"/>
+                            <save_retval name="bestSupplyTrade" variable="$bestSupplyTrade"/>
+                        </run_script>
 
-						<!-- if we found a good trade, create the buy order for the supply and the sell order for the need. -->
-						<!-- if we end up with more than one need, we'll move it down with move_order later -->
-						<do_if value="$bestProfit le 0">
-							<!-- No more profitable trades, move on to next priority! -->
-							<break/>
-						</do_if>
+                        <!-- if we found a good trade, create the buy order for the supply and the sell order for the need. -->
+                        <!-- if we end up with more than one need, we'll move it down with move_order later -->
+                        <do_if value="$bestProfit le 0">
+                            <!-- No more profitable trades, move on to next priority! -->
+                            <break/>
+                        </do_if>
 
-						<do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
-							<set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of %s.'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
-							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$tradeText" />
-							<write_to_logbook category="upkeep"  object="this.ship" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="$tradeText" />
+                        <do_if value="$bestSupplyTrade.available and $bestNeedTrade.available">
+                            <set_value name="$tradeText" exact="'buying %s %s from %s (%s) at %s  to sell to %s (%s) at %s for a profit of %s.'.[$bestAmount, $bestNeedTrade.ware, $bestSupplyTrade.owner.knownname, $bestSupplyTrade.owner.idcode, $bestSupplyTrade.unitprice.formatted.{'%s %Cr'}, $bestNeedTrade.owner.knownname, $bestNeedTrade.owner.idcode, $bestNeedTrade.unitprice.formatted.{'%s %Cr'}, $bestProfit.formatted.{'%s %Cr'}]"/>
+                            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$tradeText" />
+                            <write_to_logbook category="upkeep"  object="this.ship" title="$logbookEntryTitle" interaction="showonmap" money="$bestProfit" text="$tradeText" />
 
-							<create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
-							<create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
+                            <create_trade_order name="$bestOrder" object="this.ship" tradeoffer="$bestSupplyTrade" amount="$bestAmount"  immediate="true"/>
+                            <create_trade_order object="this.ship" tradeoffer="$bestNeedTrade" amount="$bestAmount" />
 
-							<!-- might be able remove $occupiedCargo in the future -->
-							<set_value name="$occupiedCargo" exact="$occupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
-							<!-- Lock in out trading station -->
-							<do_if value="$alreadyServing == null">
-								<!-- prevent the mule from using any other trade stations on this run/priority, by removing all other buyoffers/needs from different stations -->
-								<create_list name="$filteredNeeds" />
-								<do_for_each name="$need" in="$needs">
-									<append_to_list chance="100*($need.buyer == $bestNeedTrade.buyer)" name="$filteredNeeds" exact="$need" />
-								</do_for_each>
-								<set_value name="$needs" exact="$filteredNeeds"/>
-								<remove_value name="$filteredNeeds"/>
-								<!-- prevent searching for buyoffers from other stations in the next run/priority -->
-								<set_value name="$alreadyServing" exact="table[$serve = $priority.$serve ,$stationOrShip = $bestNeedTrade.buyer]"/>
-							</do_if>
-							<!-- remove used supply offers from evaluation -->
-							<remove_from_list name="$supplyOffers" exact="$bestSupplyTrade"/>
-							<!-- Trade Count -->
-							<set_value name="$tradeCount" operation="add" exact="1"/>
-						</do_if>
-					</do_while>
-				</do_if>
-			</do_for_each>
+                            <!-- might be able remove $occupiedCargo in the future -->
+                            <set_value name="$occupiedCargo" exact="$occupiedCargo + $bestAmount * $bestSupplyTrade.ware.volume" />
+                            <!-- Lock in out trading station -->
+                            <do_if value="$alreadyServing == null">
+                                <!-- prevent the mule from using any other trade stations on this run/priority, by removing all other buyoffers/needs from different stations -->
+                                <create_list name="$filteredNeeds" />
+                                <do_for_each name="$need" in="$needs">
+                                    <append_to_list chance="100*($need.buyer == $bestNeedTrade.buyer)" name="$filteredNeeds" exact="$need" />
+                                </do_for_each>
+                                <set_value name="$needs" exact="$filteredNeeds"/>
+                                <remove_value name="$filteredNeeds"/>
+                                <!-- prevent searching for buyoffers from other stations in the next run/priority -->
+                                <set_value name="$alreadyServing" exact="table[$serve = $priority.$serve ,$stationOrShip = $bestNeedTrade.buyer]"/>
+                            </do_if>
+                            <!-- remove used supply offers from evaluation -->
+                            <remove_from_list name="$supplyOffers" exact="$bestSupplyTrade"/>
+                            <!-- Trade Count -->
+                            <set_value name="$tradeCount" operation="add" exact="1"/>
+                        </do_if>
+                    </do_while>
+                </do_if>
+            </do_for_each>
 
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Nothing found, check back in a couple of minuites....'" />
-			<wait min="3min" max="5min" />
-			<resume label="start"/>
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Nothing found, check back in a couple of minuites....'" />
+            <wait min="3min" max="5min" />
+            <resume label="start"/>
 
-			<label name="end" />
-			<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'******* went to end'" />
-			<return/>
-			<!-- Absolutly ridicules workaround to surpress any messages related to blocking actions -->
-			<!-- Basicially, we add a bunch of blocking actions that are never reached. -->
-			<!-- This ensures, that our block action index in the savegames never exceeds the actual number of blocking actions. -->
-			<!-- Therefore, if we were to delete a blocking action above, the savegame will load without throwing an error message -->
-			<!-- Note, that the script state in this case is totally wrong, since the game will load the variables from the last game. -->
-			<!-- This is mitiagted, by restarting the order with a´patch command on load. -->
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-			<wait chance="0"/>
-		</actions>
-	</attention>
+            <label name="end" />
+            <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'******* went to end'" />
+            <return/>
+            <!-- Absolutly ridicules workaround to surpress any messages related to blocking actions -->
+            <!-- Basicially, we add a bunch of blocking actions that are never reached. -->
+            <!-- This ensures, that our block action index in the savegames never exceeds the actual number of blocking actions. -->
+            <!-- Therefore, if we were to delete a blocking action above, the savegame will load without throwing an error message -->
+            <!-- Note, that the script state in this case is totally wrong, since the game will load the variables from the last game. -->
+            <!-- This is mitiagted, by restarting the order with a´patch command on load. -->
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+            <wait chance="0"/>
+        </actions>
+    </attention>
 </aiscript>
