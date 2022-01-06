@@ -76,7 +76,7 @@
     </init>
 
     <patch sinceversion="3">
-        <!-- This will reissue any standing supply mule orders -->
+        <!-- This will reissue any standing distrib mule orders -->
         <!-- it should mitigate any problems with blocking actions beeing updated inbetween savegames -->
         <debug_text text="'PATCH: Restarting distrib mule script on load for version safety on mule %s'.[this.ship.idcode]" filter="savegame"/>
         <edit_order_param order="this.assignedcontrolled.order" param="'restartScript'" value="true"/>
