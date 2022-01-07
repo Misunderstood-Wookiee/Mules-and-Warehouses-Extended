@@ -5,11 +5,12 @@
 
 #Windows Scripts
 *.bat
+*.ps1
 
 #Linux Scripts
 *.sh
 
-#Workshop Build Files
+#X4 Packages
 *.png
 ext_*.cat
 ext_*.dat
