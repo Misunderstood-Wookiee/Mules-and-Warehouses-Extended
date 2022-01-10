@@ -5,7 +5,8 @@
 		<set_value name="$added"/>
 		<run_script name="$scriptname">
 			<param name="home" value="$order.$home"/>
-			<param name="assignHome" value="$order.$assignHome"/>
+			<!-- <param name="assignHome" value="$order.$assignHome"/> -->
+            <param name="assignHome" value="false"/>
             <param name="maxDist" value="$order.$maxDist"/>
             <param name="dedicatedServe" value="$order.$dedicatedServe"/>
             <param name="allowPlayerSuppliers" value="$order.$allowPlayerSuppliers"/>
@@ -28,7 +29,8 @@
 		<run_script name="$scriptname">
 			<param name="sourceStation" value="$order.$sourceStation"/>
             <param name="targetStation" value="$order.$targetStation"/>
-            <param name="assignSrc" value="$order.$assignSrc"/>
+            <!-- <param name="assignSrc" value="$order.$assignSrc"/> -->
+            <param name="assignSrc" value="false"/>
             <param name="incEgry" value="$order.$incEgry"/>
             <param name="incFood" value="$order.$incFood"/>
             <param name="supplyFirst" value="$order.$supplyFirst"/>
@@ -46,6 +48,8 @@
         <set_value name="$added"/>
 		<run_script name="$scriptname">
 			<param name="sourceStation" value="$order.$sourceStation"/>
+            <!-- <param name="assignSrc" value="$order.$assignSrc"/> -->
+            <param name="assignSrc" value="false"/>
             <param name="maxDist" value="$order.$maxDist"/>
             <param name="profitMargin" value="$order.$profitMargin"/>
             <param name="lockWares" value="$order.$lockWares"/>
@@ -60,6 +64,8 @@
         <set_value name="$added"/>
 		<run_script name="$scriptname">
 			<param name="sourceStation" value="$order.$sourceStation"/>
+            <!-- <param name="assignSrc" value="$order.$assignSrc"/> -->
+            <param name="assignSrc" value="false"/>
             <param name="minStorage" value="$order.$minStorage"/>
             <param name="staticStorage" value="$order.$staticStorage"/>
             <param name="maxStorage" value="$order.$maxStorage"/>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<aiscript name="mule.lib.empty_cargo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="1">
+    <!-- triggers when a mule aiscript starts while the mule already has cargo in the hold -->
+    <!-- can happen because the player changes the ship's order, or when X4 invalidates a trade -->
+    <!-- we delete the ware, and give the player money at the ware's defined averageprice -->
+    <!-- this should avoid recurring "my mule is selling to the ai!!" bug reports -->
+    <!-- though I expect it to still result in new ones... -->
+    <params>
+        <param name="debugchance"/>
+        <param name="debugFileName"/>
+        <param name="debugDirName"/>
+        <param name="logbookEntryTitle" />
+        <param name="cargo" />
+    </params>
+    <attention min="unknown">
+        <actions>
+            <do_all exact="$cargo.count" counter="$wareInCargo">
+                <set_value name="$currentWare" exact="$cargo.{$wareInCargo}" />
+                <set_value name="$wareAveragePrice" exact="$currentWare.averageprice" />
+                <set_value name="$amount" exact="this.ship.cargo.{$currentWare}.count" />
+                <set_value name="$moneyToPlayer" exact="$amount * $wareAveragePrice" />
+                <reward_player money="$moneyToPlayer" />
+                <remove_cargo object="this.ship" ware="$currentWare" exact="$amount" />
+                <set_value name="$rewardLogText" exact="'rewarded player for ' +$amount + ' ' +$currentWare + ' at averageprice ' +$wareAveragePrice/100.0 + ' due to mule cargo emptying routine'" />
+                <write_to_logbook category="upkeep"  object="this.ship" title="$logbookEntryTitle" interaction="showonmap" money="$moneyToPlayer" text="$rewardLogText" />
+            </do_all>
+        </actions>
+    </attention>
+</aiscript>
