@@ -135,7 +135,9 @@
 					<do_if value="($tradeAmount*$buyoffer.ware.volume lt $minCargoSize) and not ($buyoffer.buyer.isclass.buildstorage and ($tradeAmount == $targetOfferedAmount))">
 						<continue />
 					</do_if>
-
+					
+					<!-- default value so I don't need to set it in multiple blocks where it's not important -->
+					<set_value name="$fillLevelMod" exact="1"/>
 					<do_if value="$dedicatedPlayerBuilder" >
 						<set_value name="$targetAmount" exact="$buyoffer.buyer.cargo.{$buyoffer.ware}.target" />
 						<!--calculate fill level region: 0%..33% = 3; 33%..67% = 2; 67%..100% = 1 -->
@@ -146,13 +148,27 @@
 						<remove_value name="$fillLevelRegion" />
 					</do_if>
 					<do_else>
+						<!-- prioritize critically low stock -->
+						<!-- this primarily helps in the scenario where a mule will prefer to move an expensive ware over a cheaper one that is nearly empty -->
+						<!-- a prime example is ore vs silicon; mules will happily fill silicon to 50% while ore sits totally empty, without this -->
+						<set_value name="$targetAmount" exact="$buyoffer.buyer.cargo.{$buyoffer.ware}.target" />
+						<set_value name="$fillLevel" exact="1.0 - ((($buyoffer.desiredamount)f / ([$targetAmount,1].max)f - 0.0000001))f" />
+						<do_if value="$fillLevel lt 0.1">
+							<set_value name="$fillLevelMod" exact="3"/>
+						</do_if>
+						<do_else>
+							<set_value name="$fillLevelMod" exact="1"/>
+						</do_else>
+						<remove_value name="$targetAmount" />
+						<remove_value name="$fillLevel" />
+
 						<!-- how much profit for this trade? -->
 						<!-- If we use our own stations, we adjust the supply price by the sameFactionBuyMod to allow preferential treatment of player/owned supply chains -->
 						<do_if value="$selloffer.seller.owner == $shipEntity.owner">
-							<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice*$sameFactionBuyMod/100.0)" />
+							<set_value name="$currentProfit" exact="$cargoHauled * $fillLevelMod * ($buyoffer.unitprice - $selloffer.unitprice*$sameFactionBuyMod/100.0)" />
 						</do_if>
 						<do_else>
-							<set_value name="$currentProfit" exact="$cargoHauled * ($buyoffer.unitprice - $selloffer.unitprice)" />
+							<set_value name="$currentProfit" exact="$cargoHauled * $fillLevelMod * ($buyoffer.unitprice - $selloffer.unitprice)" />
 						</do_else>
 					</do_else>
 
@@ -165,6 +181,8 @@
 											+ ' need unitprice: ' + $buyoffer.unitprice
 											+ ' supp unitprice: ' + $selloffer.unitprice
 											+ ' faction buy modifier: ' + $sameFactionBuyMod
+											+ ' fill level: ' + $fillLevel
+											+ ' fill level mod: ' + $fillLevelMod
 											+ ' profit: ' + $currentProfit.formatted.{'%.s %Cr'}" />
 						<!-- TODO: better debug message to show owners of tradepartners -->
 					</do_if>
