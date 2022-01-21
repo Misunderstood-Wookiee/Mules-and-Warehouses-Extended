@@ -160,7 +160,6 @@
 							<set_value name="$fillLevelMod" exact="1"/>
 						</do_else>
 						<remove_value name="$targetAmount" />
-						<remove_value name="$fillLevel" />
 
 						<!-- how much profit for this trade? -->
 						<!-- If we use our own stations, we adjust the supply price by the sameFactionBuyMod to allow preferential treatment of player/owned supply chains -->
