@@ -270,7 +270,7 @@
             <set_value name="$isServingStationOrShip" exact="if ($homeStationOrShip != null) then true else false"/>
             <set_value name="$isServingSector" exact="if (($home.isclass.sector and $dedicatedServe) or ($home.isclass.{[class.ship, class.station]} and not $dedicatedServe)) then true else false"/>
             <set_value name="$isServingPlayer" exact="(not $isServingStationOrShip) or ($homeStationOrShip.owner == faction.player)" />
-            <set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions else $aiFactions" />
+            <set_value name="$serveFactions" exact="if ($isServingPlayer) then $playerFactions.clone else $aiFactions.clone" />
             <set_value name="$isServingArea" exact="$isServingPlayer and (not $dedicatedServe)" />
             <set_value name="$isDedicatedPlayerBuilder" exact="$isServingPlayer and $allowBuildstorage and (not $allowResources) and (not $allowIntermediates) and (not $allowTradewares)" />
 
