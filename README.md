@@ -113,7 +113,7 @@ If there are multiple possible trades, the supply mule will choose **based on po
 - If the mules are idle, it means they're not finding trades. 99% of the time this is not due to a bug, but simply because no trades pass their cuts. Usually, this means you have too many mules and not enough production to keep them busy. What I like to do is repurpose idle mules either to other mule jobs, or some type of auto trading (Tater Trader is our preference) until there is more work for them.
 - **For a minimal performance impact**, reduce the maximum number of trade offers the mule evaluates! **Reduce** the number of **Max Jumps** for travel and supply mules as much as possible, since every buy offer will be compared to every sell offer!
 
-## LICENCE
+## License
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 
