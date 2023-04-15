@@ -439,6 +439,10 @@
                                         <!-- this tends to happen for workforce related wares -->
                                         <continue chance="100*(($targetIsIntermediate) and ($targetStockLevel > 0.7))"/>
 
+                                        <do_if value="$supplyTarget.buyer == $supplySource.seller ">
+                                            <continue />
+                                        </do_if>
+
                                         <do_if value="$tradeAmount gt 0 and ($allowLowVol or $tradeAmount gt (this.ship.cargo.{$supplyTarget.ware}.max / 1.25) or ($supplyTarget.owner.class == class.buildstorage or $supplySource.owner.cargo.{$supplySource.ware}.target == 0))">
                                             <set_value name="$needFound" exact="true" />
                                             <create_trade_order name="$getSupply" object="this.object" tradeoffer="$supplySource" amount="$tradeAmount" immediate="false" />
