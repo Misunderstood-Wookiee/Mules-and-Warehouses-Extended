@@ -76,7 +76,7 @@ In general, the mule prioritizes build storage, then production needs, then inte
 - **Warebasket** - Wares the mule trades with (if not locked, will be auto-populated and updated by the script with all wares of the station to supply)
 - **Max Trades** - The max number of stops that can be made in an attempt to fill up the cargo hold. Each trade will have a minimum size of (100 / MaxTrades)% of the cargo hold full. i.e. a setting of 2 means each trade must be at least 50% of the hold. You can use this to avoid supply mules running low volume trades.
 - **Player Buy Mod** - Can be used to fake the sell prices on player-owned stations for profit calculations. As an extreme example, you can set it to 0 and the sell prices from player stations will be ignored.
-- **% of trades to eval** - Can be used to combat lage caused by aggressive trade searching, at 100%, evaluates all trades. If less than 100%, reduces the size of the trade lists for performance reasons.
+- **% of trades to eval** - Can be used to combat lag caused by aggressive trade searching, at 100%, evaluates all trades. If less than 100%, reduces the size of the trade lists for performance reasons.
 
 There are branches of priorities depending on whether a station is set in the UI and whether that station is owned by the player or the AI.
 
