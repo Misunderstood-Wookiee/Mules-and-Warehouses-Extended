@@ -104,6 +104,9 @@ There are branches of priorities depending on whether a station is set in the UI
 2. Any friendly **AI** faction (if checked).
 If there are multiple possible trades, the supply mule will choose **based on potential profit**.
 
+### Game Lags
+- Some lag spikes are possible in large search spaces. Typical culprits are a large number of jumps, and allowing AI suppliers. Based on the way we retrieve trade offers from the game, this may still cause you problems if those options allow a lot of stations.
+- Another source of lag spikes seems to be mimics,  be a little cautious with them and experiment if they're causing you problems.
 
 ### Some General Mule Advice
 - Make small changes at one time. Don't add storage to every Warehouse/Factory all at once. Don't add 10 travel mules or supply mules all at once. Your goal is to have just enough traders to move your goods without your factories or your traders idling. 
