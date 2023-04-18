@@ -76,6 +76,7 @@ In general, the mule prioritizes build storage, then production needs, then inte
 - **Warebasket** - Wares the mule trades with (if not locked, will be auto-populated and updated by the script with all wares of the station to supply)
 - **Max Trades** - The max number of stops that can be made in an attempt to fill up the cargo hold. Each trade will have a minimum size of (100 / MaxTrades)% of the cargo hold full. i.e. a setting of 2 means each trade must be at least 50% of the hold. You can use this to avoid supply mules running low volume trades.
 - **Player Buy Mod** - Can be used to fake the sell prices on player-owned stations for profit calculations. As an extreme example, you can set it to 0 and the sell prices from player stations will be ignored.
+- **% of trades to eval** - Can be used to combat lag caused by aggressive trade searching, at 100%, evaluates all trades. If less than 100%, reduces the size of the trade lists for performance reasons.
 
 There are branches of priorities depending on whether a station is set in the UI and whether that station is owned by the player or the AI.
 
@@ -105,7 +106,13 @@ There are branches of priorities depending on whether a station is set in the UI
 If there are multiple possible trades, the supply mule will choose **based on potential profit**.
 
 
-### Some General Mule Advice
+
+## Game Lags
+- Some lag spikes are possible in large search spaces. Typical culprits are a large number of jumps, and allowing AI suppliers. Based on the way we retrieve trade offers from the game, this may still cause you problems if those options allow a lot of stations.
+
+- Another source of lag spikes seems to be mimics,  be a little cautious with them and experiment if they're causing you problems.
+
+## Some General Mule Advice
 - Make small changes at one time. Don't add storage to every Warehouse/Factory all at once. Don't add 10 travel mules or supply mules all at once. Your goal is to have just enough traders to move your goods without your factories or your traders idling. 
 - The only mule that can add tradewares is the station mule with the "make target warehouse" option checked.
 - The new supply mule can actually work as a profit-seeking trader when assigned to an AI station and will prioritize player-owned goods. So a great way to move something you have a lot of stock of is to assign a couple of supply mules to an AI station with a high volume of demand. 
