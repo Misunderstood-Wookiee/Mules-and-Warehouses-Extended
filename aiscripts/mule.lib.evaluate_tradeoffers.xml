@@ -70,6 +70,13 @@
 						<continue />
 					</do_if>
 
+					<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'   Comparing:' 
+										+ ' buyer: ' + $buyoffer.buyer.knownname
+										+ ' (' + $buyoffer.buyer.idcode + ')'
+										+ ' seller: ' + $selloffer.seller.knownname
+										+ ' (' + $selloffer.seller.idcode + ')'
+										+ ' ware: ' + $buyoffer.ware" />
+
 					<!-- trade rule handling -->
 					<!-- the buyoffer faction needs to be allowed by the selloffer faction, and vice-versa -->
 					<set_value name="$buyofferRestrictionFactions" exact="$buyoffer.restriction.factions" />
@@ -93,24 +100,29 @@
 					<!-- if tradeoffer.restriction.inverted == 0, then the list returned by tradeoffer.restriction.factions is a whitelist. -->
 					<!-- This corresponds to checking the box for "restrict all factions" in the trade rule UI -->
 					<!-- so we have a buyer and a seller. We need to determine if either one is disallowed from the other -->
+
 					<!-- buyer whitelist case -->
 					<!-- inverted == 0 and supply owner not in the whitelist -->
 					<do_if value="($buyofferRestrictionInverted == 0) and (not $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - seller not in buyer whitelist'" />
 						<continue />
 					</do_if>
 					<!-- buyer blacklist case -->
 					<!-- inverted == 1 and supply owner in blacklist -->
 					<do_elseif value="($buyofferRestrictionInverted == 1) and ( $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - seller in buyer blacklist'" />
 						<continue />
 					</do_elseif>
 					<!-- seller whitelist case -->
 					<!-- inverted == 0 and need owner not in whitelist -->
 					<do_elseif value="($sellofferRestrictionInverted == 0) and (not $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - buyer not in seller whitelist'" />
 						<continue />
 					</do_elseif>
 					<!-- seller blacklist case -->
 					<!-- inverted == 1 and supply owner in blacklist -->
 					<do_elseif value="($sellofferRestrictionInverted == 1) and ( $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - buyer in seller blacklist'" />
 						<continue />
 					</do_elseif>
 
@@ -127,12 +139,14 @@
 
 					<!-- if there is nothing to trade, move on -->
 					<do_if value="$tradeAmount == 0">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - nothing to trade'" />
 						<continue />
 					</do_if>
 
 					<!-- if the trade is too small, move on -->
 					<!-- however, if the trade will finish off the build storage for that good, let it through -->
 					<do_if value="($tradeAmount*$buyoffer.ware.volume lt $minCargoSize) and not ($buyoffer.buyer.isclass.buildstorage and ($tradeAmount == $targetOfferedAmount))">
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - trade too small'" />
 						<continue />
 					</do_if>
 					
@@ -172,7 +186,7 @@
 					</do_else>
 
 					<do_if value="$debugchance">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$buyoffer.ware
+						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      ' + $buyoffer.ware
 											+ ' target desired amount ' + $targetOfferedAmount
 											+ ' supply amount: ' + $affordableAmount
 											+ ' ship can hold: ' + $cargoHauled
