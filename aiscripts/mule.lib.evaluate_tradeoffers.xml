@@ -103,22 +103,26 @@
 
 					<!-- buyer whitelist case -->
 					<!-- inverted == 0 and supply owner not in the whitelist -->
-					<do_if value="($buyofferRestrictionInverted == 0) and (not $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - seller not in buyer whitelist'" />
-						<continue />
+					<!-- Skip restriction check if both the ship doing the trade and station are player-owned -->
+					<do_if value="not ($buyoffer.buyer.owner == faction.player and $shipEntity.owner == faction.player)">
+						<do_if value="($buyofferRestrictionInverted == 0) and (not $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - seller not in buyer whitelist'" />
+							<continue />
+						</do_if>
+						<!-- buyer blacklist case -->
+						<!-- inverted == 1 and supply owner in blacklist -->
+						<do_elseif value="($buyofferRestrictionInverted == 1) and ( $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
+							<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - seller in buyer blacklist'" />
+							<continue />
+						</do_elseif>
 					</do_if>
-					<!-- buyer blacklist case -->
-					<!-- inverted == 1 and supply owner in blacklist -->
-					<do_elseif value="($buyofferRestrictionInverted == 1) and ( $buyofferRestrictionFactions.indexof.{$selloffer.seller.owner})">
-						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - seller in buyer blacklist'" />
-						<continue />
-					</do_elseif>
+					
 					<!-- seller whitelist case -->
 					<!-- inverted == 0 and need owner not in whitelist -->
-					<do_elseif value="($sellofferRestrictionInverted == 0) and (not $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
+					<do_if value="($sellofferRestrictionInverted == 0) and (not $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
 						<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'      Rejected - buyer not in seller whitelist'" />
 						<continue />
-					</do_elseif>
+					</do_if>
 					<!-- seller blacklist case -->
 					<!-- inverted == 1 and supply owner in blacklist -->
 					<do_elseif value="($sellofferRestrictionInverted == 1) and ( $sellofferRestrictionFactions.indexof.{$buyoffer.buyer.owner})">
