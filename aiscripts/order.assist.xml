@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd">
-<add sel="//do_if[@value='not $order.requiredskill or (this.combinedskill ge $order.requiredskill)']">
+<add sel="//do_if[@value='(@$orderdef and $createdefaultorder?) or not $order.requiredskill or (this.combinedskill ge $order.requiredskill)']">
 	<do_if value="$order.id == 'SupplyMule'">
 		<set_value name="$added"/>
 		<run_script name="$scriptname">

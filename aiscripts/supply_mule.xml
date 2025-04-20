@@ -384,6 +384,12 @@
                             <match class="$serveClass"/>
                             <match owner="$serveFactions"/>
                             <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
+                            <match_parent>
+                                <match_parent>
+                                    <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectortravel" object="this.ship" />
+                                    <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.sectoractivity" object="this.ship" />
+                                </match_parent>
+                            </match_parent>
                         </match_buyer>
                     </find_buy_offer>
                 </do_elseif>
