@@ -422,7 +422,7 @@
                     <!-- Create a tempoary list that should contain all needs based on the type given by the priority -->
                     <create_list name="$filteredNeeds" />
                     <!-- Check for every need if it fullfills the requirement and add -->
-                    <do_for_each chance="100*($needs.count > 0)" name="$need" in="$needs">
+                    <do_for_each chance="100*($needs.count gt 0)" name="$need" in="$needs">
                         <set_value name="$isResource" exact="$need.owner.resources.{$need.ware}.exists or $need.owner.supplyresources.{$need.ware}.exists"/>
                         <set_value name="$isProduct" exact="$need.owner.products.{$need.ware}.exists"/>
                         <!-- X4 treats products and resources always as tradewares... -->
@@ -528,7 +528,7 @@
 
                         <!-- emergency break to prevent mule from freezing the screen (in theory they should never crash) -->
                         <set_value name="$emergencyBreak" operation="add" exact="1"/>
-                        <do_if value="$emergencyBreak > 100">
+                        <do_if value="$emergencyBreak gt 100">
                             <set_value name="$emergencyText" exact="'Suppymule %s (%s) crashed. Check debug log for more infos and report this error to the mod developers (with a full debug log file).'.[this.ship.knownname, this.ship.idcode]"/>
                             <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="$emergencyText" />
                             <write_to_logbook category="alerts" object="this.ship" title="'Supplymule crashed!'" interaction="showonmap" text="$emergencyText" />

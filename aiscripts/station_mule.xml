@@ -428,7 +428,7 @@
                                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  sourceIsWare ' +$sourceIsWare" />
                                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetIsIntermediate ' +$targetIsIntermediate" />
                                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  targetStockLevel ' +$targetStockLevel" />
-                                        <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  continue ' +100*(($targetIsIntermediate) and ($targetStockLevel > 0.7))" />
+                                        <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  continue ' +100*(($targetIsIntermediate) and ($targetStockLevel gt 0.7))" />
                                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  this.ship.cargo.{$supplyTarget.ware}.max / 1.25 ' +this.ship.cargo.{$supplyTarget.ware}.max / 1.25" />
                                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  supplytargetDesiredAmount ' + $supplyTarget.desiredamount" />
                                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="'MulesExtended'" text="'  supplytargetAmount ' + $supplyTarget.amount" />
@@ -437,7 +437,7 @@
 
                                         <!-- avoid taking something to the target that it's already creating, if it's over 30% full -->
                                         <!-- this tends to happen for workforce related wares -->
-                                        <continue chance="100*(($targetIsIntermediate) and ($targetStockLevel > 0.7))"/>
+                                        <continue chance="100*(($targetIsIntermediate) and ($targetStockLevel gt 0.7))"/>
 
                                         <do_if value="$supplyTarget.buyer == $supplySource.seller ">
                                             <continue />

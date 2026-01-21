@@ -38,7 +38,7 @@
 			<do_if value="this.ship.iscapitalship and not this.ship.units.{unitcategory.transport}.count">
 				<create_list name="$filteredSelloffers" />
 				<do_for_each name="$selloffer" in="$selloffers">
-					<append_to_list chance="100*($selloffer.seller.units.{unitcategory.transport}.count > 0)" name="$filteredSelloffers" exact="$selloffer"/>
+					<append_to_list chance="100*($selloffer.seller.units.{unitcategory.transport}.count gt 0)" name="$filteredSelloffers" exact="$selloffer"/>
 				</do_for_each>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s selloffers due to missing cargo drones.'.[$selloffers.count - $filteredSelloffers.count]" />
 				<set_value name="$selloffers" exact="$filteredSelloffers"/>
@@ -46,7 +46,7 @@
 				
 				<create_list name="$filteredBuyoffers" />
 				<do_for_each name="$buyoffer" in="$buyoffers">
-					<append_to_list chance="100*($buyoffer.buyer.units.{unitcategory.transport}.count > 0)" name="$filteredBuyoffers" exact="$buyoffer"/>
+					<append_to_list chance="100*($buyoffer.buyer.units.{unitcategory.transport}.count gt 0)" name="$filteredBuyoffers" exact="$buyoffer"/>
 				</do_for_each>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s buyoffers due to missing cargo drones.'.[$buyoffers.count - $filteredBuyoffers.count]" />
 				<set_value name="$buyoffers" exact="$filteredBuyoffers"/>
