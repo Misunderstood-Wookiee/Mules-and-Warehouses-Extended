@@ -210,21 +210,21 @@
 					</do_if>
 
 					<!-- if we found a new best trade, set it! -->
-					<do_if value="$currentProfit > $bestProfit">
+					<do_if value="$currentProfit gt $bestProfit">
 						<set_value name="$bestProfit" exact="$currentProfit" />
 						<set_value name="$bestNeedTrade" exact="$buyoffer" />
 						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_if>
 					<!--search for the best trade amount in the same fill level region between supply offers of the same ware-->
-					<do_elseif value="$dedicatedPlayerBuilder and ($currentProfit == $bestProfit) and ($tradeAmount > $bestAmount) and ($bestNeedTrade.ware.id == $buyoffer.ware.id)" >
+					<do_elseif value="$dedicatedPlayerBuilder and ($currentProfit == $bestProfit) and ($tradeAmount gt $bestAmount) and ($bestNeedTrade.ware.id == $buyoffer.ware.id)" >
 						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_elseif>
 					<wait sinceversion="2" exact="1ms"/>
 				</do_for_each>
 			</do_for_each>
-			<do_if value="$bestProfit > 0">
+			<do_if value="$bestProfit gt 0">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Suggested Trade is: Buy %s %s from %s (%s) and sell to %s (%s) with %s of profit.'.[
 										 $bestAmount,
 										 $bestSupplyTrade.ware,
