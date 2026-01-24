@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="mule.lib.debug.dump_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="p:\X4\Database\libraries\aiscripts.xsd" version="8">
+<aiscript name="mule.lib.debug.dump_tradeoffers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\..\..\unpack-cat-files\libraries\aiscripts.xsd" version="8">
 	<params>
 		<!-- describtive header to be included before dump of offers -->
 		<param name="headerline" default="offers"/>
