@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<aiscript name="mule.lib.empty_cargo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd" version="1">
+<aiscript name="mule.lib.empty_cargo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\..\..\unpack-cat-files\libraries\aiscripts.xsd" version="1">
     <!-- triggers when a mule aiscript starts while the mule already has cargo in the hold -->
     <!-- can happen because the player changes the ship's order, or when X4 invalidates a trade -->
     <!-- we delete the ware, and give the player money at the ware's defined averageprice -->
