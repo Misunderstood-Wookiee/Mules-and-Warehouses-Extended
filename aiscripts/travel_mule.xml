@@ -183,6 +183,7 @@
                                 <match tradesknownto="this.owner" />
                                 <match owner="this.ship.owner" negate="true" />
                                 <match class="class.station" />
+                                <match known="true" />
                                 <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                 <match_parent>
                                     <match_parent>
@@ -203,6 +204,7 @@
                                 <match tradesknownto="this.owner" />
                                 <match owner="this.ship.owner" negate="true" />
                                 <match class="class.station" />
+                                <match known="true" />
                                 <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                 <match_parent>
                                     <match_parent>
@@ -233,6 +235,7 @@
                                     <match tradesknownto="this.owner" />
                                     <match owner="this.ship.owner" negate="true" />
                                     <match class="class.station" />
+                                    <match known="true" />
                                     <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                     <match_parent>
                                         <match_parent>
@@ -253,6 +256,7 @@
                                     <match tradesknownto="this.owner" />
                                     <match owner="this.ship.owner" negate="true" />
                                     <match class="class.station" />
+                                    <match known="true" />
                                     <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                     <match_parent>
                                         <match_parent>

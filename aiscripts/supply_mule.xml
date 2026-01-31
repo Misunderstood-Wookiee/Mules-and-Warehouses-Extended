@@ -383,6 +383,7 @@
                             <match tradesknownto="this.owner"/>
                             <match class="$serveClass"/>
                             <match owner="$serveFactions"/>
+                            <match known="true" />
                             <match_gate_distance object="$homeSector" min="0" max="$maxDist">
                                 <blacklist group="blacklistgroup.civilian" object="this.ship" />
                             </match_gate_distance>
