@@ -25,6 +25,8 @@
 	</params>
 	<attention min="unknown">
 		<actions>
+			<!-- Yield to prevent instant return causing infinite wake loops (issue #161) -->
+			<wait exact="1ms" />
 			<!-- Default values for best trade -->
 			<set_value name="$bestProfit" exact="0Cr" />
 			<set_value name="$bestAmount" exact="0" />

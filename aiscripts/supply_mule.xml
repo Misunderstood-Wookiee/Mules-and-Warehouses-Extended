@@ -529,6 +529,8 @@
                     <set_value name="$occupiedCargo" exact="$ShipCapacity - this.ship.cargo.free.all" />
                     <set_value name="$emergencyBreak" exact="0"/>
                     <do_while value="true">
+                        <!-- Prevent tight loop that causes game stuttering (issue #161) -->
+                        <wait exact="1ms" />
                         <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Occupied Cargo: ' + $occupiedCargo" />
 
                         <!-- emergency break to prevent mule from freezing the screen (in theory they should never crash) -->
