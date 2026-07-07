@@ -29,7 +29,11 @@ Now possible to assign Mules to station with assignment="assignment.trade" while
 
             Overall, this has the effect of checking if the ship is running our Mules command
         -->
-        <do_if value="$object.defaultorder? and global.$mwex_AllMulesCommandTags.indexof.{($object.defaultorder).id}">
+        <!-- X4 9.0 fix: use vanilla-idiom @-prefix null-safe path access.
+             Both parse-time validation AND runtime succeed because @$object.defaultorder.id
+             returns null if any link is null; indexof.{null} returns 0 (false), so the
+             whole expression safely evaluates to false when ship has no default order. -->
+        <do_if value="global.$mwex_AllMulesCommandTags.indexof.{@$object.defaultorder.id}">
             <set_value name="$flag_mwex_shipismule" exact="true" comment="Actual value not important; we simply need this variable to be here" />
         </do_if>
     </add>
