@@ -25,6 +25,8 @@
 	</params>
 	<attention min="unknown">
 		<actions>
+			<!-- Yield to prevent instant return causing infinite wake loops (issue #161) -->
+			<wait exact="1ms" />
 			<!-- Default values for best trade -->
 			<set_value name="$bestProfit" exact="0Cr" />
 			<set_value name="$bestAmount" exact="0" />
@@ -38,7 +40,7 @@
 			<do_if value="this.ship.iscapitalship and not this.ship.units.{unitcategory.transport}.count">
 				<create_list name="$filteredSelloffers" />
 				<do_for_each name="$selloffer" in="$selloffers">
-					<append_to_list chance="100*($selloffer.seller.units.{unitcategory.transport}.count > 0)" name="$filteredSelloffers" exact="$selloffer"/>
+					<append_to_list chance="100*($selloffer.seller.units.{unitcategory.transport}.count gt 0)" name="$filteredSelloffers" exact="$selloffer"/>
 				</do_for_each>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s selloffers due to missing cargo drones.'.[$selloffers.count - $filteredSelloffers.count]" />
 				<set_value name="$selloffers" exact="$filteredSelloffers"/>
@@ -46,7 +48,7 @@
 				
 				<create_list name="$filteredBuyoffers" />
 				<do_for_each name="$buyoffer" in="$buyoffers">
-					<append_to_list chance="100*($buyoffer.buyer.units.{unitcategory.transport}.count > 0)" name="$filteredBuyoffers" exact="$buyoffer"/>
+					<append_to_list chance="100*($buyoffer.buyer.units.{unitcategory.transport}.count gt 0)" name="$filteredBuyoffers" exact="$buyoffer"/>
 				</do_for_each>
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s buyoffers due to missing cargo drones.'.[$buyoffers.count - $filteredBuyoffers.count]" />
 				<set_value name="$buyoffers" exact="$filteredBuyoffers"/>
@@ -210,21 +212,21 @@
 					</do_if>
 
 					<!-- if we found a new best trade, set it! -->
-					<do_if value="$currentProfit > $bestProfit">
+					<do_if value="$currentProfit gt $bestProfit">
 						<set_value name="$bestProfit" exact="$currentProfit" />
 						<set_value name="$bestNeedTrade" exact="$buyoffer" />
 						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_if>
 					<!--search for the best trade amount in the same fill level region between supply offers of the same ware-->
-					<do_elseif value="$dedicatedPlayerBuilder and ($currentProfit == $bestProfit) and ($tradeAmount > $bestAmount) and ($bestNeedTrade.ware.id == $buyoffer.ware.id)" >
+					<do_elseif value="$dedicatedPlayerBuilder and ($currentProfit == $bestProfit) and ($tradeAmount gt $bestAmount) and ($bestNeedTrade.ware.id == $buyoffer.ware.id)" >
 						<set_value name="$bestSupplyTrade" exact="$selloffer" />
 						<set_value name="$bestAmount" exact="$tradeAmount" />
 					</do_elseif>
 					<wait sinceversion="2" exact="1ms"/>
 				</do_for_each>
 			</do_for_each>
-			<do_if value="$bestProfit > 0">
+			<do_if value="$bestProfit gt 0">
 				<debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'Suggested Trade is: Buy %s %s from %s (%s) and sell to %s (%s) with %s of profit.'.[
 										 $bestAmount,
 										 $bestSupplyTrade.ware,

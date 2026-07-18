@@ -183,6 +183,7 @@
                                 <match tradesknownto="this.owner" />
                                 <match owner="this.ship.owner" negate="true" />
                                 <match class="class.station" />
+                                <match known="true" />
                                 <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                 <match_parent>
                                     <match_parent>
@@ -203,6 +204,7 @@
                                 <match tradesknownto="this.owner" />
                                 <match owner="this.ship.owner" negate="true" />
                                 <match class="class.station" />
+                                <match known="true" />
                                 <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                 <match_parent>
                                     <match_parent>
@@ -233,6 +235,7 @@
                                     <match tradesknownto="this.owner" />
                                     <match owner="this.ship.owner" negate="true" />
                                     <match class="class.station" />
+                                    <match known="true" />
                                     <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                     <match_parent>
                                         <match_parent>
@@ -253,6 +256,7 @@
                                     <match tradesknownto="this.owner" />
                                     <match owner="this.ship.owner" negate="true" />
                                     <match class="class.station" />
+                                    <match known="true" />
                                     <match_use_blacklist group="blacklistgroup.civilian" type="blacklisttype.objectactivity" object="this.ship" />
                                     <match_parent>
                                         <match_parent>
@@ -313,7 +317,7 @@
             <do_if value="this.ship.iscapitalship and not this.ship.units.{unitcategory.transport}.count">
                 <create_list name="$filteredSupplies" />
                 <do_for_each name="$supply" in="$supplies">
-                    <append_to_list chance="100*($supply.seller.units.{unitcategory.transport}.count > 0)" name="$filteredSupplies" exact="$supply"/>
+                    <append_to_list chance="100*($supply.seller.units.{unitcategory.transport}.count gt 0)" name="$filteredSupplies" exact="$supply"/>
                 </do_for_each>
                 <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s selloffers due to missing cargo drones.'.[$supplies.count - $filteredSupplies.count]" />
                 <set_value name="$supplies" exact="$filteredSupplies"/>
@@ -321,7 +325,7 @@
 
                 <create_list name="$filteredNeeds" />
                 <do_for_each name="$need" in="$needs">
-                    <append_to_list chance="100*($need.buyer.units.{unitcategory.transport}.count > 0)" name="$filteredNeeds" exact="$need"/>
+                    <append_to_list chance="100*($need.buyer.units.{unitcategory.transport}.count gt 0)" name="$filteredNeeds" exact="$need"/>
                 </do_for_each>
                 <debug_to_file chance="$debugchance" name="$debugFileName" directory="$debugDirName" text="'filering %s buyoffers due to missing cargo drones.'.[$needs.count - $filteredNeeds.count]" />
                 <set_value name="$needs" exact="$filteredNeeds"/>
